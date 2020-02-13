@@ -1,0 +1,54 @@
+---
+title: <center>Welcome to the READi (Real-World Evidence Assessments and Needs Guidance) Tool</center>
+author: <center>presented by The CHOICE Institute</center>
+output:
+  html_document:
+    theme: lumen
+    includes:
+      before_body: homeheader.Rhtml
+---
+
+<style>
+  h2,h3,h4{
+    color: purple 
+  }
+  
+  h1{
+    font-size: 25px ;
+    color: purple ;
+    font-style: oblique
+  }
+</style>
+
+
+<center>The READi Tool is a comprehensive online tool to guide literature review and coverage decision-making</center>
+<br>
+
+<center>Once you have decided you need real world evidence to answer your question of interest, the READi tool will guide you through a 3-Phase processs of evaluating the literature to inform your adoption decision.</center>
+<br>
+<br>
+
+
+#### Phase 1:
+Identifying Real World Evidence (RWE) Needs
+<br>
+<br>
+
+#### Phase 2:
+Reviewing and Grading Evidence. This phase assumes you have conducted your literature search and have identified your studies of interest from Phase 1.
+<br>
+
+- Phase 2.1:
+Rate the quality of each study.
+<br>
+
+- Phase 2.2:
+Rate the quality of the body of evidence for each outcome of interest.
+<br>
+<br>
+
+#### Phase 3:
+Making evidenced-based Recommendations
+<br>
+<br>
+<br>
