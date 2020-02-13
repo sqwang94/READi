@@ -32,7 +32,6 @@ ui <- function(request){
                  tabPanel("Home",
                           fluidPage(
                             bookmarkButton(),
-                            
                             includeHTML("home.html")
                           )),
                  
