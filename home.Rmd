@@ -10,9 +10,9 @@ output:
 
 <style>
   h2,h3,h4{
-    color: purple 
+    color: purple
   }
-  
+
   h1{
     font-size: 25px ;
     color: purple ;
