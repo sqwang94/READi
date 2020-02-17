@@ -1,3 +1,5 @@
+source("evalPage/IndividualStudyEval/Robins/robins.R")
+
 # UI function for individual study eval
 individualStudyEvalUI <- function(id, studyId) {
     ns <- NS(id)
@@ -93,17 +95,13 @@ individualStudyEval <- function(input, output, session) {
                                                       selected = character(0))}),
                       br(),
                       br(),
-                      radioButtons(inputId = ns("input"), label = strong("1C. Overall: Based on the rating for each question,
-                                                                    please give a general rating of the quality of this study. (Good; Fair; Poor)"),
-                                   
-                                   choices = choice_quasi,
-                                   selected = character(0))
+                      radioButtons(inputId = ns("input"),
+                                    label = strong("1C. Overall: Based on the rating for each question, please give a general rating of the quality of this study. (Good; Fair; Poor)"),
+                                    choices = choice_quasi,
+                                    selected = character(0))
             )
         } else if (input$study_design %in% c("Prospective cohort study", "Retrospective cohort study", "Case-control study")) {
-            wellPanel(strong("1B. Please rate the risk of bias of this study using the ROBINS-I assessment tool"),
-                      br(),
-                      tagList(a("Robins-I", href="https://sites.google.com/site/riskofbiastool/welcome/home", target = "_blank"))
-            )
+            robinsUI(ns("robins"))
         } else if (input$study_design == "Systematic review/Meta-analysis/Network Meta-analysis") {
             wellPanel(strong("1B. Please rate the quality of the study using the AMSTAR 2 Checklist."),
                       br(),
@@ -113,4 +111,7 @@ individualStudyEval <- function(input, output, session) {
             return()
         }
     })
+    callModule(robinsServer, "robins")
 }
+
+

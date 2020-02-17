@@ -36,7 +36,6 @@ evalPage <- function(input, output, session, numOfStudy) {
 #Add and remove functionality for the studies evals
 evalPageFunction <- function(input, output, session) {
     ns <- session$ns
-    
     observe({
         if (req(input$navBar) == "Add") {
             newTabId <- input$studyCounter + 1
