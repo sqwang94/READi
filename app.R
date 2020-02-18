@@ -31,7 +31,7 @@ input_validation <- function(x){                    # a function to validate inp
 # Define UI for application that draws a histogram
 ui <- function(request){
   fluidPage(
-    theme = shinytheme("cerulean"),
+    theme = shinytheme("lumen"),
     useShinyjs(),
     extendShinyjs(text = jscode),
     tags$head(
