@@ -37,14 +37,16 @@ ui <- function(request){
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
     ),
-    navbarPage("READi Tool", collapsible = TRUE,
+    navbarPage("READi Tool",
+               id = "tabs",
+               collapsible = TRUE,
                        tabPanel("Home",
                                 homePageUI),
                        
                        # ---------------------------  ----------------------------------#
                        # --------------------------- Phase 1: RWE ----------------------------------#
                        # ---------------------------  ----------------------------------#
-                       tabPanel("Phase 1: Identify Real World Evidence",
+                     tabPanel("Phase 1: Identify Real World Evidence", value = "tab1",
                                 column(2, 
                                        dropdownButton(
                                          print("This page will allow you to enter all the details of studies
@@ -177,7 +179,7 @@ ui <- function(request){
                        # ---------------------------  ----------------------------------#
                        # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                        # ---------------------------  ----------------------------------#
-                       tabPanel("Phase 2: Reviewing and Grading of Evidence",
+                       tabPanel("Phase 2: Reviewing and Grading of Evidence", value = "tab2",
                                 column(8, offset = 2,
                                        wellPanel(
                                          radioButtons("t2_ev_available",
@@ -205,7 +207,7 @@ ui <- function(request){
                        # ---------------------------  ----------------------------------#
                        # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
                        # ---------------------------  ----------------------------------#
-                       tabPanel("Phase 3: Making Evidence-Based Recommendations",
+                       tabPanel("Phase 3: Making Evidence-Based Recommendations", value = "tab3",
                                 uiOutput("t3_pt1"),
                                 column(8, offset = 2,
                                        wellPanel(
@@ -218,6 +220,16 @@ ui <- function(request){
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+  
+  hideTab(inputId = "tabs", target = "tab1")
+  hideTab(inputId = "tabs", target = "tab2")
+  hideTab(inputId = "tabs", target = "tab3")
+  
+  observeEvent(input$beginPhase,{
+    showTab(inputId = "tabs", target = "tab1")
+  })
+  
+  
   
          # ---------------------------  ----------------------------------#
   # --------------------------- Phase 1: RWE ----------------------------------#
@@ -315,7 +327,8 @@ server <- function(input, output, session) {
                      html = TRUE,
                      type = "success",
                      btn_labels = c("Great")
-                     ) 
+                     )
+                   
                  
                  # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
                } else {
@@ -330,6 +343,14 @@ server <- function(input, output, session) {
                }
   )
   
+  observeEvent(input$submit_1,
+               if(input_validation(t1_inputs())){
+                 showTab(inputId = "tabs", target = "tab2")
+                 showTab(inputId = "tabs", target = "tab3")
+               } else {
+                 return()
+               })
+ 
            # ---------------------------  ----------------------------------#
       # --------------------------- Phase 2: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
