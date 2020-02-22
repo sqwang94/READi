@@ -44,17 +44,19 @@ evalPage <- function(input, output, session) {
     
     # ------ Creating reactionary wellPanel based on how many studies selected ------- # 
     output$study_react <- renderUI({    # goal: create panels of questions in response to "How many studies did you find?"
-        num_studies <- input$t2_n_studies  # defining number of studies
-
         if(input$t2_ev_available == "No"){
             return(" If no relevant literature can be found, please click `Submit` below and proceed to Phase 3.")
-        } else if(num_studies == 0){
-            return("Please select the number of studies identified above!")
-        } else {
-            our_ui <- studyNavUI(ns("study_nav"), num_studies)
-            callModule(studyNav, "study_nav", num_studies)
         }
-        our_ui
+        if (!is.null(input$t2_n_studies)) {
+            num_studies <- input$t2_n_studies  # defining number of studies
+            if(num_studies == 0){
+                return("Please select the number of studies identified above!")
+            } else {
+                our_ui <- studyNavUI(ns("study_nav"), num_studies)
+                callModule(studyNav, "study_nav", num_studies)
+            }
+            our_ui
+        }
     })
     callModule(studyNavGlobal, "study_nav")
 
@@ -62,7 +64,7 @@ evalPage <- function(input, output, session) {
     observeEvent(input$submit_2, {
         inputs <- callModule(studyNavValidation, "study_nav")
         if (input$t2_ev_available == "Yes" && input$t2_n_studies == 0 || length(inputs()) == 0) {
-            return()                # does not allow submission if study identified but no study is filled 
+            return()    # does not allow submission if study identified but no study is filled 
         }
         if (input_validation(inputs())) {
             sendSweetAlert(        # if all inputs are valid, submission successful

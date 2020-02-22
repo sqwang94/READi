@@ -118,10 +118,12 @@
   color: #157ab5;
 }
 
-.Error {
+input.Error {
   border-color: red;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px red;
 }
 
-.Error .radio-inline span {
-  color: red;
+.Error .shiny-options-group {
+  box-shadow: 0 0 10px 1px red;
+  border-radius: 5px
 }

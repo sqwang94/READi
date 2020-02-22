@@ -136,6 +136,7 @@ identifyPageUI <- function(id) {
 
 # server function for phase 1 identification of evidence page
 identifyPage <- function(input, output, session, parentSession) {
+    ns <- session$ns
     
     # The following renders questions for Phase1, Question 2 (O)
     output$multoutcomes <- renderUI({
@@ -147,7 +148,6 @@ identifyPage <- function(input, output, session, parentSession) {
             textInput("t1_secondary_outcome",
                       "(O) c. What is your secondary outcome of interest?")
         }
-        
     })
     
     # The following renders questions for Phase1, Question 3
@@ -194,13 +194,19 @@ identifyPage <- function(input, output, session, parentSession) {
     })
     
     # Creating list to check if all inputs are valid (not NULL)
-    t1_inputs <- reactive({                           
-        list(Pop_interest = input$t1_pop_interest,
-             int_interest = input$t1_int_interest,
-             comparator = input$t1_comparator,
-             primary_outcomes = input$t1_poutcome,
-             setting = input$t1_setting, 
-             a_interest = input$t1_AOI)
+    t1_inputs <- reactive({ 
+        inputs <- list()
+        inputs[[ns("t1_pop_interest")]] = input$t1_pop_interest
+        inputs[[ns("t1_int_interest")]] = input$t1_int_interest
+        inputs[[ns("t1_comparator")]] = input$t1_comparator
+        inputs[[ns("t1_poutcome")]] = input$t1_poutcome
+        inputs[[ns("t1_setting")]] = input$t1_setting
+        aoi <- input$t1_AOI
+        if (is.null(input$t1_AOI)) {
+            aoi <- ""
+        }
+        inputs[[ns("t1_AOI")]] = aoi
+        return(inputs)
     })
     
     
@@ -217,39 +223,42 @@ identifyPage <- function(input, output, session, parentSession) {
         
     })
     
-    input_validation <- function(x){                    # a function to validate inputs for submission
-        logic_list <- lapply(x, isTruthy)                 # create a list of logical values
-        unlisted_vec <- unlist(logic_list)                # unlist to sum
-        sum(unlisted_vec) == length(unlisted_vec)         # logical testing whether there are any "non-True" values
-    }
-    
-    observeEvent(input$submit_1,
-                 if (input_validation(t1_inputs())) {
-                     search_string()
-                     text <- paste("Take a look at your custom PubMed search <a href=\'", search_string(),"\' target=\"_blank\">here</a>. You'll use the studies identified here for grading in phase 2!")
-                     sendSweetAlert(        # if all inputs are valid, submission successful
-                         session = session,
-                         title = "Submitted!", 
-                         text = HTML(text),
-                         html = TRUE,
-                         type = "success",
-                         btn_labels = c("Great")
-                     ) 
-                     showTab(session = parentSession, inputId = "tabs", target = "tab2")
-                     showTab(session = parentSession, inputId = "tabs", target = "tab3")
-                     updateNavbarPage(parentSession, "tabs", "tab2")
-                     
-                     # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
-                 } else {
-                     sendSweetAlert(         # add error message if user needs more information
-                         session = session,
-                         title = "Oops!",
-                         text = "It looks like you may not have answered all the questions!",
-                         type = "error",
-                         btn_labels = c("Go back")
-                     )
-                 }
-    )
+    # event listener for phase 1 submit button, including input validation
+    observeEvent(input$submit_1, {
+        inputs <- t1_inputs()
+        for (key in names(inputs)) {    # add Error class for visual alert on missing input fields
+            if (inputs[key] == "") {
+                addClass(selector = paste0("#", key), class="Error")
+            } else {
+                removeClass(selector = paste0("#", key), class="Error")
+            }
+        }
+        if (input_validation(t1_inputs())) {
+            search_string()
+            text <- paste("Take a look at your custom PubMed search <a href=\'", search_string(),"\' target=\"_blank\">here</a>. You'll use the studies identified here for grading in phase 2!")
+            sendSweetAlert(        # if all inputs are valid, submission successful
+                session = session,
+                title = "Submitted!", 
+                text = HTML(text),
+                html = TRUE,
+                type = "success",
+                btn_labels = c("Great")
+            ) 
+            showTab(session = parentSession, inputId = "tabs", target = "tab2")
+            showTab(session = parentSession, inputId = "tabs", target = "tab3")
+            updateNavbarPage(parentSession, "tabs", "tab2")
+            
+            # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
+        } else {
+            sendSweetAlert(         # add error message if user needs more information
+                session = session,
+                title = "Oops!",
+                text = "It looks like you may not have answered all the questions!",
+                type = "error",
+                btn_labels = c("Go back")
+            )
+        }
+    })
 }
 
 # returns the number of outcomes and the primary outcome input from phase 1

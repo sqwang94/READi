@@ -48,7 +48,6 @@ ui <- function(request){
                                wellPanel(
                                  wellPanel(
                                    htmlOutput("t3_table")))))
-                       
   ))
 } # closing function (function necessary for bookmarking)
 
@@ -70,14 +69,14 @@ server <- function(input, output, session) {
            # ---------------------------  ----------------------------------#
     callModule(identifyPage, "identify_page", session)
     
-             # ---------------------------  ----------------------------------#
-        # --------------------------- Phase 2: RWE ----------------------------------#
-             # ---------------------------  ----------------------------------#
+           # ---------------------------  ----------------------------------#
+    # --------------------------- Phase 2: RWE ----------------------------------#
+           # ---------------------------  ----------------------------------#
     callModule(evalPage, "eval_page")
     
-            # ---------------------------  ----------------------------------#
-        # --------------------------- Phase 3: RWE ----------------------------------#
-            # ---------------------------  ----------------------------------#
+           # ---------------------------  ----------------------------------#
+    # --------------------------- Phase 3: RWE ----------------------------------#
+           # ---------------------------  ----------------------------------#
 
     
     output$t3_pt1 <- renderUI({
@@ -136,7 +135,6 @@ server <- function(input, output, session) {
                                   placement = "left",
                                   trigger = "hover")))
             })
-
     })
     
     output$t3_table <- renderText({
@@ -162,7 +160,6 @@ server <- function(input, output, session) {
         df <- data.frame(
           Domains           = domain_vec,
           `Primary Outcome` = outcomes
-          
         )
         
           kable(df,
@@ -174,8 +171,6 @@ server <- function(input, output, session) {
                           bootstrap_options = c("striped", "hover", "condensed", "bordered")) %>% 
             row_spec(c(1,3,5,7), background = "#d1b3e6", color = "black") %>% 
             row_spec(c(2,4,6,8), background = "white", color = "black")
-        
-        
       } else {
         outcomes <- list(c(outcome$poutcome,
                            input$t3_studylim_1, 
@@ -212,8 +207,6 @@ server <- function(input, output, session) {
       }
       
       })
-    
-    
   }
 
 # Run the application 

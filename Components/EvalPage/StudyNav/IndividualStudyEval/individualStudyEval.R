@@ -126,8 +126,8 @@ individualStudyInputValidation <- function(input, output, session) {
                 }
                 inputs[[ns(paste0("input", i))]] <- selected
             }
-            eval <- input[["input"]]
-            if (is.null(input[["input"]])) {
+            eval <- input$input
+            if (is.null(input$input)) {
                 eval <- ""
             }
             inputs[[ns("input")]] <- eval

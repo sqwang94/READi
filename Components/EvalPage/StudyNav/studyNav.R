@@ -24,7 +24,7 @@ studyNavUI <- function(id, numOfStudy) {
     return(div(do.call(navbarPage, c(title=NULL, title="Literature", id=ns("navBar"), collapsible = TRUE, panels)), div(class = "hidden", numericInput(ns("studyCounter"), NULL, value = numOfStudy))))
 }
 
-# Server function for studies navigation component
+# server function for studies navigation component
 studyNav <- function(input, output, session, numOfStudy) {
     lapply(1:numOfStudy, function(i) {
         callModule(studyNavButton, paste0("buttons", i), session, i)
@@ -36,40 +36,52 @@ studyNav <- function(input, output, session, numOfStudy) {
 # global add and remove functionality for the studies navigation
 studyNavGlobal <- function(input, output, session) {
     ns <- session$ns
+    
+    # add a new page to the studies navigation
+    addPageHandler <- function(tabId) {
+        selector <- paste0("#eval_page-study_react ul li:nth-child(", tabId, ")>a")
+        runjs(paste0("document.querySelector('", selector, "').blur()"))
+        updateNumericInput(session, "studyCounter", value = tabId)
+        removeClass(selector = ".Last", class="Last")
+        removeClass(selector = "#filler-remove", class="Hidden")
+        class <- "Last"
+        if (tabId == 1) {
+            class <- "First Last"
+        }
+        insertTab("navBar",
+                  tabPanel(class = class, title = toString(tabId), value = toString(tabId), individualStudyEvalUI(ns(paste0("study", tabId)), tabId), studyNavButtonButton(ns(paste0("buttons", tabId)))),
+                  target = "Add", select = TRUE, position = "before")
+        callModule(studyNavButton, paste0("buttons", tabId), session, tabId)
+        callModule(individualStudyEval, paste0("study", tabId))
+    }
+    
+    # remove the last page from the studies navigation
+    removePageHandler <- function(tabId) {
+        if (tabId > 0) {
+            selector <- paste0("#eval_page-study_react ul li:nth-child(", tabId + 2, ")>a")
+            runjs(paste0("document.querySelector('", selector, "').blur()"))
+            updateNavbarPage(session, "navBar", "1")
+            updateNumericInput(session, "studyCounter", value = tabId - 1)
+            removeTab("navBar", toString(tabId))
+            addClass(selector = paste0("#eval_page-study_react .tab-content .tab-pane:nth-child(", tabId - 1, ")"), class="Last")
+            if (tabId == 1) {
+                addClass(selector = "#filler-remove", class="Hidden")
+            }
+        }
+    }
+    
+    # event listener for add and remove
     observe({
         # add functionallity for the studies navigation
         if (req(input$navBar) == "Add") {
             newTabId <- input$studyCounter + 1
-            selector <- paste0("#eval_page-study_react ul li:nth-child(", newTabId, ")>a")
-            runjs(paste0("document.querySelector('", selector, "').blur()"))
-            updateNumericInput(session, "studyCounter", value = newTabId)
-            removeClass(selector = ".Last", class="Last")
-            removeClass(selector = "#filler-remove", class="Hidden")
-            class <- "Last"
-            if (newTabId == 1) {
-                class <- "First Last"
-            }
-            insertTab("navBar",
-                      tabPanel(class = class, title = toString(newTabId), value = toString(newTabId), individualStudyEvalUI(ns(paste0("study", newTabId)), newTabId), studyNavButtonButton(ns(paste0("buttons", newTabId)))),
-                      target = "Add", select = TRUE, position = "before")
-            callModule(studyNavButton, paste0("buttons", newTabId), session, newTabId)
-            callModule(individualStudyEval, paste0("study", newTabId))
+            addPageHandler(newTabId)
         }
         
         # remove functionallity for the studies navigation
         if (req(input$navBar) == "Remove") {
             removeTabId <- input$studyCounter
-            if (removeTabId > 0) {
-                selector <- paste0("#eval_page-study_react ul li:nth-child(", removeTabId + 2, ")>a")
-                runjs(paste0("document.querySelector('", selector, "').blur()"))
-                updateNavbarPage(session, "navBar", "1")
-                updateNumericInput(session, "studyCounter", value = removeTabId - 1)
-                removeTab("navBar", toString(removeTabId))
-                addClass(selector = paste0("#eval_page-study_react .tab-content .tab-pane:nth-child(", removeTabId - 1, ")"), class="Last")
-                if (removeTabId == 1) {
-                    addClass(selector = "#filler-remove", class="Hidden")
-                }
-            }
+            removePageHandler(removeTabId)
         }
         js$toTop()
     })
