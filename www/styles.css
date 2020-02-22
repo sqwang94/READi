@@ -1,4 +1,4 @@
-.First .PrevButton, .Last .NextButton {
+.First .PrevButton, .Last .NextButton, .Hidden {
   display: none;
 }
 
@@ -116,4 +116,12 @@
  #accordion .panel-heading a:hover {
   text-decoration: none;
   color: #157ab5;
+}
+
+.Error {
+  border-color: red;
+}
+
+.Error .radio-inline span {
+  color: red;
 }

@@ -57,4 +57,30 @@ evalPage <- function(input, output, session) {
         our_ui
     })
     callModule(studyNavGlobal, "study_nav")
+
+    # input validation for all studies in studies navigation
+    observeEvent(input$submit_2, {
+        inputs <- callModule(studyNavValidation, "study_nav")
+        if (input$t2_ev_available == "Yes" && input$t2_n_studies == 0 || length(inputs()) == 0) {
+            return()                # does not allow submission if study identified but no study is filled 
+        }
+        if (input_validation(inputs())) {
+            sendSweetAlert(        # if all inputs are valid, submission successful
+                session = session,
+                title = "Submitted!", 
+                text = "Please move on to next phase!",
+                type = "success",
+                btn_labels = c("Great")
+            ) 
+        } else {
+            sendSweetAlert(     # add error message if user needs more information
+                session = session,
+                title = "Oops!",
+                text = "It looks like you may not have answered all the questions!",
+                type = "error",
+                btn_labels = c("Go back")
+            )
+        }
+    })
 }
+

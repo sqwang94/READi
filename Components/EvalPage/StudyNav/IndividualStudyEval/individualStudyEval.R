@@ -28,7 +28,7 @@ individualStudyEvalUI <- function(id, studyId) {
                                            "None of the above"),
                                selected = "None of the above")),
               br(),
-              uiOutput(ns("radio_random"))
+              uiOutput(ns("radio_random")),
     )
 }
 
@@ -112,4 +112,33 @@ individualStudyEval <- function(input, output, session) {
     callModule(robinsServer, "robins")
 }
 
-
+# returns all inputs in the individual study as a list for input validation. Adds Error class to invalid input.
+individualStudyInputValidation <- function(input, output, session) {
+    ns <- session$ns
+    reactive({
+        inputs <- list()
+        inputs[[ns("author")]] = input$author
+        if (input$study_design == "Pragmatic controlled trial/Large simple trial") {
+            for (i in seq(8)) {
+                selected <- input[[paste0("input", i)]]
+                if (is.null(input[[paste0("input", i)]])) {
+                    selected <- ""
+                }
+                inputs[[ns(paste0("input", i))]] <- selected
+            }
+            eval <- input[["input"]]
+            if (is.null(input[["input"]])) {
+                eval <- ""
+            }
+            inputs[[ns("input")]] <- eval
+        }
+        for (key in names(inputs)) {
+            if (inputs[key] == "") {
+                addClass(selector = paste0("#", key), class="Error")
+            } else {
+                removeClass(selector = paste0("#", key), class="Error")
+            }
+        }
+        return(inputs)
+    })
+}

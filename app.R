@@ -9,25 +9,14 @@ library(kableExtra)
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
-
-# JS function scroll window to the study eval
-jscode <- "shinyjs.toTop = function() {
-    let offsetTop = document.getElementById('eval_page-study_react').parentElement.offsetTop;
-    window.scrollTo(0, offsetTop);
-}"
-
-input_validation <- function(x){                    # a function to validate inputs for submission
-  logic_list <- lapply(x, isTruthy)                 # create a list of logical values
-  unlisted_vec <- unlist(logic_list)                # unlist to sum
-  sum(unlisted_vec) == length(unlisted_vec)         # logical testing whether there are any "non-True" values
-}
+source("Auxiliary/auxiliary.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request){
   fluidPage(
     theme = shinytheme("lumen"),
     useShinyjs(),
-    extendShinyjs(text = jscode),
+    extendShinyjs(text = toTop),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
     ),
@@ -67,9 +56,9 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    hideTab(inputId = "tabs", target = "tab1")
-    hideTab(inputId = "tabs", target = "tab2")
-    hideTab(inputId = "tabs", target = "tab3")
+    # hideTab(inputId = "tabs", target = "tab1")
+    # hideTab(inputId = "tabs", target = "tab2")
+    # hideTab(inputId = "tabs", target = "tab3")
     
     observeEvent(input$beginPhase,{
         showTab(inputId = "tabs", target = "tab1")

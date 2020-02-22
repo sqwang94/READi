@@ -19,10 +19,9 @@ studyNavUI <- function(id, numOfStudy) {
     if (numOfStudy > 1) {
         panels[[numOfStudy]] <- tabPanel(class = "Last", title = toString(numOfStudy), value=toString(numOfStudy), individualStudyEvalUI(ns(paste0("study", numOfStudy)), numOfStudy), studyNavButtonButton(ns(paste0("buttons", numOfStudy))))
     }
-    panels[[numOfStudy + 1]] <- tabPanel(title = NULL, value = "Add", icon=icon("plus"), fillerContainerUI())
-    panels[[numOfStudy + 2]] <- tabPanel(title = NULL, value = "Remove", icon=icon("trash-alt"), fillerContainerUI("Please add a study"))
+    panels[[numOfStudy + 1]] <- tabPanel(title = NULL, value = "Add", icon=icon("plus"), fillerContainerUI("filler-add"))
+    panels[[numOfStudy + 2]] <- tabPanel(title = NULL, value = "Remove", icon=icon("trash-alt"), fillerContainerUI("filler-remove"), div("Please add a study"))
     return(div(do.call(navbarPage, c(title=NULL, title="Literature", id=ns("navBar"), collapsible = TRUE, panels)), div(class = "hidden", numericInput(ns("studyCounter"), NULL, value = numOfStudy))))
-        
 }
 
 # Server function for studies navigation component
@@ -45,6 +44,7 @@ studyNavGlobal <- function(input, output, session) {
             runjs(paste0("document.querySelector('", selector, "').blur()"))
             updateNumericInput(session, "studyCounter", value = newTabId)
             removeClass(selector = ".Last", class="Last")
+            removeClass(selector = "#filler-remove", class="Hidden")
             class <- "Last"
             if (newTabId == 1) {
                 class <- "First Last"
@@ -66,9 +66,29 @@ studyNavGlobal <- function(input, output, session) {
                 updateNumericInput(session, "studyCounter", value = removeTabId - 1)
                 removeTab("navBar", toString(removeTabId))
                 addClass(selector = paste0("#eval_page-study_react .tab-content .tab-pane:nth-child(", removeTabId - 1, ")"), class="Last")
+                if (removeTabId == 1) {
+                    addClass(selector = "#filler-remove", class="Hidden")
+                }
             }
         }
         js$toTop()
     })
+}
+
+# returns list of inputs from all studies from studies navigation for input validation
+studyNavValidation <- function(input, output, session) {
+    return(
+        reactive({
+            numStudy <- input$studyCounter
+            inputs <- list()
+            if (numStudy > 0) {
+                for (i in seq(numStudy)) {
+                    input <- callModule(individualStudyInputValidation, paste0("study", i))
+                    inputs <- append(inputs, input())
+                }
+            }
+            return(inputs)
+        })
+    )
 }
 
