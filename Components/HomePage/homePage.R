@@ -19,7 +19,8 @@ homePageUI <- bootstrapPage(
                                                                 tags$li("Phase 2.2: Rate the quality of the body of evidence for each outcome of interest."))
                        )),
                        bsCollapsePanel("phase 3: ", div(class = "card-body", "Making evidenced-based Recommendations."))
-            ))
-        
+            )),
+        hr(),
+        actionButton(inputId = "beginPhase", label = "Click here when you're ready to begin!")
     )
 )

@@ -10,11 +10,11 @@ studyNavButtonButton <- function(id) {
 # Server function for previous and next buttons in each study eval component
 studyNavButton <- function(input, output, session, parentSession, page) {
     observeEvent(input$prevButton, {
-        updateNavbarPage(parentSession, "navBar", selected=toString(page - 1));
+        updateNavbarPage(parentSession, "navBar", selected = toString(page - 1));
         js$toTop();
     })
     observeEvent(input$nextButton, {
-        updateNavbarPage(parentSession, "navBar", selected=toString(page + 1));
+        updateNavbarPage(parentSession, "navBar", selected = toString(page + 1));
         js$toTop();
     })
 }

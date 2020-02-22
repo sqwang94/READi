@@ -1,11 +1,9 @@
-source("evalPage/IndividualStudyEval/Robins/robins.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/Robins/robins.R")
 
 # UI function for individual study eval
 individualStudyEvalUI <- function(id, studyId) {
     ns <- NS(id)
-    well_style <- ifelse(studyId %% 2 == 0, "background: #d1b3e6", "background: #f2f2f2")
     wellPanel(strong(paste("Answer the following questions about study #", studyId)),
-              style = well_style,
               wellPanel("Basic Information",
                         br(),
                         textInput(ns("author"),
@@ -38,7 +36,7 @@ individualStudyEvalUI <- function(id, studyId) {
 individualStudyEval <- function(input, output, session) {
     ns <- session$ns
     output$radio_random <- renderUI({
-        if(input$study_design == "Pragmatic controlled trial/Large simple trial"){
+        if (input$study_design == "Pragmatic controlled trial/Large simple trial"){
             choice_prag <- c("Low Risk", "Unclear Risk", "High Risk")
             labels_prag <- c("Random sequence generation (selection bias)",
                              "Allocation concealment (selection bias)",

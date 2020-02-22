@@ -2,12 +2,12 @@
   display: none;
 }
 
-#study_react .navbar {
+#eval_page-study_react .navbar {
   position: sticky;
   top: 0;
 }
 
-#study_react .nav {
+#eval_page-study_react .nav {
   float: none;
   display: flex;
   overflow: overlay;

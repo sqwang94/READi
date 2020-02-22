@@ -1,9 +1,9 @@
-source("evalPage/IndividualStudyEval/individualStudyEval.R")
-source("evalPage/StudyNavButton/studyNavButton.R")
-source("evalPage/FillerContainer/fillerContainer.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/individualStudyEval.R")
+source("Components/EvalPage/StudyNav/StudyNavButton/studyNavButton.R")
+source("Components/EvalPage/StudyNav/FillerContainer/fillerContainer.R")
 
-# UI function for studies eval component. Uses "First" and "Last" class to show/hide Prev/Next button.
-evalPageUI <- function(id, numOfStudy) {
+# UI function for studies navigation component. Uses "First" and "Last" class to show/hide Prev/Next button.
+studyNavUI <- function(id, numOfStudy) {
     ns <- NS(id)
     if (numOfStudy == 1) {
         panels <- list(tabPanel(class = "First Last", title = "1", value = "1", individualStudyEvalUI(ns("study1"), 1), studyNavButtonButton(ns("buttons1"))))
@@ -25,21 +25,23 @@ evalPageUI <- function(id, numOfStudy) {
         
 }
 
-# Server function for studies evals component
-evalPage <- function(input, output, session, numOfStudy) {
+# Server function for studies navigation component
+studyNav <- function(input, output, session, numOfStudy) {
     lapply(1:numOfStudy, function(i) {
         callModule(studyNavButton, paste0("buttons", i), session, i)
         callModule(individualStudyEval, paste0("study", i))
     })
+    js$toTop()
 }
 
-#Add and remove functionality for the studies evals
-evalPageFunction <- function(input, output, session) {
+# global add and remove functionality for the studies navigation
+studyNavGlobal <- function(input, output, session) {
     ns <- session$ns
     observe({
+        # add functionallity for the studies navigation
         if (req(input$navBar) == "Add") {
             newTabId <- input$studyCounter + 1
-            selector <- paste0("#study_react ul li:nth-child(", newTabId, ")>a")
+            selector <- paste0("#eval_page-study_react ul li:nth-child(", newTabId, ")>a")
             runjs(paste0("document.querySelector('", selector, "').blur()"))
             updateNumericInput(session, "studyCounter", value = newTabId)
             removeClass(selector = ".Last", class="Last")
@@ -53,15 +55,17 @@ evalPageFunction <- function(input, output, session) {
             callModule(studyNavButton, paste0("buttons", newTabId), session, newTabId)
             callModule(individualStudyEval, paste0("study", newTabId))
         }
+        
+        # remove functionallity for the studies navigation
         if (req(input$navBar) == "Remove") {
             removeTabId <- input$studyCounter
             if (removeTabId > 0) {
-                selector <- paste0("#study_react ul li:nth-child(", removeTabId + 2, ")>a")
+                selector <- paste0("#eval_page-study_react ul li:nth-child(", removeTabId + 2, ")>a")
                 runjs(paste0("document.querySelector('", selector, "').blur()"))
                 updateNavbarPage(session, "navBar", "1")
                 updateNumericInput(session, "studyCounter", value = removeTabId - 1)
                 removeTab("navBar", toString(removeTabId))
-                addClass(selector = paste0("#study_react .tab-content .tab-pane:nth-child(", removeTabId - 1, ")"), class="Last")
+                addClass(selector = paste0("#eval_page-study_react .tab-content .tab-pane:nth-child(", removeTabId - 1, ")"), class="Last")
             }
         }
         js$toTop()
