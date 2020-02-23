@@ -3,7 +3,7 @@ homePageUI <- bootstrapPage(
     div(id = "home", class = "jumbotron",
         img(src = "CHOICE.png", id = "choice-image"),
         h2("Welcome to the READi (Real-World Evidence Assessments and Needs Guidance) Tool"),
-        p(id = "author", "presented by The CHOICE Institute"),
+        h3(id = "author", "presented by The CHOICE Institute"),
         hr(),
         p("The READi Tool is a comprehensive online tool to guide literature review and coverage decision-making"),
         p("Once you have decided you need real world evidence to answer your question of interest, the READi tool 

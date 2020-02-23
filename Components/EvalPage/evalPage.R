@@ -30,7 +30,7 @@ evalPageUI <- function(id) {
 }
 
 # server function for phase 2 evaluation of evidence page
-evalPage <- function(input, output, session) {
+evalPage <- function(input, output, session, parentSession) {
     ns <- session$ns
     output$study_identified <- renderUI({ # Rendering UI based on whether or not studies are available
         if(input$t2_ev_available == "No"){
@@ -73,7 +73,9 @@ evalPage <- function(input, output, session) {
                 text = "Please move on to next phase!",
                 type = "success",
                 btn_labels = c("Great")
-            ) 
+            )
+            addClass(selector = "#tabs li:nth-child(3) i", class = "show-inline")
+            updateNavbarPage(parentSession, "tabs", "tab3")
         } else {
             sendSweetAlert(     # add error message if user needs more information
                 session = session,

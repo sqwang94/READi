@@ -29,20 +29,20 @@ ui <- function(request){
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 1: RWE ----------------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 1: Identify Real World Evidence", value = "tab1",
+               tabPanel("Phase 1: Identify Real World Evidence", value = "tab1", icon = icon("check-circle"),
                         identifyPageUI("identify_page")),
                         
                # ---------------------------  ----------------------------------#
                # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 2: Reviewing and Grading of Evidence", value = "tab2",
+               tabPanel("Phase 2: Reviewing and Grading of Evidence", value = "tab2", icon = icon("check-circle"),
                         evalPageUI("eval_page")
                ),
                
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 3: Making Evidence-Based Recommendations", value = "tab3",
+               tabPanel("Phase 3: Making Evidence-Based Recommendations", value = "tab3", icon = icon("check-circle"),
                         uiOutput("t3_pt1"),
                         column(8, offset = 2,
                                wellPanel(
@@ -55,9 +55,9 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    # hideTab(inputId = "tabs", target = "tab1")
-    # hideTab(inputId = "tabs", target = "tab2")
-    # hideTab(inputId = "tabs", target = "tab3")
+    hideTab(inputId = "tabs", target = "tab1")
+    hideTab(inputId = "tabs", target = "tab2")
+    hideTab(inputId = "tabs", target = "tab3")
     
     observeEvent(input$beginPhase,{
         showTab(inputId = "tabs", target = "tab1")
@@ -72,7 +72,7 @@ server <- function(input, output, session) {
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 2: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
-    callModule(evalPage, "eval_page")
+    callModule(evalPage, "eval_page", session)
     
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 3: RWE ----------------------------------#

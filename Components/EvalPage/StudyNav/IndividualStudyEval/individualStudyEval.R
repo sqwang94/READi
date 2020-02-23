@@ -35,6 +35,8 @@ individualStudyEvalUI <- function(id, studyId) {
 # server function for individual study eval
 individualStudyEval <- function(input, output, session) {
     ns <- session$ns
+    
+    # create well panels based on the study type
     output$radio_random <- renderUI({
         if (input$study_design == "Pragmatic controlled trial/Large simple trial"){
             choice_prag <- c("Low Risk", "Unclear Risk", "High Risk")
@@ -118,7 +120,7 @@ individualStudyInputValidation <- function(input, output, session) {
     reactive({
         inputs <- list()
         inputs[[ns("author")]] = input$author
-        if (input$study_design == "Pragmatic controlled trial/Large simple trial") {
+        if (input$study_design %in% c("Pragmatic controlled trial/Large simple trial", "Quasi experimental")) {
             for (i in seq(8)) {
                 selected <- input[[paste0("input", i)]]
                 if (is.null(input[[paste0("input", i)]])) {
@@ -132,13 +134,7 @@ individualStudyInputValidation <- function(input, output, session) {
             }
             inputs[[ns("input")]] <- eval
         }
-        for (key in names(inputs)) {
-            if (inputs[key] == "") {
-                addClass(selector = paste0("#", key), class="Error")
-            } else {
-                removeClass(selector = paste0("#", key), class="Error")
-            }
-        }
+        toggleErrorInputHandler(inputs)
         return(inputs)
     })
 }

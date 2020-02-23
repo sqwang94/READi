@@ -226,13 +226,7 @@ identifyPage <- function(input, output, session, parentSession) {
     # event listener for phase 1 submit button, including input validation
     observeEvent(input$submit_1, {
         inputs <- t1_inputs()
-        for (key in names(inputs)) {    # add Error class for visual alert on missing input fields
-            if (inputs[key] == "") {
-                addClass(selector = paste0("#", key), class="Error")
-            } else {
-                removeClass(selector = paste0("#", key), class="Error")
-            }
-        }
+        toggleErrorInputHandler(inputs)
         if (input_validation(t1_inputs())) {
             search_string()
             text <- paste("Take a look at your custom PubMed search <a href=\'", search_string(),"\' target=\"_blank\">here</a>. You'll use the studies identified here for grading in phase 2!")
@@ -246,6 +240,7 @@ identifyPage <- function(input, output, session, parentSession) {
             ) 
             showTab(session = parentSession, inputId = "tabs", target = "tab2")
             showTab(session = parentSession, inputId = "tabs", target = "tab3")
+            addClass(selector = "#tabs li:nth-child(2) i", class = "show-inline")
             updateNavbarPage(parentSession, "tabs", "tab2")
             
             # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
