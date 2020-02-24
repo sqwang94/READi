@@ -103,4 +103,3 @@ studyNavValidation <- function(input, output, session) {
         })
     )
 }
-

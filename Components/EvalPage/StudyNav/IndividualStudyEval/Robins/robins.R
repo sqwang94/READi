@@ -264,7 +264,8 @@ robinsServer <- function(input, output, session) {
     })
     
     output$rob_output2_5 <- renderUI({
-        if ((input$bias_input2_1 %in% c("Yes", "Probably Yes") && input$bias_input2_2 %in% c("Yes", "Probably Yes") && input$bias_input2_3 %in% c("Yes", "Probably Yes")) 
+        if ((input$bias_input2_1 %in% c("Yes", "Probably Yes") && (!is.null(input$bias_input2_2) && input$bias_input2_2 %in% c("Yes", "Probably Yes")) 
+            && (!is.null(input$bias_input2_3) && input$bias_input2_3 %in% c("Yes", "Probably Yes"))) 
             || input$bias_input2_4 %in% c("No", "Probably No")) {
             radioButtons(label = "2.5 Were adjustment techniques used that are likely to correct for the presence of selection biases?",
                        inputId = ns("bias_input2_5"),
