@@ -1,11 +1,9 @@
-source("evalPage/IndividualStudyEval/Robins/robins.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/Robins/robins.R")
 
 # UI function for individual study eval
 individualStudyEvalUI <- function(id, studyId) {
     ns <- NS(id)
-    well_style <- ifelse(studyId %% 2 == 0, "background: #d1b3e6", "background: #f2f2f2")
     wellPanel(strong(paste("Answer the following questions about study #", studyId)),
-              style = well_style,
               wellPanel("Basic Information",
                         br(),
                         textInput(ns("author"),
@@ -30,15 +28,17 @@ individualStudyEvalUI <- function(id, studyId) {
                                            "None of the above"),
                                selected = "None of the above")),
               br(),
-              uiOutput(ns("radio_random"))
+              uiOutput(ns("radio_random")),
     )
 }
 
 # server function for individual study eval
 individualStudyEval <- function(input, output, session) {
     ns <- session$ns
+    
+    # create well panels based on the study type
     output$radio_random <- renderUI({
-        if(input$study_design == "Pragmatic controlled trial/Large simple trial"){
+        if (input$study_design == "Pragmatic controlled trial/Large simple trial"){
             choice_prag <- c("Low Risk", "Unclear Risk", "High Risk")
             labels_prag <- c("Random sequence generation (selection bias)",
                              "Allocation concealment (selection bias)",
@@ -114,4 +114,27 @@ individualStudyEval <- function(input, output, session) {
     callModule(robinsServer, "robins")
 }
 
-
+# returns all inputs in the individual study as a list for input validation. Adds Error class to invalid input.
+individualStudyInputValidation <- function(input, output, session) {
+    ns <- session$ns
+    reactive({
+        inputs <- list()
+        inputs[[ns("author")]] = input$author
+        if (input$study_design %in% c("Pragmatic controlled trial/Large simple trial", "Quasi experimental")) {
+            for (i in seq(8)) {
+                selected <- input[[paste0("input", i)]]
+                if (is.null(input[[paste0("input", i)]])) {
+                    selected <- ""
+                }
+                inputs[[ns(paste0("input", i))]] <- selected
+            }
+            eval <- input$input
+            if (is.null(input$input)) {
+                eval <- ""
+            }
+            inputs[[ns("input")]] <- eval
+        }
+        toggleErrorInputHandler(inputs)
+        return(inputs)
+    })
+}

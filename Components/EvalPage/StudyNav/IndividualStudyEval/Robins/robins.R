@@ -104,7 +104,7 @@ robinsUI <- function(id) {
                                              choices = responses,
                                              inline = TRUE,
                                              selected = "No Information")
-                                ),
+                      ),
                       
                       # ------ Question 7 from Robins
                       wellPanel(strong("7. Bias in Selection of the Reported Result"),
@@ -159,7 +159,7 @@ robinsServer <- function(input, output, session) {
         if (input$bias_input1_2 == "No Information"){
           return()
         } else if (input$bias_input1_2 %in% c("Yes", "Probably Yes")) {
-            list(radioButtons(label = "1.3 Were the intervention discontinuations or switches likely to be related to factors that  are prognostic for the outcome?",
+            list(radioButtons(label = "1.3 Were the intervention discontinuations or switches likely to be related to factors that are prognostic for the outcome?",
                               inputId = ns("bias_input1_3"),
                               inline = TRUE,
                               choices = responses,
@@ -177,8 +177,8 @@ robinsServer <- function(input, output, session) {
     
     # ---- for question response to 1.3
     output$rob_output1_3 <- renderUI({
-        if(input$bias_input1_3 == "No Information"){
-          return()
+        if (input$bias_input1_3 == "No Information"){
+            return()
         } else if (input$bias_input1_3 %in% c("No", "Probably No")) {
             list(radioButtons(label = "1.4 Did the authors use an appropriate analysis method that controlled for all the important confounding domains?",
                               inputId = ns("bias_input1_4"),
@@ -198,34 +198,34 @@ robinsServer <- function(input, output, session) {
     
     # ---- for question response to 1.4
     output$rob_output1_4 <- renderUI({
-      if(input$bias_input1_4 == "No Information"){
-        return()
-      } else if(input$bias_input1_4 %in% c("Yes", "Probably Yes")){
-        list(radioButtons(label = "1.5 Were confounding domains that were controlled for measured reliably and validly by the variables available in this study?",
-                          inputId = ns("bias_input1_5"),
-                          inline = TRUE,
-                          choices = responses,
-                          selected = "No Information"),
-             radioButtons(label = "1.6 Did the authors control for any post-intervention variables that could have been affected by the intervention?",
-                          inputId = ns("bias_input1_6"),
-                          inline = TRUE,
-                          choices = responses,
-                          selected = "No Information"))
-      } else {
-        radioButtons(label = "1.6 Did the authors control for any post-intervention variables that could have been affected by the intervention?",
-                     inputId = ns("bias_input1_6"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      }
+        if (input$bias_input1_4 == "No Information"){
+            return()
+        } else if (input$bias_input1_4 %in% c("Yes", "Probably Yes")){
+            list(radioButtons(label = "1.5 Were confounding domains that were controlled for measured reliably and validly by the variables available in this study?",
+                              inputId = ns("bias_input1_5"),
+                              inline = TRUE,
+                              choices = responses,
+                              selected = "No Information"),
+                 radioButtons(label = "1.6 Did the authors control for any post-intervention variables that could have been affected by the intervention?",
+                              inputId = ns("bias_input1_6"),
+                              inline = TRUE,
+                              choices = responses,
+                              selected = "No Information"))
+        } else {
+            radioButtons(label = "1.6 Did the authors control for any post-intervention variables that could have been affected by the intervention?",
+                         inputId = ns("bias_input1_6"),
+                         inline = TRUE,
+                         choices = responses,
+                         selected = "No Information")
+        }
     })
     
     
     output$rob_output1_7 <- renderUI({
-      if(input$bias_input1_7 %in% c("No", "Probably No", "No Information")){
-        return()
-      } else if(input$bias_input1_7 %in% c("Yes", "Probably Yes")){
-        radioButtons(label = "1.8 Were confounding domains that were adjusted for measured validly and reliably by the variables available in this study?",
+      if (input$bias_input1_7 %in% c("No", "Probably No", "No Information")){
+          return()
+      } else if (input$bias_input1_7 %in% c("Yes", "Probably Yes")){
+          radioButtons(label = "1.8 Were confounding domains that were adjusted for measured validly and reliably by the variables available in this study?",
                      inputId = ns("bias_input1_8"),
                      inline = TRUE,
                      choices = responses,
@@ -239,77 +239,68 @@ robinsServer <- function(input, output, session) {
     # ------------------------------------------------------------------------------------------------------------------- #
     
     output$rob_output2_1 <- renderUI({
-      if(input$bias_input2_1 %in% c("No Information", "No", "Probably No")){
-        return()
-      } else {
-        list(radioButtons(label = "2.2 Were the post-intervention variables that influenced selection likely to be associated with intervention?",
-                     inputId = ns("bias_input2_2"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information"),
-             uiOutput(ns("rob_output2_2")))
-      }
+        if (input$bias_input2_1 %in% c("No Information", "No", "Probably No")){
+            return()
+        } else {
+          list(radioButtons(label = "2.2 Were the post-intervention variables that influenced selection likely to be associated with intervention?",
+                            inputId = ns("bias_input2_2"),
+                            inline = TRUE,
+                            choices = responses,
+                            selected = "No Information"),
+               uiOutput(ns("rob_output2_2")))
+        }
     })
-     # ------- Question 2.2 not functional for some reason? 
+    # ------- Question 2.2 not functional for some reason? 
     output$rob_output2_2 <- renderUI({
-      if(input$bias_input2_2 %in% c("Yes", "Probably Yes")){
-        radioButtons(label = "2.3 Were the post-intervention variables that influenced selection likely to be influenced by the outcome or a cause of the outcome?",
-                     inputId = ns("bias_input2_3"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      } else {
-        return()
-      }
-      
+        if (input$bias_input2_2 %in% c("Yes", "Probably Yes")){
+          radioButtons(label = "2.3 Were the post-intervention variables that influenced selection likely to be influenced by the outcome or a cause of the outcome?",
+                       inputId = ns("bias_input2_3"),
+                       inline = TRUE,
+                       choices = responses,
+                       selected = "No Information")
+        } else {
+            return()
+        }
     })
     
     output$rob_output2_5 <- renderUI({
-      if(input$bias_input2_4 %in% c("No", "Probably No")){
-        radioButtons(label = "2.5 Were adjustment techniques used that are likely to correct for the presence of selection biases?",
-                     inputId = ns("bias_input2_5"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      } else if(input$bias_input2_2 & input$bias_input2_3 %in% c("Yes", "Probably Yes")){
-        radioButtons(label = "2.5 Were adjustment techniques used that are likely to correct for the presence of selection biases?",
-                     inputId = ns("bias_input2_5"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      } else {
-        return()
-      }
+        if ((input$bias_input2_1 %in% c("Yes", "Probably Yes") && input$bias_input2_2 %in% c("Yes", "Probably Yes") && input$bias_input2_3 %in% c("Yes", "Probably Yes")) 
+            || input$bias_input2_4 %in% c("No", "Probably No")) {
+            radioButtons(label = "2.5 Were adjustment techniques used that are likely to correct for the presence of selection biases?",
+                       inputId = ns("bias_input2_5"),
+                       inline = TRUE,
+                       choices = responses,
+                       selected = "No Information")
+        } else {
+            return()
+        }
     })
     
-
+    
     # ------------------------------------------------------------------------------------------------------------------- #
     # -------------------------------------  For all of Part 4; Bias due to Confounding --------------------------------- #
     # ------------------------------------------------------------------------------------------------------------------- #
-
+    
     output$rob_output4_1 <- renderUI({
-      if(input$bias_input4_1 %in% c("No", "Probably No", "No Information")){
-        return()
-      } else {
-        radioButtons(label = "4.2 Were these deviations from intended intervention unbalanced between groups and likely to have affected the outcome??",
-                     inputId = ns("bias_input4_2"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      }
+        if (input$bias_input4_1 %in% c("No", "Probably No", "No Information")){
+            return()
+        } else {
+            radioButtons(label = "4.2 Were these deviations from intended intervention unbalanced between groups and likely to have affected the outcome??",
+                       inputId = ns("bias_input4_2"),
+                       inline = TRUE,
+                       choices = responses,
+                       selected = "No Information")
+        }
     })
     
     output$rob_output4_6 <- renderUI({
-      input_vec <- c(input$bias_input4_3, input$bias_input4_4, input$bias_input4_5)
-      if(isTruthy(c("No", "Probably No") %in% input_vec)){
-        radioButtons(label = "4.6 Was an appropriate analysis used to estimate the effect of starting and adhering to the intervention?",
-                     inputId = ns("bias_input4_6"),
-                     inline = TRUE,
-                     choices = responses,
-                     selected = "No Information")
-      }
+        input_vec <- c(input$bias_input4_3, input$bias_input4_4, input$bias_input4_5)
+        if (isTruthy(c("No", "Probably No") %in% input_vec)){
+            radioButtons(label = "4.6 Was an appropriate analysis used to estimate the effect of starting and adhering to the intervention?",
+                       inputId = ns("bias_input4_6"),
+                       inline = TRUE,
+                       choices = responses,
+                       selected = "No Information")
+        }
     })
-    
-    
-    
 }
