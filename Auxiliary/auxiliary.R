@@ -18,6 +18,11 @@ toggleErrorInputHandler <- function(inputs) {
 
 # JS function scroll window to the study eval
 toTop <- "shinyjs.toTop = function() {
-    let offsetTop = document.getElementById('eval_page-study_react').parentElement.offsetTop;
-    window.scrollTo(0, offsetTop);
+    $('html, body').animate(
+        {
+            scrollTop: $('#eval_page-study_react').offset().top,
+        },
+        200,
+        'linear'
+    )
 }"

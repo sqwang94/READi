@@ -66,7 +66,7 @@ evalPage <- function(input, output, session, parentSession) {
         if (input$t2_ev_available == "Yes" && input$t2_n_studies == 0 || length(inputs()) == 0) {
             return()    # does not allow submission if study identified but no study is filled 
         }
-        if (input_validation(inputs())) {
+        if (input$t2_ev_available == "No" || input_validation(inputs())) {
             sendSweetAlert(        # if all inputs are valid, submission successful
                 session = session,
                 title = "Submitted!", 

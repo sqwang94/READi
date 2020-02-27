@@ -5,6 +5,7 @@ library(shinyWidgets)
 library(lubridate)
 library(shinyBS)
 library(kableExtra)
+library(V8)
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
@@ -55,9 +56,9 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    hideTab(inputId = "tabs", target = "tab1")
-    hideTab(inputId = "tabs", target = "tab2")
-    hideTab(inputId = "tabs", target = "tab3")
+    # hideTab(inputId = "tabs", target = "tab1")
+    # hideTab(inputId = "tabs", target = "tab2")
+    # hideTab(inputId = "tabs", target = "tab3")
     
     observeEvent(input$beginPhase,{
         showTab(inputId = "tabs", target = "tab1")
