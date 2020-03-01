@@ -63,7 +63,7 @@ evalPage <- function(input, output, session, parentSession) {
     # input validation for all studies in studies navigation
     observeEvent(input$submit_2, {
         inputs <- callModule(studyNavValidation, "study_nav")
-        if (input$t2_ev_available == "Yes" && input$t2_n_studies == 0 || length(inputs()) == 0) {
+        if (input$t2_ev_available == "Yes" && (input$t2_n_studies == 0 || length(inputs()) == 0)) {
             return()    # does not allow submission if study identified but no study is filled 
         }
         if (input$t2_ev_available == "No" || input_validation(inputs())) {
@@ -74,7 +74,7 @@ evalPage <- function(input, output, session, parentSession) {
                 type = "success",
                 btn_labels = c("Great")
             )
-            addClass(selector = "#tabs li:nth-child(3) i", class = "show-inline")
+            shinyjs::show(selector = "#tabs li:nth-child(3) i")
             updateNavbarPage(parentSession, "tabs", "tab3")
         } else {
             sendSweetAlert(     # add error message if user needs more information
@@ -84,6 +84,7 @@ evalPage <- function(input, output, session, parentSession) {
                 type = "error",
                 btn_labels = c("Go back")
             )
+            shinyjs::hide(selector = "#tabs li:nth-child(3) i")
         }
     })
 }
