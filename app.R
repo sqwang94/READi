@@ -11,6 +11,20 @@ source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
+source("Components/Authentication/authentication.R")
+
+navbarPageWithBtn <- function(...) {
+  navbar <- navbarPage(...)
+  btn <- tags$button(
+    id = "login",
+    type = "button",
+    class = "btn",
+    "Sign In/Register"
+  )
+  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+    navbar[[3]][[1]]$children[[1]]$children[[2]], btn)
+  navbar
+}
 
 # Define UI for application that draws a histogram
 ui <- function(request){
@@ -19,9 +33,12 @@ ui <- function(request){
     useShinyjs(),
     extendShinyjs(text = toTop),
     tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
+      shiny::tags$script(src="auth.js")
     ),
-    navbarPage("READi Tool",
+    authenticationUI("authentication"),
+    navbarPageWithBtn("READi Tool",
                id = "tabs",
                collapsible = TRUE,
                tabPanel("Home",
@@ -30,20 +47,20 @@ ui <- function(request){
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 1: RWE ----------------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 1: Identify Real World Evidence", value = "tab1", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_1", class = "inline"), value = "tab1", icon = icon("check-circle"),
                         identifyPageUI("identify_page")),
                         
                # ---------------------------  ----------------------------------#
                # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 2: Reviewing and Grading of Evidence", value = "tab2", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
                         evalPageUI("eval_page")
                ),
                
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 3: Making Evidence-Based Recommendations", value = "tab3", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
                         uiOutput("t3_pt1"),
                         column(8, offset = 2,
                                wellPanel(
@@ -60,10 +77,35 @@ server <- function(input, output, session) {
     # hideTab(inputId = "tabs", target = "tab2")
     # hideTab(inputId = "tabs", target = "tab3")
     
+    callModule(authentication, "authentication")
+  
     observeEvent(input$beginPhase,{
         showTab(inputId = "tabs", target = "tab1")
         updateNavbarPage(session, "tabs", "tab1")
     })
+    
+    output$title_panel_1 = renderText({
+      if (req(input$tabs) == "tab1") {
+        return("Phase 1: Identify Real World Evidence")
+      }
+      return("Phase 1")
+    })
+    
+    output$title_panel_2 = renderText({
+      if (req(input$tabs) == "tab2") {
+        return("Phase 2: Reviewing and Grading of Evidence")
+      }
+      return("Phase 2")
+    })
+    
+    output$title_panel_3 = renderText({
+      if (req(input$tabs) == "tab3") {
+        return("Phase 3: Making Evidence-Based Recommendations")
+      }
+      return("Phase 3")
+    })
+    
+    
   
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 1: RWE ----------------------------------#
