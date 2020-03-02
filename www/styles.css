@@ -2,6 +2,16 @@
   display: none;
 }
 
+.inline {
+  display: inline;
+}
+
+#login {
+  float: right;
+  margin-top: 6px;
+  margin-bottom: 3px;
+}
+
 #eval_page-study_react .navbar {
   position: sticky;
   top: 0;
@@ -138,8 +148,4 @@ input.Error {
 #tabs i {
   display: none;
   color: #26da4a;
-}
-
-.show-inline {
-  display: inline !important;
 }
