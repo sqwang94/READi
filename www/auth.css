@@ -1,7 +1,7 @@
-.auth_panel {
+#auth_panel {
   position: absolute;
   left: 50%;
-  width: 350px;
+  width: 400px;
   max-width: 100%;
   margin: 0 auto;
   margin-top: 75px;
@@ -17,25 +17,29 @@
   opacity: 0;
 }
 
-.auth_panel.Show {
+#auth_panel.Show {
   transform: translate(-50%, 10%);
   -webkit-transform: translate(-50%, 10%);
   opacity: 1;
 }
 
-.auth_panel h1, .auth-submit {
+#auth_panel h1, .auth-submit {
   padding-top: 0;
   text-align: center;
 }
 
-.auth_panel button {
+#auth_panel button {
   color: white;
   width: 100%;
 }
 
 .error_message {
   color: red;
-  padding-left: 2px;
+  margin: 0;
+}
+
+#login_error {
+  padding-bottom: 0px;
 }
 
 .invalid {

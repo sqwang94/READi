@@ -1,12 +1,11 @@
+# UI function for login panel
 loginUI <- function(id) {
     ns <- NS(id)
     return(
-        div(
-            id = "sign_in_panel",
-            class = "auth_panel",
+        div(id = "sign_in_panel",
             h1("Sign In"),
-            div(
-                class = "form-group",
+            p(id = "login_error", class = "error_message hidden"),
+            div(class = "form-group",
                 tags$label(
                     tagList(icon("envelope"), "Email"),
                     `for` = "email"
@@ -23,8 +22,7 @@ loginUI <- function(id) {
                     span(class = "error_message", "Please enter a valid Email")
                 )
             ),
-            div(
-                class = "form-group",
+            div(class = "form-group",
                 tags$label(
                     tagList(icon("unlock-alt"), "Password"),
                     `for` = "password"
@@ -66,15 +64,16 @@ loginUI <- function(id) {
                 actionLink(
                     ns("guest"),
                     "Continue as guest"
-                ),
+                )
             )
         )
     )
 }
 
+# server function for login panel
 login <- function(input, output, session) {
     observeEvent(input$go_to_register, {
-        shinyjs::show(selector = "#register_panel", anim = TRUE, animType = "fade", time = 0.05)
-        shinyjs::hide(selector = "#sign_in_panel")
+        removeClass(selector = "#register_panel", class = "hidden")
+        addClass(selector = "#sign_in_panel", class = "hidden")
     }, ignoreInit = TRUE)
 }

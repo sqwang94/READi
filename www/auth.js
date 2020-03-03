@@ -1,26 +1,69 @@
+const config = {
+  apiKey: "AIzaSyAhPODofJbMMXB3EmBg53l9T9klQPjpje4",
+  authDomain: "readi-dcf98.firebaseapp.com",
+  projectId: "readi-dcf98"
+}
+
+firebase.initializeApp(config)
+const auth = firebase.auth()
+
 $(document).on("click", "#submit_sign_in", () => {
   const email = $("#email").val()
   const password = $("#password").val()
-  validateFormLogin(email, password)
+  if (validateFormLogin(email, password)) {
+    auth.signInWithEmailAndPassword(email, password)
+    .catch((error) => {
+      let errorText = "Something went wrong."
+      if (error.code === "auth/user-not-found") {
+        errorText = "The username and password you entered did not match our records. Please double-check and try again."
+      }
+      $("#login_error").text(errorText)
+      $("#login_error").removeClass("hidden")
+    })
+  }
 })
 
-$(document).on("click", "#submit_register", () => {
+/**
+ * when user signs in or out send the info about that user to Shiny as
+ * a Shiny input `input$auth_user`
+ */
+auth.onAuthStateChanged((user) => {
+  Shiny.setInputValue('auth_user', user);
+  console.log(user)
+})
+
+$(document).on("click", "#submit_register", (e) => {
+  e.stopPropagation();
+  e.preventDefault();
   const email = $("#register_email").val()
   const password = $("#register_password").val()
   const confirm = $("#register_password_verify").val()
   validateFormRegister(email, password, confirm)
 })
 
-$(document).on("click", "#login", () => {
+$(document).on("click", "#login", (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  console.log("clicked login")
   $("#backdrop").removeClass("hidden")
-  $("#sign_in_panel").addClass("Show")
-  $("#register_panel").addClass("Show")
+  $("#sign_in_panel").removeClass("hidden")
+  $("#auth_panel").addClass("Show")
+  $("#register_panel").addClass("hidden")
 })
 
-$(document).on("click", "#backdrop", () => {
+$(document).on("mouseup", "#signout", (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  auth.signOut()
+})
+
+$(document).on("click", "#backdrop", (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  removeWarnings()
+  resetValues()
   $("#backdrop").addClass("hidden")
-  $("#sign_in_panel").removeClass("Show")
-  $("#register_panel").removeClass("Show")
+  $("#auth_panel").removeClass("Show")
 })
 
 /**
@@ -78,5 +121,14 @@ function removeWarnings() {
   $(".auth-input").each(function() {
     $(this).removeClass("invalid")
     $(this).next().addClass("hidden")
+  })
+  $("login_error").addClass("hidden")
+  $("#login_error").text("")
+}
+
+//** Reset all values of input fields. */
+function resetValues() {
+  $(".auth-input").each(function() {
+    $(this).val("")
   })
 }
