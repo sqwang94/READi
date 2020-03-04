@@ -240,7 +240,7 @@ identifyPage <- function(input, output, session, parentSession) {
             ) 
             showTab(session = parentSession, inputId = "tabs", target = "tab2")
             showTab(session = parentSession, inputId = "tabs", target = "tab3")
-            addClass(selector = "#tabs li:nth-child(2) i", class = "show-inline")
+            shinyjs::show(selector = "#tabs li:nth-child(2) i")
             updateNavbarPage(parentSession, "tabs", "tab2")
             
             # ----- Need to add code here to also add all inputs to a data frame/however they should be stored

@@ -5,11 +5,28 @@ library(shinyWidgets)
 library(lubridate)
 library(shinyBS)
 library(kableExtra)
+library(V8)
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
+source("Components/Authentication/authentication.R")
+
+# wrapper for navbarPage with login button
+navbarPageWithBtn <- function(...) {
+    navbar <- navbarPage(...)
+    element <- uiOutput("loginToggle")
+    btn <- tags$button(
+        id = "login",
+        type = "button",
+        class = "btn",
+        "Log in"
+    )
+    navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+        navbar[[3]][[1]]$children[[1]]$children[[2]], element)
+    navbar
+}
 
 # Define UI for application that draws a histogram
 ui <- function(request){
@@ -18,9 +35,14 @@ ui <- function(request){
     useShinyjs(),
     extendShinyjs(text = toTop),
     tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
+      tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
+      tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
+      shiny::tags$script(src="auth.js")
     ),
-    navbarPage("READi Tool",
+    authenticationUI("authentication"),
+    navbarPageWithBtn("READi Tool",
                id = "tabs",
                collapsible = TRUE,
                tabPanel("Home",
@@ -29,20 +51,20 @@ ui <- function(request){
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 1: RWE ----------------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 1: Identify Real World Evidence", value = "tab1", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_1", class = "inline"), value = "tab1", icon = icon("check-circle"),
                         identifyPageUI("identify_page")),
                         
                # ---------------------------  ----------------------------------#
                # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 2: Reviewing and Grading of Evidence", value = "tab2", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
                         evalPageUI("eval_page")
                ),
                
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
-               tabPanel("Phase 3: Making Evidence-Based Recommendations", value = "tab3", icon = icon("check-circle"),
+               tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
                         uiOutput("t3_pt1"),
                         column(8, offset = 2,
                                wellPanel(
@@ -55,15 +77,89 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    hideTab(inputId = "tabs", target = "tab1")
-    hideTab(inputId = "tabs", target = "tab2")
-    hideTab(inputId = "tabs", target = "tab3")
+    # hideTab(inputId = "tabs", target = "tab1")
+    # hideTab(inputId = "tabs", target = "tab2")
+    # hideTab(inputId = "tabs", target = "tab3")
+    
+    callModule(authentication, "authentication")
+    
+    session$userData$current_user <- reactiveVal(NULL)
+    
+    observeEvent(input$auth_user, {
+        session$userData$current_user(input$auth_user)
+    }, ignoreNULL = FALSE)
+    
+    # switch between auth sign in/registration and app for signed in user
+    observeEvent(session$userData$current_user(), {
+        current_user <- session$userData$current_user()
+        if (is.null(current_user)) {
+          
+        } else {
+            removeClass(selector = "#auth_panel", class = "Show")
+            addClass(selector = "#backdrop", class = "hidden")
+            print(current_user$emailVerified)
+            # if (current_user$emailVerified == TRUE) {
+            #     shinyjs::show("main")
+            # } else {
+            #     shinyjs::show("verify_email_view")
+            # }
+          
+        }
+    }, ignoreNULL = FALSE)
     
     observeEvent(input$beginPhase,{
         showTab(inputId = "tabs", target = "tab1")
         updateNavbarPage(session, "tabs", "tab1")
     })
-  
+    
+    output$loginToggle <- renderUI({
+        current_user <- session$userData$current_user()
+        if (is.null(current_user)) {
+            return (
+                tags$button(
+                    id = "login",
+                    type = "button",
+                    class = "btn",
+                    "Log in"
+                )
+            )
+        } else {
+            return (
+                tags$button(
+                    id = "signout",
+                    type = "button",
+                    class = "btn",
+                    "Sign out"
+                )
+            )
+        }
+    })
+    
+    
+    # dynamic title for tab 1
+    output$title_panel_1 = renderText({
+      if (req(input$tabs) == "tab1") {
+        return("Phase 1: Identify Real World Evidence")
+      }
+      return("Phase 1")
+    })
+    
+    # dynamic title for tab 2
+    output$title_panel_2 = renderText({
+      if (req(input$tabs) == "tab2") {
+        return("Phase 2: Reviewing and Grading of Evidence")
+      }
+      return("Phase 2")
+    })
+    
+    # dynamic title for tab 3
+    output$title_panel_3 = renderText({
+      if (req(input$tabs) == "tab3") {
+        return("Phase 3: Making Evidence-Based Recommendations")
+      }
+      return("Phase 3")
+    })
+    
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 1: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
@@ -172,7 +268,7 @@ server <- function(input, output, session) {
             row_spec(c(1,3,5,7), background = "#d1b3e6", color = "black") %>% 
             row_spec(c(2,4,6,8), background = "white", color = "black")
       } else {
-        outcomes <- list(c(outcome$poutcome,
+          outcomes <- list(c(outcome$poutcome,
                            input$t3_studylim_1, 
                            input$t3_subjects_1, 
                            input$t3_comparator_1, 

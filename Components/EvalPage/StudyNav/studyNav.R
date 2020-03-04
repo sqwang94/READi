@@ -93,7 +93,7 @@ studyNavValidation <- function(input, output, session) {
         reactive({
             numStudy <- input$studyCounter
             inputs <- list()
-            if (numStudy > 0) {
+            if (!is.null(numStudy) && numStudy > 0) {
                 for (i in seq(numStudy)) {
                     input <- callModule(individualStudyInputValidation, paste0("study", i))
                     inputs <- append(inputs, input())
@@ -103,4 +103,3 @@ studyNavValidation <- function(input, output, session) {
         })
     )
 }
-
