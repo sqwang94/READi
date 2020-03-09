@@ -6,13 +6,15 @@ authenticationUI <- function(id) {
     ns <- NS(id)
     return(
         div(
-            div(id = "auth_panel",
+            div(
+              id = "auth_panel",
                 loginUI(ns("login")),
                 registerUI(ns("register"))
             ),
-            div(id = "backdrop", class = "modal-backdrop hidden")
+            div(
+              id = "backdrop", class = "modal-backdrop hidden"))
         )
-    )
+    
 }
 
 # server function for authentication modal

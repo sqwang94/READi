@@ -218,7 +218,7 @@ identifyPage <- function(input, output, session, parentSession) {
         comparator <- input$t1_comparator
         outcome1 <- input$t1_poutcome
         time_frame <- input$t1_timeframe
-        search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=([",pop,"]%20AND%20[",int,"]%20AND%20[",outcome1,"]%20AND%20(\"last ",time_frame," years\"[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20\"meta-analysis%20as%20topic\"%5BMeSH%20Terms%5D %20OR%20\"pragmatic%20clinical%20trials%20as%20topic\"%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+        search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"%20AND%20",int,"%20AND%20",outcome1,"%20AND%20(\"last ",time_frame," years\"[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20\"meta-analysis%20as%20topic\"%5BMeSH%20Terms%5D %20OR%20\"pragmatic%20clinical%20trials%20as%20topic\"%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
         search
         
     })

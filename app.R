@@ -1,11 +1,20 @@
+# ----------------------------------------------------- #
+#
+#    READi Tool;
+#        Stanley Wang
+#        Brennan Beal
+#
+# ----------------------------------------------------- #
 library(shiny)
 library(shinyjs)
+library(rintrojs)
 library(shinythemes)
 library(shinyWidgets)
 library(lubridate)
 library(shinyBS)
 library(kableExtra)
 library(V8)
+
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
@@ -15,25 +24,31 @@ source("Components/Authentication/authentication.R")
 
 # wrapper for navbarPage with login button
 navbarPageWithBtn <- function(...) {
-    navbar <- navbarPage(...)
-    element <- uiOutput("loginToggle")
-    btn <- tags$button(
-        id = "login",
-        type = "button",
-        class = "btn",
-        "Log in"
-    )
-    navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
-        navbar[[3]][[1]]$children[[1]]$children[[2]], element)
-    navbar
+  navbar <- navbarPage(...)
+  element <- uiOutput("loginToggle")
+  btn <- tags$button(
+    id = "login",
+    type = "button",
+    class = "btn",
+    "Log in"
+  )
+  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+    navbar[[3]][[1]]$children[[1]]$children[[2]], element)
+  navbar
 }
+
+
+
 
 # Define UI for application that draws a histogram
 ui <- function(request){
+  
   fluidPage(
     theme = shinytheme("lumen"),
+    introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
+    
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
@@ -77,9 +92,72 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    # hideTab(inputId = "tabs", target = "tab1")
-    # hideTab(inputId = "tabs", target = "tab2")
-    # hideTab(inputId = "tabs", target = "tab3")
+  
+  
+  # -------------------- Intro Tutorial
+  observeEvent("", {
+    
+    int_text <- c(
+      
+      # -- Welcome
+      "Welcome to the READi tool - for a quick tour, click next, otherwise click 'skip' to begin! (needs to be html with actual button to continue to tour - this is placeholder)",
+      
+      # -- Login
+      "The first thing you should do is login. Here, you can either register as a new user or continue your progress on any of your projects with your login.
+      If you don't want to register, you can continue as a guest but you won't have access to your other projects!",
+      
+      # -- Save progress
+      "You will want to make sure you are saving your progress (the process can be a lot for one sitting). 
+      Click this button for a link to copy and save progress.",
+      
+      #  -- If you want to know more
+      "This process is completed in phases (which I will show you in a few seconds). If you want to learn more about the
+      phases themselves before beginning, check them out here.",
+      
+      # -- Navigate
+      "You can navigate between those phases here.",
+      
+      # -- To begin
+      "Finally, click here when you are ready to begin!"
+      
+    )
+    
+    intro  <- data.frame(
+      element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
+      intro = int_text,
+      position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
+    
+    introjs(session, options = list(steps = intro,
+                                    "nextLabel" = "Next",
+                                    "prevLabel" = "Go Back",
+                                    "doneLabel" = "Cool - let's get started!",
+                                    "showProgress" = TRUE,
+                                    "showStepNumbers" = FALSE,
+                                    "hidePrev" = TRUE,
+                                    "hideNext" = TRUE))
+    
+  })
+  # ----- Welcoming users to site (with introduction)
+
+    #showModal(modalDialog(
+      # --- Need html file here but for now:
+      #title = "Important Message",
+      #"Some welcome message:",
+      #easyClose = TRUE,
+      #footer = tagList(
+        #  --- Creating intro option on main intro
+      #  actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
+      #)
+    #))
+  
+   
+   # ----- Hiding all tabs upon  entry to site
+    hideTab(inputId = "tabs", target = "tab1")
+    hideTab(inputId = "tabs", target = "tab2")
+    hideTab(inputId = "tabs", target = "tab3")
+    
+
+    
     
     callModule(authentication, "authentication")
     
@@ -98,11 +176,11 @@ server <- function(input, output, session) {
             removeClass(selector = "#auth_panel", class = "Show")
             addClass(selector = "#backdrop", class = "hidden")
             print(current_user$emailVerified)
-            # if (current_user$emailVerified == TRUE) {
-            #     shinyjs::show("main")
-            # } else {
-            #     shinyjs::show("verify_email_view")
-            # }
+             if (current_user$emailVerified == TRUE) {
+                 shinyjs::show("main")
+             } else {
+                 shinyjs::show("verify_email_view")
+             }
           
         }
     }, ignoreNULL = FALSE)
