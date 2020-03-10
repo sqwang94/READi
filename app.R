@@ -52,8 +52,10 @@ ui <- function(request){
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
+      tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
+      tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"),
       shiny::tags$script(src="auth.js")
     ),
     authenticationUI("authentication"),
