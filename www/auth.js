@@ -141,7 +141,6 @@ $(document).on("click", "#submit_register", (e) => {
 $(document).on("click", "#login", (e) => {
   e.stopPropagation();
   e.preventDefault();
-  console.log("clicked login")
   $("#backdrop").removeClass("hidden")
   $("#sign_in_panel").removeClass("hidden")
   $("#auth_panel").addClass("Show")

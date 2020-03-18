@@ -14,6 +14,7 @@ library(lubridate)
 library(shinyBS)
 library(kableExtra)
 library(V8)
+library(shiny.router)
 
 
 source("Components/EvalPage/evalPage.R")
@@ -37,12 +38,8 @@ navbarPageWithBtn <- function(...) {
   navbar
 }
 
-
-
-
 # Define UI for application that draws a histogram
-ui <- function(request){
-  
+ui <- function(){
   fluidPage(
     theme = shinytheme("lumen"),
     introjsUI(),
