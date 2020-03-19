@@ -23,7 +23,7 @@ source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
 
 # Define UI for application that draws a histogram
-ui <- function(){
+ui <- function(request){
   fluidPage(
     theme = shinytheme("lumen"),
     introjsUI(),
@@ -345,5 +345,5 @@ server <- function(input, output, session) {
   }
 
 # Run the application 
-shinyApp(ui = ui, server = server, enableBookmarking = "url")
+shinyApp(ui = ui, server = server, enableBookmarking = "server")
 
