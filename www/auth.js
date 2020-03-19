@@ -73,7 +73,7 @@ $(document).on("click", "#reset_password", (e) => {
             btnClass: 'btn-blue',
             action: function () {
                 let email = this.$content.find('.reset_email').val();
-                if (!email.match("^[^@]+@[^@]+\.[^@]+$")) {
+                if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
                   this.$content.find('.error_message').removeClass("hidden")
                   this.$content.find('.reset_email').addClass("invalid")
                   return false;
@@ -83,7 +83,7 @@ $(document).on("click", "#reset_password", (e) => {
                 }).catch((error) => {
                   $.alert({
                     title: 'Error',
-                    content: 'Error sending password reset email',
+                    content: 'Something went wrong when sending password reset email',
                     type: "orange"
                   });
                 })
@@ -141,7 +141,7 @@ $(document).on("click", "#submit_register", (e) => {
 $(document).on("click", "#login", (e) => {
   e.stopPropagation();
   e.preventDefault();
-  $("#backdrop").removeClass("hidden")
+  $("#login_backdrop").removeClass("hidden")
   $("#sign_in_panel").removeClass("hidden")
   $("#auth_panel").addClass("Show")
   $("#register_panel").addClass("hidden")
@@ -153,12 +153,12 @@ $(document).on("mouseup", "#signout", (e) => {
   auth.signOut()
 })
 
-$(document).on("click", "#backdrop", (e) => {
+$(document).on("click", "#login_backdrop", (e) => {
   e.stopPropagation();
   e.preventDefault();
   removeWarnings()
   resetValues()
-  $("#backdrop").addClass("hidden")
+  $("#login_backdrop").addClass("hidden")
   $("#auth_panel").removeClass("Show")
 })
 
@@ -171,7 +171,7 @@ $(document).on("click", "#backdrop", (e) => {
 function validateFormLogin(email, password) {
   removeWarnings()
   let valid = true
-  if (!email.match("^[^@]+@[^@]+\.[^@]+$")) {
+  if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
     $("#email").addClass("invalid")
     $("#email").next().removeClass("hidden")
     valid = false

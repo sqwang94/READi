@@ -12,7 +12,7 @@ authenticationUI <- function(id) {
                 registerUI(ns("register"))
             ),
             div(
-              id = "backdrop", class = "modal-backdrop hidden"))
+              id = "login_backdrop", class = "hidden"))
         )
     
 }
@@ -21,6 +21,4 @@ authenticationUI <- function(id) {
 authentication <- function(input, output, session) {
     callModule(login, "login")
     callModule(register, "register")
-    
-    
 }

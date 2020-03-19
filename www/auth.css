@@ -10,10 +10,10 @@
   padding: 30px;
   background: #f9f9f9;
   z-index: 2000;
-  webkit-transform: translate(-50%, -100vh);
-  transform: translate(-50%, -100vh);
+  webkit-transform: translate(-50%, -150vh);
+  transform: translate(-50%, -150vh);
   transition: all 0.3s ease-out;
-  -webkit-transform: translate(-50%, -100vh);
+  -webkit-transform: translate(-50%, -150vh);
   opacity: 0;
 }
 
@@ -47,7 +47,7 @@
   border-color: red;
 }
 
-.modal-backdrop {
+#login_backdrop {
   position: fixed;
   top: 0;
   right: 0;
