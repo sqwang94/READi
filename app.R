@@ -14,29 +14,13 @@ library(lubridate)
 library(shinyBS)
 library(kableExtra)
 library(V8)
-library(shiny.router)
-
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
-
-# wrapper for navbarPage with login button
-navbarPageWithBtn <- function(...) {
-  navbar <- navbarPage(...)
-  element <- uiOutput("loginToggle")
-  btn <- tags$button(
-    id = "login",
-    type = "button",
-    class = "btn",
-    "Log in"
-  )
-  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
-    navbar[[3]][[1]]$children[[1]]$children[[2]], element)
-  navbar
-}
+source("Components/Authentication/LoginDropdown/loginDropdown.R")
 
 # Define UI for application that draws a histogram
 ui <- function(){
@@ -152,6 +136,10 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "tab2")
     hideTab(inputId = "tabs", target = "tab3")
     
+    observeEvent(input$beginPhase,{
+      showTab(inputId = "tabs", target = "tab1")
+      updateNavbarPage(session, "tabs", "tab1")
+    })
     
     callModule(authentication, "authentication")
     
@@ -166,16 +154,9 @@ server <- function(input, output, session) {
         current_user <- session$userData$current_user()
         if (!is.null(current_user)) {
           removeClass(selector = "#auth_panel", class = "Show")
-          addClass(selector = "#backdrop", class = "hidden")
-           if (current_user$emailVerified == TRUE) {
-           }
+          addClass(selector = "#login_backdrop", class = "hidden")
         }
     }, ignoreNULL = FALSE)
-    
-    observeEvent(input$beginPhase,{
-        showTab(inputId = "tabs", target = "tab1")
-        updateNavbarPage(session, "tabs", "tab1")
-    })
     
     output$loginToggle <- renderUI({
         current_user <- session$userData$current_user()
@@ -189,14 +170,7 @@ server <- function(input, output, session) {
                 )
             )
         } else {
-            return (
-                tags$button(
-                    id = "signout",
-                    type = "button",
-                    class = "btn",
-                    "Sign out"
-                )
-            )
+            return (loginDropdown)
         }
     })
     
@@ -371,5 +345,5 @@ server <- function(input, output, session) {
   }
 
 # Run the application 
-shinyApp(ui = ui, server = server, enableBookmarking = "server")
+shinyApp(ui = ui, server = server, enableBookmarking = "url")
 

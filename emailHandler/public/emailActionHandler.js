@@ -1,4 +1,4 @@
-const homeURL = "http://127.0.0.1:7641/"
+const homeURL = "https://sqwang94.shinyapps.io/readi/"
 
 document.addEventListener('DOMContentLoaded', function() {
   let mode = getParameterByName('mode');

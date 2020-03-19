@@ -14,7 +14,6 @@ authenticationUI <- function(id) {
             div(
               id = "login_backdrop", class = "hidden"))
         )
-    
 }
 
 # server function for authentication modal

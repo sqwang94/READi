@@ -149,3 +149,34 @@ input.Error {
   display: none;
   color: #26da4a;
 }
+
+.login_dropdown_item {
+  cursor: pointer;
+  color: #555555;
+  border: none;
+  background: inherit;
+  padding: 5px;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-menu {
+  min-width: 120px;
+}
+
+.login_dropdown_item:hover {
+  color: black;
+  text-decoration: underline;
+}
+
+#account_dropdown {
+  border: none;
+  background-color: inherit;
+  border-radius: 2px;
+  border: 1px solid rgb(0, 0, 0, 0);
+}
+
+#account_dropdown:hover, #account_dropdown:focus {
+  margin-top: auto;
+  border-color: inherit;
+}

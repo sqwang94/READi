@@ -16,6 +16,21 @@ toggleErrorInputHandler <- function(inputs) {
     }
 }
 
+# wrapper for navbarPage with login button
+navbarPageWithBtn <- function(...) {
+    navbar <- navbarPage(...)
+    element <- uiOutput("loginToggle")
+    btn <- tags$button(
+        id = "login",
+        type = "button",
+        class = "btn",
+        "Log in"
+    )
+    navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+        navbar[[3]][[1]]$children[[1]]$children[[2]], element)
+    navbar
+}
+
 # JS function scroll window to the study eval
 toTop <- "shinyjs.toTop = function() {
     $('html, body').animate(
