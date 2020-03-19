@@ -12,9 +12,31 @@ $(document).on("click", "#submit_sign_in", () => {
   const password = $("#password").val()
   if (validateFormLogin(email, password)) {
     auth.signInWithEmailAndPassword(email, password)
+    .then(user => {
+      if(!user.user.emailVerified) {
+        $("#login_error").html("<p>Your email address has not been verified. Click <a id='resend_verification' href='#'>here</a> to resend a verification email.")
+        $(document).off('click', '#resend_verification');
+        $(document).on("click", "#resend_verification", () => {
+          user.user.sendEmailVerification()
+          .then(() => {
+            $.alert({
+                title: 'Please check your email',
+                content: 'A verifiation email has been sent to ' + email,
+            });
+          })
+          .catch((error) => {
+            if (error.code === "auth/too-many-requests") {
+              $("#login_error").text("we recently sent your a verification email. Please check your email.")
+            }
+          })
+        })
+        auth.signOut()
+        $("#login_error").removeClass("hidden")
+      }
+    })
     .catch((error) => {
       let errorText = "Something went wrong."
-      if (error.code === "auth/user-not-found") {
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
         errorText = "The username and password you entered did not match our records. Please double-check and try again."
       }
       $("#login_error").text(errorText)
@@ -28,8 +50,59 @@ $(document).on("click", "#submit_sign_in", () => {
  * a Shiny input `input$auth_user`
  */
 auth.onAuthStateChanged((user) => {
-  Shiny.setInputValue('auth_user', user);
-  console.log(user)
+  if (!user || user.emailVerified) {
+    Shiny.setInputValue('auth_user', user);
+  }
+})
+
+$(document).on("click", "#reset_password", (e) => {
+  $.confirm({
+    icon: "fas fa-exclamation-triangle",
+    title: 'Resetting your password',
+    content: '' +
+    '<form action="">' +
+    '<div class="form-group">' +
+    '<label>Please Enter Your Email</label>' +
+    '<input type="text" placeholder="example@domain.com" class="reset_email form-control" required />' +
+    '<p class="hidden error_message">Please enter a valid Email address</p>' +
+    '</div>' +
+    '</form>',
+    buttons: {
+        formSubmit: {
+            text: 'Submit',
+            btnClass: 'btn-blue',
+            action: function () {
+                let email = this.$content.find('.reset_email').val();
+                if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+                  this.$content.find('.error_message').removeClass("hidden")
+                  this.$content.find('.reset_email').addClass("invalid")
+                  return false;
+                }
+                auth.sendPasswordResetEmail(email).then(() => {
+                  $.alert("Please check your email.");
+                }).catch((error) => {
+                  $.alert({
+                    title: 'Error',
+                    content: 'Something went wrong when sending password reset email',
+                    type: "orange"
+                  });
+                })
+            }
+        },
+        cancel: function () {
+            //close
+        },
+    },
+    onContentReady: function () {
+        // bind to events
+        var jc = this;
+        this.$content.find('form').on('submit', function (e) {
+            // if the user submits the form by pressing enter in the field.
+            e.preventDefault();
+            jc.$$formSubmit.trigger('click'); // reference the button and click it
+        });
+    }
+  });
 })
 
 $(document).on("click", "#submit_register", (e) => {
@@ -38,14 +111,37 @@ $(document).on("click", "#submit_register", (e) => {
   const email = $("#register_email").val()
   const password = $("#register_password").val()
   const confirm = $("#register_password_verify").val()
-  validateFormRegister(email, password, confirm)
+  if (validateFormRegister(email, password, confirm)) {
+    auth.createUserWithEmailAndPassword(email, password).then((user) => {
+      user.user.sendEmailVerification()
+      .then(response => {
+        $.alert({
+            title: 'Success!',
+            content: 'You have successfully registered! Please verify your email address.',
+        });
+        $("#sign_in_panel").removeClass("hidden")
+        $("#register_panel").addClass("hidden")
+      })
+      .catch((error) => {
+        $("#register_error").text("We couldn't send verification email to the email address")
+        $("#register_error").removeClass("hidden")
+      })
+    })
+    .catch((error) => {
+      let errorText = "Something went wrong."
+      if (error.code === "auth/email-already-in-use") {
+        errorText = error.message
+      }
+      $("#register_error").text(errorText)
+      $("#register_error").removeClass("hidden")
+    })
+  }
 })
 
 $(document).on("click", "#login", (e) => {
   e.stopPropagation();
   e.preventDefault();
-  console.log("clicked login")
-  $("#backdrop").removeClass("hidden")
+  $("#login_backdrop").removeClass("hidden")
   $("#sign_in_panel").removeClass("hidden")
   $("#auth_panel").addClass("Show")
   $("#register_panel").addClass("hidden")
@@ -57,12 +153,12 @@ $(document).on("mouseup", "#signout", (e) => {
   auth.signOut()
 })
 
-$(document).on("click", "#backdrop", (e) => {
+$(document).on("click", "#login_backdrop", (e) => {
   e.stopPropagation();
   e.preventDefault();
   removeWarnings()
   resetValues()
-  $("#backdrop").addClass("hidden")
+  $("#login_backdrop").addClass("hidden")
   $("#auth_panel").removeClass("Show")
 })
 
@@ -75,7 +171,7 @@ $(document).on("click", "#backdrop", (e) => {
 function validateFormLogin(email, password) {
   removeWarnings()
   let valid = true
-  if (!email.match("^[^@]+@[^@]+\.[^@]+$")) {
+  if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
     $("#email").addClass("invalid")
     $("#email").next().removeClass("hidden")
     valid = false
@@ -124,6 +220,8 @@ function removeWarnings() {
   })
   $("login_error").addClass("hidden")
   $("#login_error").text("")
+  $("register_error").addClass("hidden")
+  $("#register_error").text("")
 }
 
 //** Reset all values of input fields. */

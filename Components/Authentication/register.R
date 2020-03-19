@@ -4,6 +4,7 @@ registerUI <- function(id) {
     return(
         div(id = "register_panel",
             h1("Register"),
+            div(id = "register_error", class = "error_message hidden"),
             div(class = "form-group",
                 tags$label(
                     tagList(icon("envelope"), "Email"),

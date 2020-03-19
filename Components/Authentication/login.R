@@ -4,7 +4,7 @@ loginUI <- function(id) {
     return(
         div(id = "sign_in_panel",
             h1("Sign In"),
-            p(id = "login_error", class = "error_message hidden"),
+            div(id = "login_error", class = "error_message hidden"),
             div(class = "form-group",
                 tags$label(
                     tagList(icon("envelope"), "Email"),

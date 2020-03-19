@@ -15,45 +15,27 @@ library(shinyBS)
 library(kableExtra)
 library(V8)
 
-
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
-
-# wrapper for navbarPage with login button
-navbarPageWithBtn <- function(...) {
-  navbar <- navbarPage(...)
-  element <- uiOutput("loginToggle")
-  btn <- tags$button(
-    id = "login",
-    type = "button",
-    class = "btn",
-    "Log in"
-  )
-  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
-    navbar[[3]][[1]]$children[[1]]$children[[2]], element)
-  navbar
-}
-
-
-
+source("Components/Authentication/LoginDropdown/loginDropdown.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request){
-  
   fluidPage(
     theme = shinytheme("lumen"),
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
-    
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
+      tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
+      tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"),
       shiny::tags$script(src="auth.js")
     ),
     authenticationUI("authentication"),
@@ -92,41 +74,39 @@ ui <- function(request){
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-  
-  
   # -------------------- Intro Tutorial
-  observeEvent("", {
-    
+  observeEvent(input$intro, {
+    removeModal()
     int_text <- c(
-      
+
       # -- Welcome
       "Welcome to the READi tool - for a quick tour, click next, otherwise click 'skip' to begin! (needs to be html with actual button to continue to tour - this is placeholder)",
-      
+
       # -- Login
       "The first thing you should do is login. Here, you can either register as a new user or continue your progress on any of your projects with your login.
       If you don't want to register, you can continue as a guest but you won't have access to your other projects!",
-      
+
       # -- Save progress
-      "You will want to make sure you are saving your progress (the process can be a lot for one sitting). 
+      "You will want to make sure you are saving your progress (the process can be a lot for one sitting).
       Click this button for a link to copy and save progress.",
-      
+
       #  -- If you want to know more
       "This process is completed in phases (which I will show you in a few seconds). If you want to learn more about the
       phases themselves before beginning, check them out here.",
-      
+
       # -- Navigate
       "You can navigate between those phases here.",
-      
+
       # -- To begin
       "Finally, click here when you are ready to begin!"
-      
+
     )
-    
-    intro  <- data.frame(
+
+    intro <- data.frame(
       element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
       intro = int_text,
       position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
-    
+
     introjs(session, options = list(steps = intro,
                                     "nextLabel" = "Next",
                                     "prevLabel" = "Go Back",
@@ -135,20 +115,20 @@ server <- function(input, output, session) {
                                     "showStepNumbers" = FALSE,
                                     "hidePrev" = TRUE,
                                     "hideNext" = TRUE))
-    
+
   })
   # ----- Welcoming users to site (with introduction)
 
-    #showModal(modalDialog(
+    showModal(modalDialog(
       # --- Need html file here but for now:
-      #title = "Important Message",
-      #"Some welcome message:",
-      #easyClose = TRUE,
-      #footer = tagList(
-        #  --- Creating intro option on main intro
-      #  actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
-      #)
-    #))
+      title = "Important Message",
+      "Some welcome message:",
+      easyClose = TRUE,
+      footer = tagList(
+        # --- Creating intro option on main intro
+        actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
+      )
+    ))
   
    
    # ----- Hiding all tabs upon  entry to site
@@ -156,8 +136,10 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "tab2")
     hideTab(inputId = "tabs", target = "tab3")
     
-
-    
+    observeEvent(input$beginPhase,{
+      showTab(inputId = "tabs", target = "tab1")
+      updateNavbarPage(session, "tabs", "tab1")
+    })
     
     callModule(authentication, "authentication")
     
@@ -170,25 +152,11 @@ server <- function(input, output, session) {
     # switch between auth sign in/registration and app for signed in user
     observeEvent(session$userData$current_user(), {
         current_user <- session$userData$current_user()
-        if (is.null(current_user)) {
-          
-        } else {
-            removeClass(selector = "#auth_panel", class = "Show")
-            addClass(selector = "#backdrop", class = "hidden")
-            print(current_user$emailVerified)
-             if (current_user$emailVerified == TRUE) {
-                 shinyjs::show("main")
-             } else {
-                 shinyjs::show("verify_email_view")
-             }
-          
+        if (!is.null(current_user)) {
+          removeClass(selector = "#auth_panel", class = "Show")
+          addClass(selector = "#login_backdrop", class = "hidden")
         }
     }, ignoreNULL = FALSE)
-    
-    observeEvent(input$beginPhase,{
-        showTab(inputId = "tabs", target = "tab1")
-        updateNavbarPage(session, "tabs", "tab1")
-    })
     
     output$loginToggle <- renderUI({
         current_user <- session$userData$current_user()
@@ -202,14 +170,7 @@ server <- function(input, output, session) {
                 )
             )
         } else {
-            return (
-                tags$button(
-                    id = "signout",
-                    type = "button",
-                    class = "btn",
-                    "Sign out"
-                )
-            )
+            return (loginDropdown)
         }
     })
     
