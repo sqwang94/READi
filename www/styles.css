@@ -6,6 +6,10 @@
   display: inline;
 }
 
+.always-show {
+  display: block !important;
+}
+
 #loginToggle {
   float: right;
   margin-top: 6px;
@@ -158,14 +162,19 @@ input.Error {
   padding: 5px;
   width: 100%;
   text-align: left;
+  text-transform: none;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .dropdown-menu {
   min-width: 120px;
 }
 
-.login_dropdown_item:hover {
+.login_dropdown_item:hover, .login_dropdown_item:focus, .login_dropdown_item:focus:active {
   color: black;
+  margin-top: 0;
+  background-color: inherit;
   text-decoration: underline;
 }
 
