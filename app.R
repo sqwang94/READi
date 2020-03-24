@@ -135,12 +135,12 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "tab1")
     hideTab(inputId = "tabs", target = "tab2")
     hideTab(inputId = "tabs", target = "tab3")
-    
+
     observeEvent(input$beginPhase,{
       showTab(inputId = "tabs", target = "tab1")
       updateNavbarPage(session, "tabs", "tab1")
     })
-    
+
     callModule(authentication, "authentication")
     
     session$userData$current_user <- reactiveVal(NULL)
@@ -227,8 +227,15 @@ server <- function(input, output, session) {
       bias       <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_bias_", i)})
 
       lapply(seq_len(outcome$outcomes()), function(i){
+        if(i == 1){
+          out <- "primary"
+          type <- outcome$poutcome()
+        } else {
+          out <- "secondary"
+          type <- outcome$soutcome()
+        }
             column(8, offset = 2,
-              wellPanel(strong(paste0("For your primary outcome of ", outcome$poutcome(), " answer the following questions:")),
+              wellPanel(strong(paste0("For your ", out, " outcome of ", type, " answer the following questions:")),
                         br(),
                         br(),
                         wellPanel(
@@ -307,7 +314,7 @@ server <- function(input, output, session) {
             row_spec(c(1,3,5,7), background = "#d1b3e6", color = "black") %>% 
             row_spec(c(2,4,6,8), background = "white", color = "black")
       } else {
-          outcomes <- list(c(outcome$poutcome,
+          outcomes <- list(c(outcome$poutcome(),
                            input$t3_studylim_1, 
                            input$t3_subjects_1, 
                            input$t3_comparator_1, 
@@ -315,7 +322,7 @@ server <- function(input, output, session) {
                            input$t3_direct_1, 
                            input$t3_precise_1,
                            input$t3_bias_1),
-                         c(input$t1_secondary_outcome,
+                         c(outcome$soutcome(),
                            input$t3_studylim_2, 
                            input$t3_subjects_2, 
                            input$t3_comparator_2, 

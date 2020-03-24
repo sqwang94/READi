@@ -145,7 +145,7 @@ identifyPage <- function(input, output, session, parentSession) {
             return()
         
         if (input$t1_outcomes == 2){
-            textInput("t1_secondary_outcome",
+            textInput(ns("t1_secondary_outcome"),
                       "(O) c. What is your secondary outcome of interest?")
         }
     })
@@ -258,10 +258,12 @@ identifyPage <- function(input, output, session, parentSession) {
 
 # returns the number of outcomes and the primary outcome input from phase 1
 identifyPageGetOutcome <- function(input, output, session) {
+  ns <- session$ns
     return (
         list(
             outcomes = reactive({input$t1_outcomes}),
-            poutcome = reactive({input$t1_poutcome})
+            poutcome = reactive({input$t1_poutcome}),
+            soutcome = reactive({input$t1_secondary_outcome})
         )
     )
 }
