@@ -12,7 +12,7 @@ authenticationUI <- function(id) {
                 registerUI(ns("register"))
             ),
             div(
-              id = "login_backdrop", class = "hidden"))
+              id = "login_backdrop", class = "backdrop hidden"))
         )
 }
 

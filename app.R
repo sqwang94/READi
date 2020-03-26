@@ -22,6 +22,7 @@ source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
 source("Components/EvalHistory/evalHistory.R")
+source("Components/UI/Loader/loader.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request){
@@ -34,6 +35,7 @@ ui <- function(request){
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "UI.css"),
       tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
@@ -41,6 +43,7 @@ ui <- function(request){
       shiny::tags$script(src="auth.js")
     ),
     authenticationUI("authentication"),
+    loader,
     navbarPageWithBtn("READi Tool",
                id = "tabs",
                collapsible = TRUE,
@@ -141,9 +144,6 @@ server <- function(input, output, session) {
     observeEvent(input$bookmark, {
       session$doBookmark()
     })
-    
-    
-    
    
     # ----- Hiding all tabs upon  entry to site
     hideTab("tabs", "account")
@@ -164,10 +164,14 @@ server <- function(input, output, session) {
 
     callModule(authentication, "authentication")
     
+    # initialize user and session data
     session$userData$current_user <- reactiveVal(NULL)
-    
+    session$userData$current_session <- reactiveVal(NULL)
     observeEvent(input$auth_user, {
       session$userData$current_user(input$auth_user)
+    }, ignoreNULL = FALSE)
+    observeEvent(input$current_session, {
+      session$userData$current_session(input$current_session)
     }, ignoreNULL = FALSE)
     
     # switch between auth sign in/registration and app for signed in user
@@ -176,11 +180,18 @@ server <- function(input, output, session) {
       if (!is.null(current_user)) {
         removeClass(selector = "#auth_panel", class = "Show")
         addClass(selector = "#login_backdrop", class = "hidden")
+        cur_session <- getQueryString()$session
+        js$hideSpinner()
+        # get current session and update bookmark save state
+        if (!is.null(cur_session)) {
+          session$userData$current_session(cur_session)
+        }
         onBookmarked(function(url) {
-          js$saveState(url, current_user$uid)
+          js$saveState(url, current_user$uid, session$userData$current_session())
         })
       } else {
         js$clearAccount()
+        js$hideSpinner()
       }
     }, ignoreNULL = FALSE)
     
@@ -200,6 +211,7 @@ server <- function(input, output, session) {
       }
     })
     
+    # always show phase 1 for restored state
     onRestore(function(state) {
       showTab(inputId = "tabs", target = "tab1")
     })
