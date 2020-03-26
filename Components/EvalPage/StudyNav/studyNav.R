@@ -25,16 +25,16 @@ studyNavUI <- function(id, numOfStudy) {
 }
 
 # server function for studies navigation component
-studyNav <- function(input, output, session, numOfStudy) {
+studyNav <- function(input, output, session, numOfStudy, phase1_inputs) {
     lapply(1:numOfStudy, function(i) {
         callModule(studyNavButton, paste0("buttons", i), session, i)
-        callModule(individualStudyEval, paste0("study", i))
+        callModule(individualStudyEval, paste0("study", i), phase1_inputs)
     })
     js$toTop()
 }
 
 # global add and remove functionality for the studies navigation
-studyNavGlobal <- function(input, output, session) {
+studyNavGlobal <- function(input, output, session, phase1_inputs) {
     ns <- session$ns
     
     # add a new page to the studies navigation
@@ -52,7 +52,7 @@ studyNavGlobal <- function(input, output, session) {
                   tabPanel(class = class, title = toString(tabId), value = toString(tabId), individualStudyEvalUI(ns(paste0("study", tabId)), tabId), studyNavButtonButton(ns(paste0("buttons", tabId)))),
                   target = "Add", select = TRUE, position = "before")
         callModule(studyNavButton, paste0("buttons", tabId), session, tabId)
-        callModule(individualStudyEval, paste0("study", tabId))
+        callModule(individualStudyEval, paste0("study", tabId), phase1_inputs)
     }
     
     # remove the last page from the studies navigation

@@ -11,9 +11,9 @@ individualStudyEvalUI <- function(id, studyId) {
                         sliderInput(ns("pub_year"), 
                                     "The year of publication is: ",
                                     min = 1950, max = year(Sys.Date()), value = 2015, sep = ""),
-                        radioButtons(ns("outcome"),
-                                     "Did this study address your primary outcome of interest?",
-                                     choices = c("Yes", "No"))
+                        
+                        uiOutput(ns("poutcome")),
+                        uiOutput(ns("soutcome"))
               ),
               br(),
               wellPanel(
@@ -33,8 +33,23 @@ individualStudyEvalUI <- function(id, studyId) {
 }
 
 # server function for individual study eval
-individualStudyEval <- function(input, output, session) {
+individualStudyEval <- function(input, output, session, phase1_inputs) {
     ns <- session$ns
+    
+    output$poutcome <- renderUI({
+        radioButtons(ns("outcome1"),
+                     paste0("Did this study address your primary outcome of interest ", phase1_inputs$t1_poutcome, "?"),
+                     choices = c("Yes", "No"))
+    })
+    
+    output$soutcome <- renderUI({
+        if (!is.null(phase1_inputs$t1_outcomes) && phase1_inputs$t1_outcomes == 2) {
+            return(radioButtons(ns("outcome2"),
+                         paste0("Did this study address your secondary outcome of interest ", phase1_inputs$t1_secondary_outcome, "?"),
+                         choices = c("Yes", "No")))
+        }
+        return()
+    })
     
     # create well panels based on the study type
     output$radio_random <- renderUI({

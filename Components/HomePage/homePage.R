@@ -1,5 +1,5 @@
 homePageUI <- bootstrapPage(
-    bookmarkButton(label = "Save Progress"),
+    bookmarkButton(label = "Save Progress", id="bookmark"),
     div(id = "home", class = "jumbotron",
         img(src = "CHOICE.png", id = "choice-image"),
         h2("Welcome to the READi (Real-World Evidence Assessments and Needs Guidance) Tool"),

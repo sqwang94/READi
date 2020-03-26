@@ -4,9 +4,8 @@ loginDropdown <- dropdownButton(
     circle = FALSE,
     right = TRUE,
     label = "account",
-    tags$button(
-        id = "my_account",
-        type = "button",
+    actionButton(
+        inputId = "my_account",
         class = "login_dropdown_item",
         "My account"
     ),

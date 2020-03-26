@@ -6,6 +6,10 @@
   display: inline;
 }
 
+.always-show.active {
+  display: block !important;
+}
+
 #loginToggle {
   float: right;
   margin-top: 6px;
@@ -158,14 +162,19 @@ input.Error {
   padding: 5px;
   width: 100%;
   text-align: left;
+  text-transform: none;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .dropdown-menu {
   min-width: 120px;
 }
 
-.login_dropdown_item:hover {
+.login_dropdown_item:hover, .login_dropdown_item:focus, .login_dropdown_item:focus:active {
   color: black;
+  margin-top: 0;
+  background-color: inherit;
   text-decoration: underline;
 }
 
@@ -179,4 +188,12 @@ input.Error {
 #account_dropdown:hover, #account_dropdown:focus {
   margin-top: auto;
   border-color: inherit;
+}
+
+.evalEntry {
+  box-sizing: border-box;
+  padding: 20px 20px 12px;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+  border-radius: 5px;
+  margin: 10px;
 }
