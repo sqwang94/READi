@@ -254,6 +254,9 @@ identifyPage <- function(input, output, session, parentSession) {
                 type = "error",
                 btn_labels = c("Go back")
             )
+            hideTab(session = parentSession, inputId = "tabs", target = "tab2")
+            hideTab(session = parentSession, inputId = "tabs", target = "tab3")
+            shinyjs::hide(selector = "#tabs li:nth-child(2) i")
         }
     })
     

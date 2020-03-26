@@ -219,6 +219,8 @@ server <- function(input, output, session) {
     # dynamic title for tab 1
     output$title_panel_1 = renderText({
       if (req(input$tabs) == "tab1") {
+        hideTab(inputId = "tabs", target = "tab2")
+        hideTab(inputId = "tabs", target = "tab3")
         return("Phase 1: Identify Real World Evidence")
       }
       return("Phase 1")
