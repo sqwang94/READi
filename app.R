@@ -155,7 +155,7 @@ server <- function(input, output, session) {
       showTab(inputId = "tabs", target = "tab1")
       updateNavbarPage(session, "tabs", "tab1")
     })
-    
+
     observeEvent(input$my_account, {
       updateNavbarPage(session, "tabs", "account")
       toggleDropdownButton(inputId = "account_dropdown")
@@ -248,7 +248,7 @@ server <- function(input, output, session) {
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 2: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
-    callModule(evalPage, "eval_page", session, phase1_inputs)
+    phase2_inputs <- callModule(evalPage, "eval_page", session, phase1_inputs)
     
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 3: RWE ----------------------------------#
@@ -257,7 +257,7 @@ server <- function(input, output, session) {
     
     output$t3_pt1 <- renderUI({
       outcome <- callModule(identifyPageGetOutcome, "identify_page")
-      
+
       # ------ Defining inputID for all inputs
       studylim <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_studylim_", i)})
       subjects <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_subjects_", i)})
@@ -271,6 +271,7 @@ server <- function(input, output, session) {
         if(i == 1){
           out <- "primary"
           type <- outcome$poutcome()
+          study <- phase2_inputs$t2_n_studies
         } else {
           out <- "secondary"
           type <- outcome$soutcome()
