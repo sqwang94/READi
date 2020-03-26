@@ -4,6 +4,8 @@ const config = {
   projectId: "readi-dcf98"
 }
 
+const HOME_URL = "http://127.0.0.1:5866/"
+
 firebase.initializeApp(config)
 const auth = firebase.auth()
 
@@ -50,6 +52,7 @@ $(document).on("click", "#submit_sign_in", () => {
  * a Shiny input `input$auth_user`
  */
 auth.onAuthStateChanged((user) => {
+  console.log(user)
   if (!user || user.emailVerified) {
     Shiny.setInputValue('auth_user', user);
   }
@@ -151,6 +154,7 @@ $(document).on("mouseup", "#signout", (e) => {
   e.stopPropagation();
   e.preventDefault();
   auth.signOut()
+  window.location.replace(HOME_URL);
 })
 
 $(document).on("click", "#login_backdrop", (e) => {

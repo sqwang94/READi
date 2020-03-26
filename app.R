@@ -121,20 +121,31 @@ server <- function(input, output, session) {
   
     })
     # ----- Welcoming users to site (with introduction)
-
-    showModal(modalDialog(
-      # --- Need html file here but for now:
-      title = "Important Message",
-      "Some welcome message:",
-      easyClose = TRUE,
-      footer = tagList(
-        # --- Creating intro option on main intro
-        actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
-      )
-    ))
-  
+    observe({
+      if (length(getQueryString(session)) == 0) {
+        showModal(modalDialog(
+          # --- Need html file here but for now:
+          title = "Important Message",
+          "Some welcome message:",
+          easyClose = TRUE,
+          footer = tagList(
+            # --- Creating intro option on main intro
+            actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
+          )
+        ))
+      }
+    })
+    
+    setBookmarkExclude(c("bookmark"))
+    
+    observeEvent(input$bookmark, {
+      session$doBookmark()
+    })
+    
+    
+    
    
-   # ----- Hiding all tabs upon  entry to site
+    # ----- Hiding all tabs upon  entry to site
     hideTab("tabs", "account")
     hideTab(inputId = "tabs", target = "tab1")
     hideTab(inputId = "tabs", target = "tab2")
@@ -148,7 +159,7 @@ server <- function(input, output, session) {
     observeEvent(input$my_account, {
       updateNavbarPage(session, "tabs", "account")
       toggleDropdownButton(inputId = "account_dropdown")
-      js$updateAccount()
+      js$updateAccount(session$userData$current_user()$uid)
     })
 
     callModule(authentication, "authentication")
@@ -165,6 +176,9 @@ server <- function(input, output, session) {
       if (!is.null(current_user)) {
         removeClass(selector = "#auth_panel", class = "Show")
         addClass(selector = "#login_backdrop", class = "hidden")
+        onBookmarked(function(url) {
+          js$saveState(url, current_user$uid)
+        })
       } else {
         js$clearAccount()
       }
@@ -186,6 +200,9 @@ server <- function(input, output, session) {
       }
     })
     
+    onRestore(function(state) {
+      showTab(inputId = "tabs", target = "tab1")
+    })
     
     # dynamic title for tab 1
     output$title_panel_1 = renderText({

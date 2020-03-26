@@ -209,7 +209,6 @@ identifyPage <- function(input, output, session, parentSession) {
         return(inputs)
     })
     
-    
     # --- Need to create search string:
     # ----- 
     search_string <- reactive({
