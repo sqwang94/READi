@@ -34,7 +34,7 @@ shinyjs.saveState = function(stateData) {
     });
   }
   var d = new Date($.now());
-  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()+ ":" + d.getSeconds()
+  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()+ ":" + (d.getSeconds() < 9 ? "0" : "") + d.getSeconds()
   var data = {
     url: stateData[0],
     time: time
@@ -74,9 +74,7 @@ function makeEvalEntry(uid, key, data) {
     ).append(
       $('<a/>', {'class': 'link', 'href': data.url + '&session=' + key, text: "Click Here to Continue"})
     ).append(
-      $('<span/>', {text: data.url})
-    ).append(
-      $('<span/>', {text: "Last modified: " + data.time})
+      $('<p/>', {text: "Last modified: " + data.time})
     ).append(
       $('<button/>', {text: "delete"}).click(function() {
         $.confirm({

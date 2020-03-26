@@ -200,6 +200,9 @@ identifyPage <- function(input, output, session, parentSession) {
         inputs[[ns("t1_int_interest")]] = input$t1_int_interest
         inputs[[ns("t1_comparator")]] = input$t1_comparator
         inputs[[ns("t1_poutcome")]] = input$t1_poutcome
+        if (!is.null(input$t1_outcomes) && input$t1_outcomes == 2) {
+            inputs[[ns("t1_secondary_outcome")]] = input$t1_secondary_outcome
+        }
         inputs[[ns("t1_setting")]] = input$t1_setting
         aoi <- input$t1_AOI
         if (is.null(input$t1_AOI)) {
@@ -253,6 +256,8 @@ identifyPage <- function(input, output, session, parentSession) {
             )
         }
     })
+    
+    return(input)
 }
 
 # returns the number of outcomes and the primary outcome input from phase 1

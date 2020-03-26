@@ -30,7 +30,7 @@ evalPageUI <- function(id) {
 }
 
 # server function for phase 2 evaluation of evidence page
-evalPage <- function(input, output, session, parentSession) {
+evalPage <- function(input, output, session, parentSession, phase1_inputs) {
     ns <- session$ns
     output$study_identified <- renderUI({ # Rendering UI based on whether or not studies are available
         if(input$t2_ev_available == "No"){
@@ -53,7 +53,7 @@ evalPage <- function(input, output, session, parentSession) {
                 return("Please select the number of studies identified above!")
             } else {
                 our_ui <- studyNavUI(ns("study_nav"), num_studies)
-                callModule(studyNav, "study_nav", num_studies)
+                callModule(studyNav, "study_nav", num_studies, phase1_inputs)
             }
             our_ui
         }
