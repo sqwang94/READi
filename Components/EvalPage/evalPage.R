@@ -59,7 +59,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
             our_ui
         }
     })
-    bias_values(callModule(studyNavGlobal, "study_nav", phase1_inputs, bias_values))
+    callModule(studyNavGlobal, "study_nav", phase1_inputs, bias_values)
 
     # input validation for all studies in studies navigation
     observeEvent(input$submit_2, {
