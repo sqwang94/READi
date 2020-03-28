@@ -22,7 +22,9 @@ source("Components/RecommendationPage/recommendationPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
+source("Components/RecPage/recPage.R")
 source("Components/EvalHistory/evalHistory.R")
+source("Components/SumPage/sumPage.R")
 source("Components/UI/Loader/loader.R")
 
 # Define UI for application that draws a histogram
@@ -61,25 +63,23 @@ ui <- function(request){
                # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
-                        evalPageUI("eval_page")
-               ),
+                        evalPageUI("eval_page")),
+               
 
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 3: Summarizing Available Literature ----------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
-                        uiOutput("t3_pt1"),
-                        column(8, offset = 2,
-                               wellPanel(
-                                 wellPanel(
-                                   htmlOutput("t3_table"))))),
+                        sumPageUI("sum_page")),
+               
+
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
-                        recommendationPageUI("rec_page")
-               ),
-               
+                        recPageUI("rec_page")),
+
+               # Evaluation history page
                tabPanel("", value = "account", class = "always-show", evalHistory)
                
                
@@ -234,6 +234,8 @@ server <- function(input, output, session) {
     # dynamic title for tab 1
     output$title_panel_1 = renderText({
       if (req(input$tabs) == "tab1") {
+        hideTab(inputId = "tabs", target = "tab2")
+        hideTab(inputId = "tabs", target = "tab3")
         return("Phase 1: Identify Real World Evidence")
       }
       return("Phase 1")
@@ -262,6 +264,7 @@ server <- function(input, output, session) {
       }
       return("Phase 4")
     })
+
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 1: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
@@ -270,149 +273,13 @@ server <- function(input, output, session) {
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 2: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
-    phase2_inputs <- callModule(evalPage, "eval_page", session, phase1_inputs)
+    bias_values <- callModule(evalPage, "eval_page", session, phase1_inputs)
     
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 3: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
 
-    
-    output$t3_pt1 <- renderUI({
-      outcome <- callModule(identifyPageGetOutcome, "identify_page")
-
-      # ------ Defining inputID for all inputs
-      studylim <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_studylim_", i)})
-      subjects <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_subjects_", i)})
-      comparator <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_comparator_", i)})
-      consistent <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_consistent_", i)})
-      direct     <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_direct_", i)})
-      precise    <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_precise_", i)})
-      bias       <- lapply(seq_len(outcome$outcomes()), function(i){paste0("t3_bias_", i)})
-
-      lapply(seq_len(outcome$outcomes()), function(i){
-        if(i == 1){
-          out <- "primary"
-          type <- outcome$poutcome()
-          study <- phase2_inputs$t2_n_studies
-        } else {
-          out <- "secondary"
-          type <- outcome$soutcome()
-        }
-            column(8, offset = 2,
-              wellPanel(strong(paste0("For your ", out, " outcome of ", type, " answer the following questions:")),
-                        br(),
-                        br(),
-                        wellPanel(
-                          selectInput(inputId = studylim[[i]],
-                                      label = "Based on the rating for each study, what's the overall level of study limitation?",
-                                      choices = c("High", "Moderate", "Low"),
-                                      selected = character(0)),
-                          textInput(inputId = subjects[[i]],
-                                    label = "What is the overall number of subjects (N)?",
-                                    placeholder = 50),
-                          textInput(inputId = comparator[[i]],
-                                    label = "What is the comparator listed in each study for this outcome?",
-                                    placeholder = "Standard of Care"),
-                          selectInput(inputId = consistent[[i]],
-                                      label = "Are the results among the studies consistent with one another? ",
-                                      choices = c("Consistent", "Unknown", "Inconsistent")),
-                          selectInput(inputId = direct[[i]],
-                                      label = "Are the results direct?",  # need hover tool tip for "direct"
-                                      choices = c("Direct", "Indirect")),
-                          selectInput(inputId = precise[[i]],
-                                      label = "Are the results precise?",
-                                      choices = c("Precise", "Imprecise")),
-                          selectInput(inputId = bias[[i]],
-                                      label = "Is there publication bias?",
-                                      choices = c("Yes", "No"))),
-                        bsPopover(id = direct[[i]],
-                                  title = "Evidence can be indirect when:",
-                                  content =  paste("i. Patients, intervention, or outcomes differ from that of interest",
-                                                   "ii. Clinicians must choose between interventions that hvae not been compared in a head-to-head manner",
-                                                   sep = "<br><br>"), 
-                                  placement = "left", 
-                                  trigger = "hover"),
-                        bsPopover(id = precise[[i]],
-                                  title = "Precision", content =  paste("Studies can be considered imprecise if there are few patients or and few events, thereby rendering a fairly large confidence interval"),
-                                  placement = "left",
-                                  trigger = "hover"),
-                        bsPopover(id = bias[[i]],
-                                  title = "Publication Bias:", content =  paste("A systematic over or underestimate of treatment effect due to the selective publication of studies"),
-                                  placement = "left",
-                                  trigger = "hover")))
-            })
-    })
-    
-    output$t3_table <- renderText({
-      outcome <- callModule(identifyPageGetOutcome, "identify_page")
-      domain_vec <- c("Outcome of interest", 
-                      "Comparator in each study", 
-                      "Number of studies and number of subjects (overall)",
-                      "Level of overall study limitation",
-                      "Are the results consistent",
-                      "Are the results direct?",
-                      "Are the results precise?",
-                      "Is there publication bias?")
-      if (outcome$outcomes() == 1){
-        outcomes <- c(outcome$poutcome(),
-                      input$t3_studylim_1, 
-                      input$t3_subjects_1, 
-                      input$t3_comparator_1, 
-                      input$t3_consistent_1, 
-                      input$t3_direct_1, 
-                      input$t3_precise_1,
-                      input$t3_bias_1)
-        
-        df <- data.frame(
-          Domains           = domain_vec,
-          `Primary Outcome` = outcomes
-        )
-        
-          kable(df,
-                col.names = c("Domains", "Primary Outcome"),
-                "html", 
-                escape = FALSE,
-                align = "c") %>% 
-            kable_styling(full_width = TRUE, 
-                          bootstrap_options = c("striped", "hover", "condensed", "bordered")) %>% 
-            row_spec(c(1,3,5,7), background = "#d1b3e6", color = "black") %>% 
-            row_spec(c(2,4,6,8), background = "white", color = "black")
-      } else {
-          outcomes <- list(c(outcome$poutcome(),
-                           input$t3_studylim_1, 
-                           input$t3_subjects_1, 
-                           input$t3_comparator_1, 
-                           input$t3_consistent_1, 
-                           input$t3_direct_1, 
-                           input$t3_precise_1,
-                           input$t3_bias_1),
-                         c(outcome$soutcome(),
-                           input$t3_studylim_2, 
-                           input$t3_subjects_2, 
-                           input$t3_comparator_2, 
-                           input$t3_consistent_2, 
-                           input$t3_direct_2, 
-                           input$t3_precise_2,
-                           input$t3_bias_2))
-        df <- data.frame(
-          Domains           = domain_vec,
-          `Primary Outcome` = outcomes[[1]],
-          `Secondary Outcomes` = outcomes[[2]]
-          
-        )
-        
-        kable(df,
-              col.names = c("Domains", "Primary Outcome", "Secondary Outcome"),
-              "html", 
-              escape = FALSE,
-              align = "c") %>% 
-          kable_styling(full_width = TRUE, 
-                        bootstrap_options = c("striped", "hover", "condensed")) %>% 
-          row_spec(c(1,3,5,7), background = "#d1b3e6", color = "black") %>% 
-          row_spec(c(2,4,6,8), background = "white", color = "black")
-      }
-      
-      })
+    callModule(sumPage, "sum_page", phase1_inputs, bias_values)
   }
 
 # Run the application 

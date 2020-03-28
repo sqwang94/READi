@@ -145,7 +145,7 @@ identifyPage <- function(input, output, session, parentSession) {
             return()
         
         if (input$t1_outcomes == 2){
-            textInput(ns("t1_secondary_outcome"),
+            textInput(ns("t1_soutcome"),
                       "(O) c. What is your secondary outcome of interest?")
         }
     })
@@ -201,7 +201,7 @@ identifyPage <- function(input, output, session, parentSession) {
         inputs[[ns("t1_comparator")]] = input$t1_comparator
         inputs[[ns("t1_poutcome")]] = input$t1_poutcome
         if (!is.null(input$t1_outcomes) && input$t1_outcomes == 2) {
-            inputs[[ns("t1_secondary_outcome")]] = input$t1_secondary_outcome
+            inputs[[ns("t1_soutcome")]] = input$t1_soutcome
         }
         inputs[[ns("t1_setting")]] = input$t1_setting
         aoi <- input$t1_AOI
@@ -254,20 +254,10 @@ identifyPage <- function(input, output, session, parentSession) {
                 type = "error",
                 btn_labels = c("Go back")
             )
+            hideTab(session = parentSession, inputId = "tabs", target = "tab2")
+            hideTab(session = parentSession, inputId = "tabs", target = "tab3")
+            shinyjs::hide(selector = "#tabs li:nth-child(2) i")
         }
     })
-    
     return(input)
-}
-
-# returns the number of outcomes and the primary outcome input from phase 1
-identifyPageGetOutcome <- function(input, output, session) {
-  ns <- session$ns
-    return (
-        list(
-            outcomes = reactive({input$t1_outcomes}),
-            poutcome = reactive({input$t1_poutcome}),
-            soutcome = reactive({input$t1_secondary_outcome})
-        )
-    )
 }
