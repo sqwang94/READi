@@ -42,6 +42,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
         }
     })
     
+    bias_values <- reactiveVal(reactiveValues())
     # ------ Creating reactionary wellPanel based on how many studies selected ------- # 
     output$study_react <- renderUI({    # goal: create panels of questions in response to "How many studies did you find?"
         if(input$t2_ev_available == "No"){
@@ -53,12 +54,12 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
                 return("Please select the number of studies identified above!")
             } else {
                 our_ui <- studyNavUI(ns("study_nav"), num_studies)
-                callModule(studyNav, "study_nav", num_studies, phase1_inputs)
+                bias_values(callModule(studyNav, "study_nav", num_studies, phase1_inputs))
             }
             our_ui
         }
     })
-    callModule(studyNavGlobal, "study_nav")
+    bias_values(callModule(studyNavGlobal, "study_nav", phase1_inputs, bias_values))
 
     # input validation for all studies in studies navigation
     observeEvent(input$submit_2, {
@@ -87,6 +88,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
             shinyjs::hide(selector = "#tabs li:nth-child(3) i")
         }
     })
+    return(bias_values)
 }
 
 

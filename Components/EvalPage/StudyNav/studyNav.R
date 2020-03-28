@@ -26,15 +26,18 @@ studyNavUI <- function(id, numOfStudy) {
 
 # server function for studies navigation component
 studyNav <- function(input, output, session, numOfStudy, phase1_inputs) {
+    bias <- reactiveValues()
+    bias$count <- numOfStudy
     lapply(1:numOfStudy, function(i) {
         callModule(studyNavButton, paste0("buttons", i), session, i)
-        callModule(individualStudyEval, paste0("study", i), phase1_inputs)
+        bias[[toString(i)]] <- callModule(individualStudyEval, paste0("study", i), phase1_inputs)
     })
     js$toTop()
+    return(bias)
 }
 
 # global add and remove functionality for the studies navigation
-studyNavGlobal <- function(input, output, session, phase1_inputs) {
+studyNavGlobal <- function(input, output, session, phase1_inputs, bias_values) {
     ns <- session$ns
     
     # add a new page to the studies navigation
@@ -52,7 +55,10 @@ studyNavGlobal <- function(input, output, session, phase1_inputs) {
                   tabPanel(class = class, title = toString(tabId), value = toString(tabId), individualStudyEvalUI(ns(paste0("study", tabId)), tabId), studyNavButtonButton(ns(paste0("buttons", tabId)))),
                   target = "Add", select = TRUE, position = "before")
         callModule(studyNavButton, paste0("buttons", tabId), session, tabId)
-        callModule(individualStudyEval, paste0("study", tabId), phase1_inputs)
+        bias <- bias_values()
+        bias$count <- tabId
+        bias[[toString(tabId)]] <- callModule(individualStudyEval, paste0("study", tabId), phase1_inputs)
+        bias_values(bias)
     }
     
     # remove the last page from the studies navigation
@@ -67,6 +73,10 @@ studyNavGlobal <- function(input, output, session, phase1_inputs) {
             if (tabId == 1) {
                 addClass(selector = "#filler-remove", class="Hidden")
             }
+            bias <- bias_values()
+            bias$count <- tabId - 1
+            bias[[toString(tabId)]] <- NULL
+            bias_values(bias)
         }
     }
     

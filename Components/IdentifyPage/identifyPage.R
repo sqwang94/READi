@@ -259,7 +259,6 @@ identifyPage <- function(input, output, session, parentSession) {
             shinyjs::hide(selector = "#tabs li:nth-child(2) i")
         }
     })
-    
     return(input)
 }
 
