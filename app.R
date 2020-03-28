@@ -21,8 +21,9 @@ source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
-source("Components/EvalHistory/evalHistory.R")
 source("Components/RecPage/recPage.R")
+source("Components/EvalHistory/evalHistory.R")
+source("Components/SumPage/sumPage.R")
 source("Components/UI/Loader/loader.R")
 
 # Define UI for application that draws a histogram
@@ -61,15 +62,20 @@ ui <- function(request){
                # ------------------------- Phase 2: Grading of Evidence ---------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
-                        evalPageUI("eval_page")
-               ),
+                        evalPageUI("eval_page")),
                
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
-                        recPageUI("rec_page")),
+                        sumPageUI("sum_page")),
                
+               # ---------------------------  ----------------------------------#
+               # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
+               # ---------------------------  ----------------------------------#
+               tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
+                        recPageUI("rec_page")),
+
                # Evaluation history page
                tabPanel("", value = "account", class = "always-show", evalHistory)
   ))
@@ -236,9 +242,17 @@ server <- function(input, output, session) {
     # dynamic title for tab 3
     output$title_panel_3 = renderText({
       if (req(input$tabs) == "tab3") {
-        return("Phase 3: Making Evidence-Based Recommendations")
+        return("Phase 3: Summarizing The Literature")
       }
       return("Phase 3")
+    })
+    
+    # dynamic title for tab 4
+    output$title_panel_4 = renderText({
+      if (req(input$tabs) == "tab4") {
+        return("Phase 4: Making an Evidence-Based Recommendation")
+      }
+      return("Phase 4")
     })
     
            # ---------------------------  ----------------------------------#
@@ -255,7 +269,7 @@ server <- function(input, output, session) {
     # --------------------------- Phase 3: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
 
-    callModule(recPage, "rec_page", phase1_inputs, bias_values)
+    callModule(sumPage, "sum_page", phase1_inputs, bias_values)
   }
 
 # Run the application 
