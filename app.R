@@ -18,6 +18,7 @@ library(V8)
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
+source("Components/RecommendationPage/recommendationPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
@@ -62,9 +63,9 @@ ui <- function(request){
                tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
                         evalPageUI("eval_page")
                ),
-               
+
                # ---------------------------  ----------------------------------#
-               # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
+               # --------------------------- Phase 3: Summarizing Available Literature ----------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
                         uiOutput("t3_pt1"),
@@ -72,7 +73,20 @@ ui <- function(request){
                                wellPanel(
                                  wellPanel(
                                    htmlOutput("t3_table"))))),
+               # ---------------------------  ----------------------------------#
+               # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
+               # ---------------------------  ----------------------------------#
+               tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
+                        recommendationPageUI("rec_page")
+               ),
+               
                tabPanel("", value = "account", class = "always-show", evalHistory)
+               
+               
+               
+
+               
+               
   ))
 } # closing function (function necessary for bookmarking)
 
@@ -145,11 +159,12 @@ server <- function(input, output, session) {
       session$doBookmark()
     })
    
-    # ----- Hiding all tabs upon  entry to site
+    # ----- Hiding all tabs upon entry to site
     hideTab("tabs", "account")
     hideTab(inputId = "tabs", target = "tab1")
     hideTab(inputId = "tabs", target = "tab2")
     hideTab(inputId = "tabs", target = "tab3")
+    hideTab(inputId = "tabs", target = "tab4")
 
     observeEvent(input$beginPhase,{
       showTab(inputId = "tabs", target = "tab1")
@@ -235,11 +250,18 @@ server <- function(input, output, session) {
     # dynamic title for tab 3
     output$title_panel_3 = renderText({
       if (req(input$tabs) == "tab3") {
-        return("Phase 3: Making Evidence-Based Recommendations")
+        return("Phase 3: Summarizing The Literature")
       }
       return("Phase 3")
     })
     
+    # dynamic title for tab 4
+    output$title_panel_4 = renderText({
+      if (req(input$tabs) == "tab4") {
+        return("Phase 4: Making an Evidence-Based Recommendation")
+      }
+      return("Phase 4")
+    })
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 1: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
