@@ -242,6 +242,7 @@ identifyPage <- function(input, output, session, parentSession) {
             ) 
             showTab(session = parentSession, inputId = "tabs", target = "tab2")
             showTab(session = parentSession, inputId = "tabs", target = "tab3")
+            showTab(session = parentSession, inputId = "tabs", target = "tab4")
             shinyjs::show(selector = "#tabs li:nth-child(2) i")
             updateNavbarPage(parentSession, "tabs", "tab2")
             
@@ -256,6 +257,7 @@ identifyPage <- function(input, output, session, parentSession) {
             )
             hideTab(session = parentSession, inputId = "tabs", target = "tab2")
             hideTab(session = parentSession, inputId = "tabs", target = "tab3")
+            hideTab(session = parentSession, inputId = "tabs", target = "tab4")
             shinyjs::hide(selector = "#tabs li:nth-child(2) i")
         }
     })
