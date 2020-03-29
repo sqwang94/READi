@@ -18,6 +18,7 @@ library(V8)
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
+source("Components/RecommendationPage/recommendationPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
@@ -64,12 +65,14 @@ ui <- function(request){
                tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
                         evalPageUI("eval_page")),
                
+
                # ---------------------------  ----------------------------------#
-               # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
+               # --------------------------- Phase 3: Summarizing Available Literature ----------------------------#
                # ---------------------------  ----------------------------------#
                tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
                         sumPageUI("sum_page")),
                
+
                # ---------------------------  ----------------------------------#
                # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
                # ---------------------------  ----------------------------------#
@@ -78,6 +81,12 @@ ui <- function(request){
 
                # Evaluation history page
                tabPanel("", value = "account", class = "always-show", evalHistory)
+               
+               
+               
+
+               
+               
   ))
 } # closing function (function necessary for bookmarking)
 
@@ -150,7 +159,7 @@ server <- function(input, output, session) {
       session$doBookmark()
     })
    
-    # ----- Hiding all tabs upon  entry to site
+    # ----- Hiding all tabs upon entry to site
     hideTab("tabs", "account")
     hideTab(inputId = "tabs", target = "tab1")
     hideTab(inputId = "tabs", target = "tab2")
@@ -280,7 +289,7 @@ server <- function(input, output, session) {
       }
       return("Phase 4")
     })
-    
+
            # ---------------------------  ----------------------------------#
     # --------------------------- Phase 1: RWE ----------------------------------#
            # ---------------------------  ----------------------------------#
