@@ -14,6 +14,8 @@ library(lubridate)
 library(shinyBS)
 library(kableExtra)
 library(V8)
+library(ggthemes)
+library(tidyverse)
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")

@@ -1,6 +1,12 @@
 sumPageUI <- function(id) {
     ns <- NS(id)
     fluidPage(
+        column(8, offset = 2,
+               wellPanel(strong(paste0("Below is a summary of your responses for your outcome(s). Use this to think about the questions below.")),
+                         br(),
+                         br(),
+                         wellPanel(
+                           plotOutput(ns("summaryoutcomes"))))),
         uiOutput(ns("t3_pt1")),
         column(8, offset = 2,
                wellPanel(
@@ -10,9 +16,57 @@ sumPageUI <- function(id) {
 
 sumPage <- function(input, output, session, phase1_inputs, bias_values) {
     ns <- session$ns
-    output$t3_pt1 <- renderUI({
-        bias <- reactiveValuesToList(bias_values())
+    
+    output$summaryoutcomes <- renderPlot({
+      bias <- reactiveValuesToList(bias_values())
+  
+      x <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$standard_bias})) # unlisting answers from individualStudyEval (found in bias <- reactiveValuesToList(bias_values()))
+      y <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$outcome1}))
+      
+      if (phase1_inputs$t1_outcomes == 1){
+        
+      df <- data.frame(
+        x = x,
+        y = y
+      )
+      
+      ggplot(df %>% 
+               filter(y == "Yes")) +
+        geom_bar(aes(x = x, fill = x)) +
+        theme_hc() +
+        guides(fill = FALSE) +
+        labs(x = "")
+      } else {
+        
+        z <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$outcome2}))
+          
+        df <- data.frame(
+          x = x,
+          y = y,
+          z = z
+        )
+        
+       df_update <-  df %>% 
+          pivot_longer(cols = c("y", "z"), 
+                       names_to = "outcome_type", 
+                       values_to = "YesNo")
+        
+        ggplot(df_update %>% 
+                 filter(YesNo == "Yes")) +
+          geom_bar(aes(x = x, fill = x)) +
+          theme_hc() +
+          guides(fill = FALSE) +
+          labs(x = "") +
+          facet_grid(~outcome_type)
+      }
+        
 
+    })
+
+    
+    output$t3_pt1 <- renderUI({
+      bias <- reactiveValuesToList(bias_values())
+      
         # ------ Defining inputID for all inputs
         studylim <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_studylim_", i)})
         subjects <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_subjects_", i)})
