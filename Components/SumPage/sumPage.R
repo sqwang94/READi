@@ -12,7 +12,9 @@ sumPage <- function(input, output, session, phase1_inputs, bias_values) {
     ns <- session$ns
     output$t3_pt1 <- renderUI({
         bias <- reactiveValuesToList(bias_values())
-
+        # print(bias$count)
+        # print(bias[['1']]$standard_bias)
+                                                                      
         # ------ Defining inputID for all inputs
         studylim <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_studylim_", i)})
         subjects <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_subjects_", i)})

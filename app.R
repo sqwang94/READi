@@ -123,7 +123,7 @@ server <- function(input, output, session) {
                                       "prevLabel" = "Go Back",
                                       "doneLabel" = "Cool - let's get started!",
                                       "showProgress" = TRUE,
-                                      "showStepNumbers" = FALSE,
+                                      "showStepNumbers" = FALSE,                                                                                                                             
                                       "hidePrev" = TRUE,
                                       "hideNext" = TRUE))
   
@@ -144,7 +144,7 @@ server <- function(input, output, session) {
       }
     })
     
-    setBookmarkExclude(c("bookmark"))
+    setBookmarkExclude(c("bookmark", "new_session_save"))
     
     observeEvent(input$bookmark, {
       session$doBookmark()
@@ -155,10 +155,32 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "tab1")
     hideTab(inputId = "tabs", target = "tab2")
     hideTab(inputId = "tabs", target = "tab3")
+    hideTab(inputId = "tabs", target = "tab4")
 
     observeEvent(input$beginPhase,{
-      showTab(inputId = "tabs", target = "tab1")
-      updateNavbarPage(session, "tabs", "tab1")
+      if (session$userData$inSession()) {
+        confirmSweetAlert(
+          session,
+          inputId = "new_session_save",
+          title = "New session",
+          text = "You are leaving your current session. Do you want to save your progress?",
+          type = "question",
+          btn_labels = c("Don't Save", "Save"),
+          closeOnClickOutside = TRUE,
+          showCloseButton = TRUE,
+          html = FALSE,
+        )
+      } else {
+        showTab(inputId = "tabs", target = "tab1")
+        updateNavbarPage(session, "tabs", "tab1")
+        session$userData$inSession(TRUE)
+      }
+    })
+    
+    observeEvent(input$new_session_save, {
+      if (isTRUE(input$new_session_save)) {
+        session$doBookmark()
+      }
     })
 
     observeEvent(input$my_account, {
@@ -172,6 +194,7 @@ server <- function(input, output, session) {
     # initialize user and session data
     session$userData$current_user <- reactiveVal(NULL)
     session$userData$current_session <- reactiveVal(NULL)
+    session$userData$inSession <- reactiveVal(FALSE)
     observeEvent(input$auth_user, {
       session$userData$current_user(input$auth_user)
     }, ignoreNULL = FALSE)
@@ -189,7 +212,9 @@ server <- function(input, output, session) {
         js$hideSpinner()
         # get current session and update bookmark save state
         if (!is.null(cur_session)) {
+          js$checkSession(current_user$uid, cur_session)
           session$userData$current_session(cur_session)
+          session$userData$inSession(TRUE)
         }
         onBookmarked(function(url) {
           js$saveState(url, current_user$uid, session$userData$current_session())
@@ -219,6 +244,7 @@ server <- function(input, output, session) {
     # always show phase 1 for restored state
     onRestore(function(state) {
       showTab(inputId = "tabs", target = "tab1")
+      session$userData$inSession(TRUE)
     })
     
     # dynamic title for tab 1
