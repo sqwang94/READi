@@ -18,7 +18,6 @@ library(V8)
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
 source("Components/IdentifyPage/identifyPage.R")
-source("Components/RecommendationPage/recommendationPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
 source("Components/Authentication/LoginDropdown/loginDropdown.R")
@@ -48,264 +47,256 @@ ui <- function(request){
     authenticationUI("authentication"),
     loader,
     navbarPageWithBtn("READi Tool",
-               id = "tabs",
-               collapsible = TRUE,
-               tabPanel("Home",
-                        homePageUI),
-               
-               # ---------------------------  ----------------------------------#
-               # --------------------------- Phase 1: RWE ----------------------------------#
-               # ---------------------------  ----------------------------------#
-               tabPanel(uiOutput("title_panel_1", class = "inline"), value = "tab1", icon = icon("check-circle"),
-                        identifyPageUI("identify_page")),
-                        
-               # ---------------------------  ----------------------------------#
-               # ------------------------- Phase 2: Grading of Evidence ---------------------------#
-               # ---------------------------  ----------------------------------#
-               tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
-                        evalPageUI("eval_page")),
-               
-
-               # ---------------------------  ----------------------------------#
-               # --------------------------- Phase 3: Summarizing Available Literature ----------------------------#
-               # ---------------------------  ----------------------------------#
-               tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
-                        sumPageUI("sum_page")),
-               
-
-               # ---------------------------  ----------------------------------#
-               # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
-               # ---------------------------  ----------------------------------#
-               tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
-                        recPageUI("rec_page")),
-
-               # Evaluation history page
-               tabPanel("", value = "account", class = "always-show", evalHistory)
-               
-               
-               
-
-               
-               
-  ))
+                      id = "tabs",
+                      collapsible = TRUE,
+                      tabPanel("Home",
+                               homePageUI),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # --------------------------- Phase 1: RWE ----------------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_1", class = "inline"), value = "tab1", icon = icon("check-circle"),
+                               identifyPageUI("identify_page")),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # ------------------------- Phase 2: Grading of Evidence ---------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_2", class = "inline"), value = "tab2", icon = icon("check-circle"),
+                               evalPageUI("eval_page")),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # --------------------------- Phase 3: Evidence-Based Rec ----------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_3", class = "inline"), value = "tab3", icon = icon("check-circle"),
+                               sumPageUI("sum_page")),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # --------------------------- Phase 4: Making an Evidence-Based Rec ----------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
+                               recPageUI("rec_page")),
+                      
+                      # Evaluation history page
+                      tabPanel("", value = "account", class = "always-show", evalHistory)
+    ))
 } # closing function (function necessary for bookmarking)
 
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-    # -------------------- Intro Tutorial
-    observeEvent(input$intro, {
-      removeModal()
-      int_text <- c(
-  
-        # -- Welcome
-        "Welcome to the READi tool - for a quick tour, click next, otherwise click 'skip' to begin! (needs to be html with actual button to continue to tour - this is placeholder)",
-  
-        # -- Login
-        "The first thing you should do is login. Here, you can either register as a new user or continue your progress on any of your projects with your login.
+  # -------------------- Intro Tutorial
+  observeEvent(input$intro, {
+    removeModal()
+    int_text <- c(
+      
+      # -- Welcome
+      "Welcome to the READi tool - for a quick tour, click next, otherwise click 'skip' to begin! (needs to be html with actual button to continue to tour - this is placeholder)",
+      
+      # -- Login
+      "The first thing you should do is login. Here, you can either register as a new user or continue your progress on any of your projects with your login.
         If you don't want to register, you can continue as a guest but you won't have access to your other projects!",
-  
-        # -- Save progress
-        "You will want to make sure you are saving your progress (the process can be a lot for one sitting).
+      
+      # -- Save progress
+      "You will want to make sure you are saving your progress (the process can be a lot for one sitting).
         Click this button for a link to copy and save progress.",
-  
-        #  -- If you want to know more
-        "This process is completed in phases (which I will show you in a few seconds). If you want to learn more about the
+      
+      #  -- If you want to know more
+      "This process is completed in phases (which I will show you in a few seconds). If you want to learn more about the
         phases themselves before beginning, check them out here.",
-  
-        # -- Navigate
-        "You can navigate between those phases here.",
-  
-        # -- To begin
-        "Finally, click here when you are ready to begin!"
-  
-      )
-  
-      intro <- data.frame(
-        element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
-        intro = int_text,
-        position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
-  
-      introjs(session, options = list(steps = intro,
-                                      "nextLabel" = "Next",
-                                      "prevLabel" = "Go Back",
-                                      "doneLabel" = "Cool - let's get started!",
-                                      "showProgress" = TRUE,
-                                      "showStepNumbers" = FALSE,                                                                                                                             
-                                      "hidePrev" = TRUE,
-                                      "hideNext" = TRUE))
-  
-    })
-    # ----- Welcoming users to site (with introduction)
-    observe({
-      if (length(getQueryString(session)) == 0) {
-        showModal(modalDialog(
-          # --- Need html file here but for now:
-          title = "Important Message",
-          "Some welcome message:",
-          easyClose = TRUE,
-          footer = tagList(
-            # --- Creating intro option on main intro
-            actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
-          )
-        ))
-      }
-    })
+      
+      # -- Navigate
+      "You can navigate between those phases here.",
+      
+      # -- To begin
+      "Finally, click here when you are ready to begin!"
+      
+    )
     
-    setBookmarkExclude(c("bookmark", "new_session_save"))
+    intro <- data.frame(
+      element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
+      intro = int_text,
+      position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
     
-    observeEvent(input$bookmark, {
-      session$doBookmark()
-    })
-   
-    # ----- Hiding all tabs upon entry to site
-    hideTab("tabs", "account")
-    hideTab(inputId = "tabs", target = "tab1")
-    hideTab(inputId = "tabs", target = "tab2")
-    hideTab(inputId = "tabs", target = "tab3")
-    hideTab(inputId = "tabs", target = "tab4")
-
-    observeEvent(input$beginPhase,{
-      if (session$userData$inSession()) {
-        confirmSweetAlert(
-          session,
-          inputId = "new_session_save",
-          title = "New session",
-          text = "You are leaving your current session. Do you want to save your progress?",
-          type = "question",
-          btn_labels = c("Don't Save", "Save"),
-          closeOnClickOutside = TRUE,
-          showCloseButton = TRUE,
-          html = FALSE,
+    introjs(session, options = list(steps = intro,
+                                    "nextLabel" = "Next",
+                                    "prevLabel" = "Go Back",
+                                    "doneLabel" = "Cool - let's get started!",
+                                    "showProgress" = TRUE,
+                                    "showStepNumbers" = FALSE,                                                                                                                             
+                                    "hidePrev" = TRUE,
+                                    "hideNext" = TRUE))
+    
+  })
+  # ----- Welcoming users to site (with introduction)
+  observe({
+    if (length(getQueryString(session)) == 0) {
+      showModal(modalDialog(
+        # --- Need html file here but for now:
+        title = "Important Message",
+        "Some welcome message:",
+        easyClose = TRUE,
+        footer = tagList(
+          # --- Creating intro option on main intro
+          actionButton(inputId = "intro", label = "Introduction Tour!", icon = icon("info-circle"))
         )
-      } else {
-        showTab(inputId = "tabs", target = "tab1")
-        updateNavbarPage(session, "tabs", "tab1")
+      ))
+    }
+  })
+  
+  setBookmarkExclude(c("bookmark", "new_session_save"))
+  
+  observeEvent(input$bookmark, {
+    session$doBookmark()
+  })
+  
+  # ----- Hiding all tabs upon  entry to site
+  hideTab("tabs", "account")
+  hideTab(inputId = "tabs", target = "tab1")
+  hideTab(inputId = "tabs", target = "tab2")
+  hideTab(inputId = "tabs", target = "tab3")
+  hideTab(inputId = "tabs", target = "tab4")
+  
+  observeEvent(input$beginPhase,{
+    if (session$userData$inSession()) {
+      confirmSweetAlert(
+        session,
+        inputId = "new_session_save",
+        title = "New session",
+        text = "You are leaving your current session. Do you want to save your progress?",
+        type = "question",
+        btn_labels = c("Don't Save", "Save"),
+        closeOnClickOutside = TRUE,
+        showCloseButton = TRUE,
+        html = FALSE,
+      )
+    } else {
+      showTab(inputId = "tabs", target = "tab1")
+      updateNavbarPage(session, "tabs", "tab1")
+      session$userData$inSession(TRUE)
+    }
+  })
+  
+  observeEvent(input$new_session_save, {
+    if (isTRUE(input$new_session_save)) {
+      session$doBookmark()
+    }
+  })
+  
+  observeEvent(input$my_account, {
+    updateNavbarPage(session, "tabs", "account")
+    toggleDropdownButton(inputId = "account_dropdown")
+    js$updateAccount(session$userData$current_user()$uid)
+  })
+  
+  callModule(authentication, "authentication")
+  
+  # initialize user and session data
+  session$userData$current_user <- reactiveVal(NULL)
+  session$userData$current_session <- reactiveVal(NULL)
+  session$userData$inSession <- reactiveVal(FALSE)
+  observeEvent(input$auth_user, {
+    session$userData$current_user(input$auth_user)
+  }, ignoreNULL = FALSE)
+  observeEvent(input$current_session, {
+    session$userData$current_session(input$current_session)
+  }, ignoreNULL = FALSE)
+  
+  # switch between auth sign in/registration and app for signed in user
+  observeEvent(session$userData$current_user(), {
+    current_user <- session$userData$current_user()
+    if (!is.null(current_user)) {
+      removeClass(selector = "#auth_panel", class = "Show")
+      addClass(selector = "#login_backdrop", class = "hidden")
+      cur_session <- getQueryString()$session
+      js$hideSpinner()
+      # get current session and update bookmark save state
+      if (!is.null(cur_session)) {
+        js$checkSession(current_user$uid, cur_session)
+        session$userData$current_session(cur_session)
         session$userData$inSession(TRUE)
       }
-    })
-    
-    observeEvent(input$new_session_save, {
-      if (isTRUE(input$new_session_save)) {
-        session$doBookmark()
-      }
-    })
-
-    observeEvent(input$my_account, {
-      updateNavbarPage(session, "tabs", "account")
-      toggleDropdownButton(inputId = "account_dropdown")
-      js$updateAccount(session$userData$current_user()$uid)
-    })
-
-    callModule(authentication, "authentication")
-    
-    # initialize user and session data
-    session$userData$current_user <- reactiveVal(NULL)
-    session$userData$current_session <- reactiveVal(NULL)
-    session$userData$inSession <- reactiveVal(FALSE)
-    observeEvent(input$auth_user, {
-      session$userData$current_user(input$auth_user)
-    }, ignoreNULL = FALSE)
-    observeEvent(input$current_session, {
-      session$userData$current_session(input$current_session)
-    }, ignoreNULL = FALSE)
-    
-    # switch between auth sign in/registration and app for signed in user
-    observeEvent(session$userData$current_user(), {
-      current_user <- session$userData$current_user()
-      if (!is.null(current_user)) {
-        removeClass(selector = "#auth_panel", class = "Show")
-        addClass(selector = "#login_backdrop", class = "hidden")
-        cur_session <- getQueryString()$session
-        js$hideSpinner()
-        # get current session and update bookmark save state
-        if (!is.null(cur_session)) {
-          js$checkSession(current_user$uid, cur_session)
-          session$userData$current_session(cur_session)
-          session$userData$inSession(TRUE)
-        }
-        onBookmarked(function(url) {
-          js$saveState(url, current_user$uid, session$userData$current_session())
-        })
-      } else {
-        js$clearAccount()
-        js$hideSpinner()
-      }
-    }, ignoreNULL = FALSE)
-    
-    output$loginToggle <- renderUI({
-      current_user <- session$userData$current_user()
-      if (is.null(current_user)) {
-        return (
-          tags$button(
-            id = "login",
-            type = "button",
-            class = "btn",
-            "Log in"
-          )
+      onBookmarked(function(url) {
+        js$saveState(url, current_user$uid, session$userData$current_session())
+      })
+    } else {
+      js$clearAccount()
+      js$hideSpinner()
+    }
+  }, ignoreNULL = FALSE)
+  
+  output$loginToggle <- renderUI({
+    current_user <- session$userData$current_user()
+    if (is.null(current_user)) {
+      return (
+        tags$button(
+          id = "login",
+          type = "button",
+          class = "btn",
+          "Log in"
         )
-      } else {
-        return (loginDropdown)
-      }
-    })
-    
-    # always show phase 1 for restored state
-    onRestore(function(state) {
-      showTab(inputId = "tabs", target = "tab1")
-      session$userData$inSession(TRUE)
-    })
-    
-    # dynamic title for tab 1
-    output$title_panel_1 = renderText({
-      if (req(input$tabs) == "tab1") {
-        hideTab(inputId = "tabs", target = "tab2")
-        hideTab(inputId = "tabs", target = "tab3")
-        return("Phase 1: Identify Real World Evidence")
-      }
-      return("Phase 1")
-    })
-    
-    # dynamic title for tab 2
-    output$title_panel_2 = renderText({
-      if (req(input$tabs) == "tab2") {
-        return("Phase 2: Reviewing and Grading of Evidence")
-      }
-      return("Phase 2")
-    })
-    
-    # dynamic title for tab 3
-    output$title_panel_3 = renderText({
-      if (req(input$tabs) == "tab3") {
-        return("Phase 3: Summarizing The Literature")
-      }
-      return("Phase 3")
-    })
-    
-    # dynamic title for tab 4
-    output$title_panel_4 = renderText({
-      if (req(input$tabs) == "tab4") {
-        return("Phase 4: Making an Evidence-Based Recommendation")
-      }
-      return("Phase 4")
-    })
-
-           # ---------------------------  ----------------------------------#
-    # --------------------------- Phase 1: RWE ----------------------------------#
-           # ---------------------------  ----------------------------------#
-    phase1_inputs <- callModule(identifyPage, "identify_page", session)
-    
-           # ---------------------------  ----------------------------------#
-    # --------------------------- Phase 2: RWE ----------------------------------#
-           # ---------------------------  ----------------------------------#
-    bias_values <- callModule(evalPage, "eval_page", session, phase1_inputs)
-    
-           # ---------------------------  ----------------------------------#
-    # --------------------------- Phase 3: RWE ----------------------------------#
-           # ---------------------------  ----------------------------------#
-
-    callModule(sumPage, "sum_page", phase1_inputs, bias_values)
-  }
+      )
+    } else {
+      return (loginDropdown)
+    }
+  })
+  
+  # always show phase 1 for restored state
+  onRestore(function(state) {
+    showTab(inputId = "tabs", target = "tab1")
+    session$userData$inSession(TRUE)
+  })
+  
+  # dynamic title for tab 1
+  output$title_panel_1 = renderText({
+    if (req(input$tabs) == "tab1") {
+      hideTab(inputId = "tabs", target = "tab2")
+      hideTab(inputId = "tabs", target = "tab3")
+      return("Phase 1: Identify Real World Evidence")
+    }
+    return("Phase 1")
+  })
+  
+  # dynamic title for tab 2
+  output$title_panel_2 = renderText({
+    if (req(input$tabs) == "tab2") {
+      return("Phase 2: Reviewing and Grading of Evidence")
+    }
+    return("Phase 2")
+  })
+  
+  # dynamic title for tab 3
+  output$title_panel_3 = renderText({
+    if (req(input$tabs) == "tab3") {
+      return("Phase 3: Summarizing The Literature")
+    }
+    return("Phase 3")
+  })
+  
+  # dynamic title for tab 4
+  output$title_panel_4 = renderText({
+    if (req(input$tabs) == "tab4") {
+      return("Phase 4: Making an Evidence-Based Recommendation")
+    }
+    return("Phase 4")
+  })
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 1: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  phase1_inputs <- callModule(identifyPage, "identify_page", session)
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 2: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  bias_values <- callModule(evalPage, "eval_page", session, phase1_inputs)
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 3: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  
+  callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+}
 
 # Run the application 
 shinyApp(ui = ui, server = server, enableBookmarking = "server")
