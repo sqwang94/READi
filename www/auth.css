@@ -34,6 +34,7 @@
 }
 
 .error_message {
+  position: fixed;
   color: red;
   margin: 0;
 }

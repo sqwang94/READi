@@ -1,5 +1,9 @@
 var databaseURL = 'https://readi-dcf98.firebaseio.com/'
 var homeURL = 'http://127.0.0.1:5886/'
+var phases = ["Phase 1: Identify Real World Evidence",
+              "Phase 2: Reviewing and Grading of Evidence",
+              "Phase 3: Summarizing The Literature",
+              "Phase 4: Making an Evidence-Based Recommendation"]
 
 /**
  * Retrieve eval history data from firebase and update the eval history page
@@ -53,28 +57,78 @@ shinyjs.checkSession = function(state) {
  * @param {Array} stateData - data of the saved state
  */
 shinyjs.saveState = function(stateData) {
-  shinyjs.showSpinner()
   var session = stateData[2]
-  // Delete the previous state if session exists
+  var d = new Date($.now())
+  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + (d.getSeconds() < 9 ? "0" : "") + d.getSeconds()
   if (session) {
+    shinyjs.showSpinner()
+    var data = {
+      url: stateData[0],
+      time: time,
+      phase: stateData[3]
+    }
     $.ajax({
-    url: databaseURL + stateData[1] + '/' + session + '.json',
-    type: 'DELETE'
+      url: databaseURL + stateData[1] + '/' + session + '.json',
+      type: 'PATCH',
+      data: JSON.stringify(data)
+    }).done(function(data){
+      shinyjs.hideSpinner()
+    }).fail(function(error) {
+      console.log(error)
+    })
+  } else {
+    $.confirm({
+      title: 'Save your progress',
+      content: '' +
+      '<form action="" class="formName">' +
+      '<div class="form-group">' +
+      '<label>Please enter a name</label>' +
+      '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
+      '<p id="project-name-error" class="error_message hidden">Project name is required</p>' +
+      '</div>' +
+      '</form>',
+      buttons: {
+          formSubmit: {
+              text: 'Submit',
+              btnClass: 'btn-blue',
+              action: function () {
+                  var name = this.$content.find('.name').val();
+                  if(!name){
+                      $('#project-name-error').removeClass("hidden")
+                      this.$content.find('.name').addClass("invalid")
+                      return false;
+                  }
+                  shinyjs.showSpinner()
+                  var data = {
+                    name: name,
+                    url: stateData[0],
+                    time: time,
+                    phase: stateData[3]
+                  }
+                  // Add the new saved state
+                  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
+                    Shiny.setInputValue('current_session', data.name);
+                    shinyjs.hideSpinner()
+                  }).fail(function(error) {
+                    console.log(error)
+                  })
+              }
+          },
+          cancel: function () {
+              //close
+          },
+      },
+      onContentReady: function () {
+          // bind to events
+          var jc = this;
+          this.$content.find('form').on('submit', function (e) {
+              // if the user submits the form by pressing enter in the field.
+              e.preventDefault();
+              jc.$$formSubmit.trigger('click'); // reference the button and click it
+          });
+      }
     });
   }
-  var d = new Date($.now());
-  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()+ ":" + (d.getSeconds() < 9 ? "0" : "") + d.getSeconds()
-  var data = {
-    url: stateData[0],
-    time: time
-  }
-  // Add the new saved state
-  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
-    Shiny.setInputValue('current_session', data.name);
-    shinyjs.hideSpinner()
-  }).fail(function(error) {
-    console.log(error)
-  })
 }
 
 /**
@@ -101,25 +155,49 @@ function makeEvalEntry(uid, key, data) {
     $('<div/>',
       {'class': 'evalEntry'}
     ).append(
-      $('<a/>', {'class': 'link', 'href': data.url + '&session=' + key, text: "Click Here to Continue"})
+      $('<h3/>', {text: data.name})
     ).append(
-      $('<p/>', {text: "Last modified: " + data.time})
+      $('<hr>')
     ).append(
-      $('<button/>', {text: "delete"}).click(function() {
-        $.confirm({
-          icon: "fas fa-exclamation-triangle",
-          title: 'Are you sure?',
-          content: 'Do you really want to delete this entry? This process cannot be undone.',
-          buttons: {
-            cancel: function () {
-            },
-            confirm: function () {
-              shinyjs.showSpinner()
-              deleteEntry(uid, key)
-            },
-          }
-        })
-      })
+      $('<div/>',
+        {'class': 'evalInfo'}
+      ).append(
+        $('<p/>'
+        ).append(
+          $('<strong/>', {text: "Progress: "})
+        ).append(
+          $('<span/>', {text: phases[data.phase]})
+        )
+      ).append(
+        $('<p/>'
+        ).append(
+          $('<strong/>', {text: "Last modified: "})
+        ).append(
+          $('<span/>', {text: data.time})
+        )
+      ).append(
+        $('<div/>',
+          {'class': 'evalActions'}
+        ).append(
+          $('<a/>', {'href': data.url + '&session=' + key, text: "Click Here to Continue"})
+        ).append(
+          $('<button/>', {'class': 'btn', text: "delete"}).click(function() {
+            $.confirm({
+              icon: "fas fa-exclamation-triangle",
+              title: 'Are you sure?',
+              content: 'Do you really want to delete this entry? This process cannot be undone.',
+              buttons: {
+                cancel: function () {
+                },
+                confirm: function () {
+                  shinyjs.showSpinner()
+                  deleteEntry(uid, key)
+                },
+              }
+            })
+          })
+        )
+      )
     )
   )
 }

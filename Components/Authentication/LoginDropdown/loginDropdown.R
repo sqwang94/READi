@@ -9,8 +9,8 @@ loginDropdown <- dropdownButton(
         class = "login_dropdown_item",
         "My account"
     ),
-    tags$button(
-        id = "my_progress",
+    actionButton(
+        inputId = "my_progress",
         type = "button",
         class = "login_dropdown_item",
         "My progress"

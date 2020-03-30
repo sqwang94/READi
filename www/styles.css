@@ -1,3 +1,8 @@
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .First .PrevButton, .Last .NextButton, .Hidden {
   display: none;
 }
@@ -195,9 +200,46 @@ input.Error {
 }
 
 .evalEntry {
+  width: 50%;
   box-sizing: border-box;
   padding: 20px 20px 12px;
   box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
   border-radius: 5px;
+  margin: 10px auto;
+}
+
+.evalEntry h3 {
+  margin: 0;
+  margin-left: 10px;
+}
+
+.evalActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.evalEntry hr {
   margin: 10px;
+}
+
+.evalInfo {
+  margin-left: 10px;
+  margin-right:10px;
+}
+
+.evalActions a {
+  border: 1px solid;
+  padding: 7px;
+  border-radius: 5px;
+}
+
+.evalActions a:hover, .evalActions a:focus {
+  text-decoration: none;
+  color: white;
+  background-color: #158cba;
+}
+
+.evalActions a:hover:focus {
+  border-color: white;
+  box-shadow: 0 0 0 0.1rem rgba(0,123,255,.5);
 }

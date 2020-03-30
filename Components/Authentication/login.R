@@ -60,11 +60,7 @@ loginUI <- function(id) {
                     href = "#",
                     "Forgot your password?"
                 ),
-                br(),
-                actionLink(
-                    ns("guest"),
-                    "Continue as guest"
-                )
+                br()
             )
         )
     )

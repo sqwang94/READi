@@ -80,7 +80,7 @@ ui <- function(request){
                                recPageUI("rec_page")),
                       
                       # Evaluation history page
-                      tabPanel("", value = "account", class = "always-show", evalHistory)
+                      tabPanel("", value = "history", class = "always-show", evalHistory)
     ))
 } # closing function (function necessary for bookmarking)
 
@@ -155,11 +155,11 @@ server <- function(input, output, session) {
   })
   
   # ----- Hiding all tabs upon  entry to site
-  hideTab("tabs", "account")
+  hideTab("tabs", "history")
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
   hideTab(inputId = "tabs", target = "tab3")
-  hideTab(inputId = "tabs", target = "tab4")
+  # hideTab(inputId = "tabs", target = "tab4")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
@@ -188,9 +188,9 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$my_account, {
+  observeEvent(input$my_progress, {
     shinyjs::hide(id = "bookmark")
-    updateNavbarPage(session, "tabs", "account")
+    updateNavbarPage(session, "tabs", "history")
     toggleDropdownButton(inputId = "account_dropdown")
     js$updateAccount(session$userData$current_user()$uid)
   })
