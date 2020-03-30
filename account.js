@@ -1,3 +1,6 @@
+var databaseURL = 'https://readi-dcf98.firebaseio.com/'
+var homeURL = 'http://127.0.0.1:5886/'
+
 /**
  * Retrieve eval history data from firebase and update the eval history page
  * @param {String} uid - id of the user
@@ -5,7 +8,7 @@
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
   $("#history").empty()
-  $.get('https://readi-dcf98.firebaseio.com/' + uid + '.json').done(function(data) {
+  $.get(databaseURL + uid + '.json').done(function(data) {
     update(uid, data)
     shinyjs.hideSpinner()
   }).fail(function(error) {
@@ -20,6 +23,32 @@ shinyjs.clearAccount = function() {
 }
 
 /**
+ * Check if the current session is expired. Redirect to homepage if true.
+ * @param {Array} state - data of the state, including user id and session id
+ */
+shinyjs.checkSession = function(state) {
+  $.get(databaseURL + state[0] + "/" + state[1] + '.json').done(function(data) {
+    if (!data) {
+      $.alert({
+        title: 'Session expired',
+        content: 'You will be redirected to homepage',
+        autoClose: 'OK|5000',
+        draggable: false,
+        buttons: {
+          OK: {
+            action: function () {
+                window.location.replace(homeURL)
+            }
+          }
+        }
+      });
+    }
+  }).fail(function(error) {
+    console.log(error)
+  })
+}
+
+/**
  * Save the current state to firebase and replace the previous state if exists
  * @param {Array} stateData - data of the saved state
  */
@@ -29,7 +58,7 @@ shinyjs.saveState = function(stateData) {
   // Delete the previous state if session exists
   if (session) {
     $.ajax({
-    url: 'https://readi-dcf98.firebaseio.com/' + stateData[1] + '/' + session + '.json',
+    url: databaseURL + stateData[1] + '/' + session + '.json',
     type: 'DELETE'
     });
   }
@@ -40,7 +69,7 @@ shinyjs.saveState = function(stateData) {
     time: time
   }
   // Add the new saved state
-  $.post('https://readi-dcf98.firebaseio.com/' + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
+  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
     Shiny.setInputValue('current_session', data.name);
     shinyjs.hideSpinner()
   }).fail(function(error) {
@@ -107,9 +136,14 @@ shinyjs.hideSpinner = function() {
   $("#spinner_backdrop").addClass("hidden")
 }
 
+/**
+ * Delete an evaluation entry in the eval history page
+ * @param {String} uid - id of the user
+ * @param {String} id - id of the entry
+ */
 function deleteEntry(uid, id) {
   $.ajax({
-    url: 'https://readi-dcf98.firebaseio.com/' + uid + '/' + id + '.json',
+    url: databaseURL + uid + '/' + id + '.json',
     type: 'DELETE'
   }).done(function(data) {
     shinyjs.updateAccount(uid)

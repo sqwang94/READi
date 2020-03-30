@@ -147,7 +147,7 @@ individualStudyInputValidation <- function(input, output, session) {
   ns <- session$ns
   reactive({
     inputs <- list()
-    inputs[[ns("author")]] = input$author
+    inputs[[ns("author")]] <- input$author
     if (input$study_design %in% c("Pragmatic controlled trial/Large simple trial", "Quasi experimental")) {
       for (i in seq(8)) {
         selected <- input[[paste0("input", i)]]

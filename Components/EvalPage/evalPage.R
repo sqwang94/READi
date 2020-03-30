@@ -32,6 +32,9 @@ evalPageUI <- function(id) {
 # server function for phase 2 evaluation of evidence page
 evalPage <- function(input, output, session, parentSession, phase1_inputs) {
     ns <- session$ns
+    
+    setBookmarkExclude(c("submit_2"))
+    
     output$study_identified <- renderUI({ # Rendering UI based on whether or not studies are available
         if(input$t2_ev_available == "No"){
             return()
@@ -45,6 +48,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
     bias_values <- reactiveVal(reactiveValues())
     # ------ Creating reactionary wellPanel based on how many studies selected ------- # 
     output$study_react <- renderUI({    # goal: create panels of questions in response to "How many studies did you find?"
+        bias_values(NULL)
         if(input$t2_ev_available == "No"){
             return(" If no relevant literature can be found, please click `Submit` below and proceed to Phase 3.")
         }
@@ -76,6 +80,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
                 btn_labels = c("Great")
             )
             shinyjs::show(selector = "#tabs li:nth-child(3) i")
+            showTab(session = parentSession, inputId = "tabs", target = "tab3")
             updateNavbarPage(parentSession, "tabs", "tab3")
         } else {
             sendSweetAlert(     # add error message if user needs more information

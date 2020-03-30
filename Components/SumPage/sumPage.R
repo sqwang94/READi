@@ -18,7 +18,11 @@ sumPage <- function(input, output, session, phase1_inputs, bias_values) {
     ns <- session$ns
     
     output$summaryoutcomes <- renderPlot({
+      if (is.null(bias_values())){
+        return()
+      }
       bias <- reactiveValuesToList(bias_values())
+      
   
       x <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$standard_bias})) # unlisting answers from individualStudyEval (found in bias <- reactiveValuesToList(bias_values()))
       y <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$outcome1}))
@@ -59,13 +63,13 @@ sumPage <- function(input, output, session, phase1_inputs, bias_values) {
           labs(x = "") +
           facet_grid(~outcome_type)
       }
-        
-
     })
 
-    
     output$t3_pt1 <- renderUI({
-      bias <- reactiveValuesToList(bias_values())
+      study_count <- 0
+      if (!is.null(bias_values())) {
+        study_count <- reactiveValuesToList(bias_values())$count
+      }
       
         # ------ Defining inputID for all inputs
         studylim <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_studylim_", i)})
@@ -80,7 +84,7 @@ sumPage <- function(input, output, session, phase1_inputs, bias_values) {
             if(i == 1){
                 out <- "primary"
                 type <- phase1_inputs$t1_poutcome
-                study <- bias$count
+                study <- study_count
             } else {
                 out <- "secondary"
                 type <- phase1_inputs$t1_soutcome

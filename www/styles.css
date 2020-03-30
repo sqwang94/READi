@@ -154,6 +154,10 @@ input.Error {
   color: #26da4a;
 }
 
+#bookmark {
+  float: right;
+}
+
 .login_dropdown_item {
   cursor: pointer;
   color: #555555;

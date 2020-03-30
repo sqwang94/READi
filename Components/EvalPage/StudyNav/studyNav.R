@@ -29,7 +29,6 @@ studyNav <- function(input, output, session, numOfStudy, phase1_inputs) {
     bias <- reactiveValues()
     bias$count <- numOfStudy
     lapply(1:numOfStudy, function(i) {
-        callModule(studyNavButton, paste0("buttons", i), session, i)
         bias[[toString(i)]] <- callModule(individualStudyEval, paste0("study", i), phase1_inputs)
     })
     js$toTop()
