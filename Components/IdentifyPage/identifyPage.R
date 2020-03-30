@@ -138,9 +138,11 @@ identifyPageUI <- function(id) {
 identifyPage <- function(input, output, session, parentSession) {
     ns <- session$ns
     
+    setBookmarkExclude(c("submit_1"))
+    
     # The following renders questions for Phase1, Question 2 (O)
     output$multoutcomes <- renderUI({
-         
+        
         if (is.null(input$t1_outcomes))
             return()
         
@@ -241,9 +243,9 @@ identifyPage <- function(input, output, session, parentSession) {
                 btn_labels = c("Great")
             ) 
             showTab(session = parentSession, inputId = "tabs", target = "tab2")
-            showTab(session = parentSession, inputId = "tabs", target = "tab3")                                                                            
             shinyjs::show(selector = "#tabs li:nth-child(2) i")
             updateNavbarPage(parentSession, "tabs", "tab2")
+            parentSession$userData$phase(2)
             
             # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
         } else {

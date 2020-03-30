@@ -13,6 +13,8 @@ library(shinyWidgets)
 library(lubridate)
 library(shinyBS)
 library(kableExtra)
+library(ggthemes)
+library(tidyverse)
 library(V8)
 
 source("Components/EvalPage/evalPage.R")
@@ -49,7 +51,8 @@ ui <- function(request){
     navbarPageWithBtn("READi Tool",
                       id = "tabs",
                       collapsible = TRUE,
-                      tabPanel("Home",
+                      header = bookmarkButton(label = "Save Progress", id = "bookmark"),
+                      tabPanel("Home", value = "home",
                                homePageUI),
                       
                       # ---------------------------  ----------------------------------#
@@ -144,6 +147,7 @@ server <- function(input, output, session) {
     }
   })
   
+ 
   setBookmarkExclude(c("bookmark", "new_session_save"))
   
   observeEvent(input$bookmark, {
@@ -174,6 +178,7 @@ server <- function(input, output, session) {
       showTab(inputId = "tabs", target = "tab1")
       updateNavbarPage(session, "tabs", "tab1")
       session$userData$inSession(TRUE)
+      session$userData$phase(1)
     }
   })
   
@@ -184,6 +189,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$my_account, {
+    shinyjs::hide(id = "bookmark")
     updateNavbarPage(session, "tabs", "account")
     toggleDropdownButton(inputId = "account_dropdown")
     js$updateAccount(session$userData$current_user()$uid)
@@ -195,6 +201,7 @@ server <- function(input, output, session) {
   session$userData$current_user <- reactiveVal(NULL)
   session$userData$current_session <- reactiveVal(NULL)
   session$userData$inSession <- reactiveVal(FALSE)
+  session$userData$phase <- reactiveVal(NULL)
   observeEvent(input$auth_user, {
     session$userData$current_user(input$auth_user)
   }, ignoreNULL = FALSE)
@@ -217,7 +224,7 @@ server <- function(input, output, session) {
         session$userData$inSession(TRUE)
       }
       onBookmarked(function(url) {
-        js$saveState(url, current_user$uid, session$userData$current_session())
+        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
       })
     } else {
       js$clearAccount()
@@ -241,17 +248,37 @@ server <- function(input, output, session) {
     }
   })
   
-  # always show phase 1 for restored state
+  # hide bookmark button on homepage
+  onBookmark(function(state) {
+    state$values$phase <- session$userData$phase()
+  })
+  
+  # On restored bookmark, update UI to current phase
   onRestore(function(state) {
-    showTab(inputId = "tabs", target = "tab1")
     session$userData$inSession(TRUE)
+    session$userData$phase(state$values$phase)
+    for (i in 1:state$values$phase) {
+      if (i > 1) {
+        shinyjs::show(selector = paste0("#tabs li:nth-child(", i, ") i"))
+      }
+      showTab(inputId = "tabs", target = paste0("tab", i))
+    }
+    updateNavbarPage(session, "tabs", paste0("tab", i))
+  })
+  
+  observe({
+    if (req(input$tabs) == "home") {
+      shinyjs::hide(id = "bookmark")
+    }
   })
   
   # dynamic title for tab 1
   output$title_panel_1 = renderText({
     if (req(input$tabs) == "tab1") {
+      shinyjs::show(id = "bookmark")
       hideTab(inputId = "tabs", target = "tab2")
       hideTab(inputId = "tabs", target = "tab3")
+      session$userData$phase(1)
       return("Phase 1: Identify Real World Evidence")
     }
     return("Phase 1")
@@ -260,6 +287,8 @@ server <- function(input, output, session) {
   # dynamic title for tab 2
   output$title_panel_2 = renderText({
     if (req(input$tabs) == "tab2") {
+      shinyjs::show(id = "bookmark")
+      session$userData$phase(2)
       return("Phase 2: Reviewing and Grading of Evidence")
     }
     return("Phase 2")
@@ -268,6 +297,8 @@ server <- function(input, output, session) {
   # dynamic title for tab 3
   output$title_panel_3 = renderText({
     if (req(input$tabs) == "tab3") {
+      shinyjs::show(id = "bookmark")
+      session$userData$phase(3)
       return("Phase 3: Summarizing The Literature")
     }
     return("Phase 3")
@@ -276,6 +307,8 @@ server <- function(input, output, session) {
   # dynamic title for tab 4
   output$title_panel_4 = renderText({
     if (req(input$tabs) == "tab4") {
+      shinyjs::show(id = "bookmark")
+      session$userData$phase(4)
       return("Phase 4: Making an Evidence-Based Recommendation")
     }
     return("Phase 4")
