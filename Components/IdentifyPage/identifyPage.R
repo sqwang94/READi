@@ -110,13 +110,6 @@ identifyPageUI <- function(id) {
                                 
                    )
                ),
-               wellPanel(style = "background: #d1b3e6",
-                         radioButtons(ns("t1_limitsearch"),
-                                      "Do you want to limit your literature search to key words in titles and abstracts only (recommended)?",
-                                      choices = c("Yes", "No")
-                                      
-                         )
-               ),
                br(),
                br(),
                actionBttn(
@@ -219,8 +212,15 @@ identifyPage <- function(input, output, session, parentSession) {
         int <- input$t1_int_interest
         comparator <- input$t1_comparator
         outcome1 <- input$t1_poutcome
+        outcome2 <- input$t1_soutcome
         time_frame <- input$t1_timeframe
-        search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"%20AND%20",int,"%20AND%20",outcome1,"%20AND%20(\"last ",time_frame," years\"[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20\"meta-analysis%20as%20topic\"%5BMeSH%20Terms%5D %20OR%20\"pragmatic%20clinical%20trials%20as%20topic\"%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+        
+        if(is.null(outcome2)){
+          search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20",outcome1,"[tiab]%20AND%20(\"last ",time_frame," years\"[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20\"meta-analysis%20as%20topic\"%5BMeSH%20Terms%5D %20OR%20\"pragmatic%20clinical%20trials%20as%20topic\"%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+        } else {
+          search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20(",outcome1,"[tiab]%20OR%20",outcome2,"[tiab])%20AND%20('last ",time_frame," years'[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20'meta-analysis%20as%20topic'%5BMeSH%20Terms%5D %20OR%20'pragmatic%20clinical%20trials%20as%20topic'%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+        }
+        
         search
         
     })
