@@ -15,6 +15,27 @@ h2 {
   display: block !important;
 }
 
+.navbar-brand {
+  padding: 0;
+}
+
+#mobile-toggle {
+  padding: 15px;
+  margin-right: 10px;
+  line-height: 50px;
+  display: inline;
+  cursor: pointer;
+}
+
+#nav_title {
+  line-height: 50px;
+}
+
+#mobile-toggle:hover {
+  opacity: 0.8;
+  background-color: #e7e7e7;
+}
+
 #loginToggle {
   float: right;
   margin-top: 6px;
@@ -24,6 +45,10 @@ h2 {
 #eval_page-study_react .navbar {
   position: sticky;
   top: 0;
+}
+
+#eval_page-study_react .navbar-brand {
+  padding: 15px;
 }
 
 #eval_page-study_react .nav {
@@ -64,6 +89,16 @@ h2 {
     display: none;
     height: 0px;
     width: 0px;
+}
+
+@media (min-width: 768px) {
+  #mobile-toggle {
+    display: none;
+  }
+
+  #nav_title {
+    margin-left: 20px;
+  }
 }
 
 #home {
@@ -201,6 +236,7 @@ input.Error {
 
 .evalEntry {
   width: 50%;
+  min-width: 400px;
   box-sizing: border-box;
   padding: 20px 20px 12px;
   box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);

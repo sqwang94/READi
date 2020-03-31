@@ -22,3 +22,24 @@ loginDropdown <- dropdownButton(
         "Sign out"
     )
 )
+
+# sidebar login dropdown UI for logged in user
+loginDropdownSide <- div(
+    actionButton(
+        inputId = "my_account",
+        class = "SideDrawerItem",
+        "My account"
+    ),
+    actionButton(
+        inputId = "my_progress",
+        type = "button",
+        class = "SideDrawerItem",
+        "My progress"
+    ),
+    tags$button(
+        id = "signout",
+        type = "button",
+        class = "SideDrawerItem",
+        "Sign out"
+    )
+)

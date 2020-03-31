@@ -27,6 +27,7 @@ source("Components/RecPage/recPage.R")
 source("Components/EvalHistory/evalHistory.R")
 source("Components/SumPage/sumPage.R")
 source("Components/UI/Loader/loader.R")
+source("Components/UI/SideDrawer/sideDrawer.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request){
@@ -44,11 +45,13 @@ ui <- function(request){
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
       tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"),
-      shiny::tags$script(src="auth.js")
+      shiny::tags$script(src="auth.js"),
+      shiny::tags$script(src="UI.js")
     ),
     authenticationUI("authentication"),
     loader,
-    navbarPageWithBtn("READi Tool",
+    sideDrawerUI,
+    navbarPageWithBtn(div(tags$div(id = "mobile-toggle", icon("user-circle")), span(id = "nav_title", "READi Tool")),
                       id = "tabs",
                       collapsible = TRUE,
                       header = bookmarkButton(label = "Save Progress", id = "bookmark"),
@@ -146,7 +149,6 @@ server <- function(input, output, session) {
       ))
     }
   })
-  
  
   setBookmarkExclude(c("bookmark", "new_session_save"))
   
@@ -239,12 +241,39 @@ server <- function(input, output, session) {
         tags$button(
           id = "login",
           type = "button",
-          class = "btn",
+          class = "btn DesktopOnly",
           "Log in"
         )
       )
     } else {
       return (loginDropdown)
+    }
+  })
+  
+  output$loginToggleSide <- renderUI({
+    current_user <- session$userData$current_user()
+    if (is.null(current_user)) {
+      return (
+        tags$button(
+          id = "login",
+          type = "button",
+          class = "SideDrawerItem",
+          "Log in"
+        )
+      )
+    } else {
+      return (loginDropdownSide)
+    }
+  })
+  
+  observe( {
+    req(input$width)
+    if(input$width < 768) {
+      shinyjs::hide("loginToggle")
+      shinyjs::show("sidebar")
+    } else {
+      shinyjs::show("loginToggle")
+      shinyjs::hide("sidebar")
     }
   })
   

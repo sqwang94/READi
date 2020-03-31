@@ -10,10 +10,12 @@
   width: 80px;
   height: 80px;
 }
+
 .lds-spinner div {
   transform-origin: 40px 40px;
   animation: lds-spinner 1.2s linear infinite;
 }
+
 .lds-spinner div:after {
   content: " ";
   display: block;
@@ -93,4 +95,50 @@
   width: 100%;
   height: 100%;
   z-index: 1500;
+}
+
+.sideDrawer-header h2 {
+  color: white;
+}
+
+.SideDrawer {
+  position: fixed;
+  width: 200px;
+  max-width: 70%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 3000;
+  background-color: #7386D5;
+  color: white;
+  padding: 32px 0;
+  box-sizing: border-box;
+  transition: transform 0.3s ease-out;
+}
+
+.SideDrawerItem {
+  padding: 0;
+  color: white;
+  width: 100%;
+  background-color: #6d7fcc;
+  border-radius: 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: inherit;
+  height: 50px;
+  border: none;
+}
+
+.SideDrawerItem:hover, .SideDrawerItem:focus {
+  margin-top: 0;
+  background-color: white;
+  color: #7386D5;
+}
+
+.Open {
+  transform: translateX(0);
+}
+
+.Close {
+  transform: translateX(-100%);
 }
