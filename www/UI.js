@@ -18,12 +18,12 @@ $(document).on("click", "#side_backdrop", function() {
   hideSideBar()
 })
 
-$(document).on("click", "#login", function() {
+$(document).on("click", ".Progress", function() {
   hideSideBar()
 })
 
 function hideSideBar() {
   $("#sidebar").addClass("Close")
   $("#sidebar").removeClass("Show")
-  $("#side_backdrop").toggleClass("hidden")
+  $("#side_backdrop").addClass("hidden")
 }

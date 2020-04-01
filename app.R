@@ -32,6 +32,7 @@ source("Components/UI/SideDrawer/sideDrawer.R")
 # Define UI for application that draws a histogram
 ui <- function(request){
   fluidPage(
+    title = "READi",
     theme = shinytheme("lumen"),
     introjsUI(),
     useShinyjs(),
@@ -190,11 +191,20 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$my_progress, {
+  # display the my-progress page
+  showProgressPage <- function() {
     shinyjs::hide(id = "bookmark")
     updateNavbarPage(session, "tabs", "history")
     toggleDropdownButton(inputId = "account_dropdown")
     js$updateAccount(session$userData$current_user()$uid)
+  }
+  
+  observeEvent(input$my_progress, {
+    showProgressPage()
+  })
+  
+  observeEvent(input$my_progress_side, {
+    showProgressPage()
   })
   
   callModule(authentication, "authentication")
@@ -241,7 +251,7 @@ server <- function(input, output, session) {
         tags$button(
           id = "login",
           type = "button",
-          class = "btn DesktopOnly",
+          class = "Login btn DesktopOnly",
           "Log in"
         )
       )
@@ -255,9 +265,9 @@ server <- function(input, output, session) {
     if (is.null(current_user)) {
       return (
         tags$button(
-          id = "login",
+          id = "login-side",
           type = "button",
-          class = "SideDrawerItem",
+          class = "Login SideDrawerItem",
           "Log in"
         )
       )
@@ -266,7 +276,8 @@ server <- function(input, output, session) {
     }
   })
   
-  observe( {
+  # switch between desktop and mobile navbar
+  observe({
     req(input$width)
     if(input$width < 768) {
       shinyjs::hide("loginToggle")
@@ -277,7 +288,14 @@ server <- function(input, output, session) {
     }
   })
   
-  # hide bookmark button on homepage
+  # hide bookarmk button on homepage
+  observe({
+    if (req(input$tabs) == "home") {
+      shinyjs::hide(id = "bookmark")
+    }
+  })
+
+  # save current phase on bookmark
   onBookmark(function(state) {
     state$values$phase <- session$userData$phase()
   })
@@ -293,12 +311,6 @@ server <- function(input, output, session) {
       showTab(inputId = "tabs", target = paste0("tab", i))
     }
     updateNavbarPage(session, "tabs", paste0("tab", i))
-  })
-  
-  observe({
-    if (req(input$tabs) == "home") {
-      shinyjs::hide(id = "bookmark")
-    }
   })
   
   # dynamic title for tab 1

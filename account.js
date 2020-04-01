@@ -155,7 +155,52 @@ function makeEvalEntry(uid, key, data) {
     $('<div/>',
       {'class': 'evalEntry'}
     ).append(
-      $('<h3/>', {text: data.name})
+      $('<div/>',
+        {"class": "evalHeader"}
+      ).append(
+        $('<h3/>', {text: data.name})
+      ).append(
+        $('<i/>', {"class" : "fa fa-edit", click: function() {
+          $.confirm({
+            title: 'Edit Name',
+            content: '' +
+            '<form action="" class="formName">' +
+            '<div class="form-group">' +
+            '<label>Please enter a new name</label>' +
+            '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
+            '<p id="project-name-error" class="error_message hidden">Project name is required</p>' +
+            '</div>' +
+            '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Submit',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                      var name = this.$content.find('.name').val();
+                      if(!name){
+                          $('#project-name-error').removeClass("hidden")
+                          this.$content.find('.name').addClass("invalid")
+                          return false;
+                      }
+                      editName(uid, key, name)
+                    }
+                },
+                cancel: function () {
+                    //close
+                },
+            },
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+          });
+        }})
+      )
     ).append(
       $('<hr>')
     ).append(
@@ -166,7 +211,7 @@ function makeEvalEntry(uid, key, data) {
         ).append(
           $('<strong/>', {text: "Progress: "})
         ).append(
-          $('<span/>', {text: phases[data.phase]})
+          $('<span/>', {text: phases[data.phase - 1]})
         )
       ).append(
         $('<p/>'
@@ -227,5 +272,27 @@ function deleteEntry(uid, id) {
     shinyjs.updateAccount(uid)
   }).fail(function(error) {
     shinyjs.hideSpinner()
+  })
+}
+
+/**
+ * Edit the name of the evaluation entry.
+ * @param {String} uid - id of the user
+ * @param {String} id - id of the entry
+ * @param {String} name - new name of the entry
+ */
+function editName(uid, id, name) {
+  shinyjs.showSpinner()
+  var data = {
+    name: name
+  }
+  $.ajax({
+    url: databaseURL + uid + '/' + id + '.json',
+    type: 'PATCH',
+    data: JSON.stringify(data)
+  }).done(function(data){
+    shinyjs.updateAccount(uid)
+  }).fail(function(error) {
+    console.log(error)
   })
 }

@@ -142,9 +142,10 @@ $(document).on("click", "#submit_register", (e) => {
   }
 })
 
-$(document).on("click", "#login", (e) => {
+$(document).on("click", ".Login", (e) => {
   e.stopPropagation();
   e.preventDefault();
+  hideSideBar()
   $("#login_backdrop").removeClass("hidden")
   $("#sign_in_panel").removeClass("hidden")
   $("#auth_panel").addClass("Show")

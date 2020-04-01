@@ -6,19 +6,19 @@ loginDropdown <- dropdownButton(
     label = "account",
     actionButton(
         inputId = "my_account",
-        class = "login_dropdown_item",
+        class = "Account login_dropdown_item",
         "My account"
     ),
     actionButton(
         inputId = "my_progress",
         type = "button",
-        class = "login_dropdown_item",
+        class = "Progress login_dropdown_item",
         "My progress"
     ),
     tags$button(
         id = "signout",
         type = "button",
-        class = "login_dropdown_item",
+        class = "Logout login_dropdown_item",
         "Sign out"
     )
 )
@@ -26,20 +26,20 @@ loginDropdown <- dropdownButton(
 # sidebar login dropdown UI for logged in user
 loginDropdownSide <- div(
     actionButton(
-        inputId = "my_account",
-        class = "SideDrawerItem",
+        inputId = "my_account-side",
+        class = "Account SideDrawerItem",
         "My account"
     ),
     actionButton(
-        inputId = "my_progress",
+        inputId = "my_progress_side",
         type = "button",
-        class = "SideDrawerItem",
+        class = "Progress SideDrawerItem",
         "My progress"
     ),
     tags$button(
-        id = "signout",
+        id = "signout-side",
         type = "button",
-        class = "SideDrawerItem",
+        class = "Logout SideDrawerItem",
         "Sign out"
     )
 )
