@@ -1,19 +1,21 @@
+var entryPerPage = 3
 var databaseURL = 'https://readi-dcf98.firebaseio.com/'
-var homeURL = 'http://127.0.0.1:5886/'
+var homeURL = 'http://127.0.0.1:4046/'
 var phases = ["Phase 1: Identify Real World Evidence",
               "Phase 2: Reviewing and Grading of Evidence",
               "Phase 3: Summarizing The Literature",
               "Phase 4: Making an Evidence-Based Recommendation"]
 
+
+
 /**
  * Retrieve eval history data from firebase and update the eval history page
- * @param {String} uid - id of the user
+ * @param {Array/String} uid - data of the user and entry indexes
  */
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
-  $("#history").empty()
   $.get(databaseURL + uid + '.json').done(function(data) {
-    update(uid, data)
+    update(uid, data, 0)
     shinyjs.hideSpinner()
   }).fail(function(error) {
     shinyjs.hideSpinner()
@@ -24,6 +26,7 @@ shinyjs.updateAccount = function(uid) {
 /** Clear the evalutaion history page. */
 shinyjs.clearAccount = function() {
   $("#history").empty()
+  $("#history-nav").empty()
 }
 
 /**
@@ -41,7 +44,7 @@ shinyjs.checkSession = function(state) {
         buttons: {
           OK: {
             action: function () {
-                window.location.replace(homeURL)
+              window.location.replace(homeURL)
             }
           }
         }
@@ -73,6 +76,9 @@ shinyjs.saveState = function(stateData) {
       data: JSON.stringify(data)
     }).done(function(data){
       shinyjs.hideSpinner()
+      if (stateData[4]) {
+        shinyjs.newSession()
+      }
     }).fail(function(error) {
       console.log(error)
     })
@@ -107,6 +113,9 @@ shinyjs.saveState = function(stateData) {
                   }
                   // Add the new saved state
                   $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
+                    if (stateData[4]) {
+                      alert("refresh")
+                    }
                     Shiny.setInputValue('current_session', data.name);
                     shinyjs.hideSpinner()
                   }).fail(function(error) {
@@ -133,20 +142,88 @@ shinyjs.saveState = function(stateData) {
 
 /**
  * Update the Evaluation history page.
+ * @param {String} uid - id of the user
  * @param {Object} data - data retrieved from firebase
+ * @param {number} start - start index of the entries
  */
-function update(uid, data) {
+function update(uid, data, start) {
+  shinyjs.clearAccount()
+  data = data == null ? {} : data
+  var keys = Object.keys(data)
   if (!jQuery.isEmptyObject(data)) {
-    $.each(data, function(key, value) {
-      makeEvalEntry(uid, key, value)
+    keys.forEach(function(key, index, array) {
+      if (index >= start && index < start + entryPerPage) {
+        makeEvalEntry(uid, array[index], data[key])
+      }
     })
+    if (keys.length > entryPerPage) {
+      makeEvalNav(uid, data, start)
+    }
   } else {
     $("#history").text("No previous evaluation")
   }
 }
 
+// Create a callback function as onclick listener for eval nav item
+function createCallbackNav(uid, data, i) {
+  return function() {
+    update(uid, data, i)
+  }
+}
+
+/**
+ * Create the eval history navigatio div
+ * @param {String} uid - id of the user
+ * @param {Object} data - data retrieved from firebase
+ * @param {number} start - start index of the entries
+ */
+function makeEvalNav(uid, data, start) {
+  var length = Object.keys(data).length
+  $("#history-nav").append("<ul/>")
+  $("#history-nav ul").append(
+    $('<li/>', {"class": start === 0 ? "eval-nav-item-disabled" : "eval-nav-item", click: function() {
+      if (start > 0) {
+        update(uid, data, start - entryPerPage)
+      }
+    }}).append(
+      $("<a/>", {text: "prev"})
+    )
+  )
+  for (i = 0; i < Math.ceil(length / entryPerPage); i++) {
+    var className = "eval-nav-item"
+    if (i === Math.floor(start / entryPerPage)) {
+      className += " Active"
+    }
+    $("#history-nav ul").append(
+      $('<li/>', {"class": className, click: createCallbackNav(uid, data, i * entryPerPage)}).append(
+        $("<a/>", {text: i + 1})
+      )
+    )
+  }
+  $("#history-nav ul").append(
+    $('<li/>', {"class": start + entryPerPage >= length ? "eval-nav-item-disabled" : "eval-nav-item", click: function() {
+      if (start + entryPerPage < length) {
+        update(uid, data, start + entryPerPage)
+      }
+    }}).append(
+      $("<a/>", {text: "next"})
+    )
+  )
+}
+
+/**
+ * Create a nav button in the eval history navigation
+ * @param {String} text - text of the button
+ */
+function makeNavButton(text) {
+  return($('<li/>').append(
+    $("<a/>", {text: text})
+  ))
+}
+
 /**
  * Create an evaluation entry in the eval history page
+ * @param {String} uid - id of the user
  * @param {String} key - id of the entry
  * @param {Object} data - data corresponding to the entry
  */
@@ -178,9 +255,9 @@ function makeEvalEntry(uid, key, data) {
                     action: function () {
                       var name = this.$content.find('.name').val();
                       if(!name){
-                          $('#project-name-error').removeClass("hidden")
-                          this.$content.find('.name').addClass("invalid")
-                          return false;
+                        $('#project-name-error').removeClass("hidden")
+                        this.$content.find('.name').addClass("invalid")
+                        return false;
                       }
                       editName(uid, key, name)
                     }
@@ -257,6 +334,11 @@ shinyjs.showSpinner = function() {
 shinyjs.hideSpinner = function() {
   $("#spinner").addClass("hidden")
   $("#spinner_backdrop").addClass("hidden")
+}
+
+/** Refresh the page and start a new session. */
+shinyjs.newSession = function() {
+  window.location.replace(homeURL + "?new=true")
 }
 
 /**

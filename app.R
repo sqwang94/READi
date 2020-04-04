@@ -121,13 +121,14 @@ server <- function(input, output, session) {
     )
     
     intro <- data.frame(
-      element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
+      element = c("null", "#loginToggle", "#loginToggle", "#learn", "#tabs", "#beginPhase"),
       intro = int_text,
       position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
     
     introjs(session, options = list(steps = intro,
+                                    disableInteraction = TRUE,
                                     "nextLabel" = "Next",
-                                    "prevLabel" = "Go Back",
+                                    "prevLabel" = "Prev",
                                     "doneLabel" = "Cool - let's get started!",
                                     "showProgress" = TRUE,
                                     "showStepNumbers" = FALSE,                                                                                                                             
@@ -178,16 +179,16 @@ server <- function(input, output, session) {
         html = FALSE,
       )
     } else {
-      showTab(inputId = "tabs", target = "tab1")
-      updateNavbarPage(session, "tabs", "tab1")
-      session$userData$inSession(TRUE)
-      session$userData$phase(1)
+      startNewSession()
     }
   })
   
   observeEvent(input$new_session_save, {
+    session$userData$newSession(TRUE)
     if (isTRUE(input$new_session_save)) {
       session$doBookmark()
+    } else {
+      js$newSession()
     }
   })
   
@@ -199,10 +200,20 @@ server <- function(input, output, session) {
     js$updateAccount(session$userData$current_user()$uid)
   }
   
+  # Update state and UI and start a new session
+  startNewSession <- function() {
+    showTab(inputId = "tabs", target = "tab1")
+    updateNavbarPage(session, "tabs", "tab1")
+    session$userData$inSession(TRUE)
+    session$userData$phase(1)
+  }
+  
+  # eventHandler for displaying my-progress page
   observeEvent(input$my_progress, {
     showProgressPage()
   })
   
+  # eventHandler for displaying my-progress page from side bar (mobile)
   observeEvent(input$my_progress_side, {
     showProgressPage()
   })
@@ -210,6 +221,7 @@ server <- function(input, output, session) {
   callModule(authentication, "authentication")
   
   # initialize user and session data
+  session$userData$newSession <- reactiveVal(FALSE)
   session$userData$current_user <- reactiveVal(NULL)
   session$userData$current_session <- reactiveVal(NULL)
   session$userData$inSession <- reactiveVal(FALSE)
@@ -236,7 +248,7 @@ server <- function(input, output, session) {
         session$userData$inSession(TRUE)
       }
       onBookmarked(function(url) {
-        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
+        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase(), session$userData$newSession())
       })
     } else {
       js$clearAccount()
@@ -303,6 +315,10 @@ server <- function(input, output, session) {
   # On restored bookmark, update UI to current phase
   onRestore(function(state) {
     session$userData$inSession(TRUE)
+    if (!is.null(getQueryString()$new) && getQueryString()$new == "true") {
+      startNewSession()
+      return()
+    }
     session$userData$phase(state$values$phase)
     for (i in 1:state$values$phase) {
       if (i > 1) {
