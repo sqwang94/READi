@@ -1,15 +1,21 @@
+var entryPerPage = 3
 var databaseURL = 'https://readi-dcf98.firebaseio.com/'
-var homeURL = 'http://127.0.0.1:5886/'
+var homeURL = 'http://127.0.0.1:4046/'
+var phases = ["Phase 1: Identify Real World Evidence",
+              "Phase 2: Reviewing and Grading of Evidence",
+              "Phase 3: Summarizing The Literature",
+              "Phase 4: Making an Evidence-Based Recommendation"]
+
+
 
 /**
  * Retrieve eval history data from firebase and update the eval history page
- * @param {String} uid - id of the user
+ * @param {Array/String} uid - data of the user and entry indexes
  */
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
-  $("#history").empty()
   $.get(databaseURL + uid + '.json').done(function(data) {
-    update(uid, data)
+    update(uid, data, 0)
     shinyjs.hideSpinner()
   }).fail(function(error) {
     shinyjs.hideSpinner()
@@ -20,6 +26,7 @@ shinyjs.updateAccount = function(uid) {
 /** Clear the evalutaion history page. */
 shinyjs.clearAccount = function() {
   $("#history").empty()
+  $("#history-nav").empty()
 }
 
 /**
@@ -37,7 +44,7 @@ shinyjs.checkSession = function(state) {
         buttons: {
           OK: {
             action: function () {
-                window.location.replace(homeURL)
+              window.location.replace(homeURL)
             }
           }
         }
@@ -53,46 +60,170 @@ shinyjs.checkSession = function(state) {
  * @param {Array} stateData - data of the saved state
  */
 shinyjs.saveState = function(stateData) {
-  shinyjs.showSpinner()
   var session = stateData[2]
-  // Delete the previous state if session exists
+  var d = new Date($.now())
+  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + (d.getSeconds() < 9 ? "0" : "") + d.getSeconds()
   if (session) {
+    shinyjs.showSpinner()
+    var data = {
+      url: stateData[0],
+      time: time,
+      phase: stateData[3]
+    }
     $.ajax({
-    url: databaseURL + stateData[1] + '/' + session + '.json',
-    type: 'DELETE'
+      url: databaseURL + stateData[1] + '/' + session + '.json',
+      type: 'PATCH',
+      data: JSON.stringify(data)
+    }).done(function(data){
+      shinyjs.hideSpinner()
+      if (stateData[4]) {
+        shinyjs.newSession()
+      }
+    }).fail(function(error) {
+      console.log(error)
+    })
+  } else {
+    $.confirm({
+      title: 'Save your progress',
+      content: '' +
+      '<form action="" class="formName">' +
+      '<div class="form-group">' +
+      '<label>Please enter a name</label>' +
+      '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
+      '<p id="project-name-error" class="error_message Fixed hidden">Project name is required</p>' +
+      '</div>' +
+      '</form>',
+      buttons: {
+          formSubmit: {
+              text: 'Submit',
+              btnClass: 'btn-blue',
+              action: function () {
+                  var name = this.$content.find('.name').val();
+                  if(!name){
+                      $('#project-name-error').removeClass("hidden")
+                      this.$content.find('.name').addClass("invalid")
+                      return false;
+                  }
+                  shinyjs.showSpinner()
+                  var data = {
+                    name: name,
+                    url: stateData[0],
+                    time: time,
+                    phase: stateData[3]
+                  }
+                  // Add the new saved state
+                  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
+                    if (stateData[4]) {
+                      alert("refresh")
+                    }
+                    Shiny.setInputValue('current_session', data.name);
+                    shinyjs.hideSpinner()
+                  }).fail(function(error) {
+                    console.log(error)
+                  })
+              }
+          },
+          cancel: function () {
+              //close
+          },
+      },
+      onContentReady: function () {
+          // bind to events
+          var jc = this;
+          this.$content.find('form').on('submit', function (e) {
+              // if the user submits the form by pressing enter in the field.
+              e.preventDefault();
+              jc.$$formSubmit.trigger('click'); // reference the button and click it
+          });
+      }
     });
   }
-  var d = new Date($.now());
-  var time = (d.getMonth() + 1) + "-" + d.getDate() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes()+ ":" + (d.getSeconds() < 9 ? "0" : "") + d.getSeconds()
-  var data = {
-    url: stateData[0],
-    time: time
-  }
-  // Add the new saved state
-  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
-    Shiny.setInputValue('current_session', data.name);
-    shinyjs.hideSpinner()
-  }).fail(function(error) {
-    console.log(error)
-  })
 }
 
 /**
  * Update the Evaluation history page.
+ * @param {String} uid - id of the user
  * @param {Object} data - data retrieved from firebase
+ * @param {number} start - start index of the entries
  */
-function update(uid, data) {
+function update(uid, data, start) {
+  shinyjs.clearAccount()
+  data = data == null ? {} : data
+  var keys = Object.keys(data)
   if (!jQuery.isEmptyObject(data)) {
-    $.each(data, function(key, value) {
-      makeEvalEntry(uid, key, value)
+    keys.forEach(function(key, index, array) {
+      if (index >= start && index < start + entryPerPage) {
+        makeEvalEntry(uid, array[index], data[key])
+      }
     })
+    if (keys.length > entryPerPage) {
+      makeEvalNav(uid, data, start)
+    }
   } else {
     $("#history").text("No previous evaluation")
   }
 }
 
+// Create a callback function as onclick listener for eval nav item
+function createCallbackNav(uid, data, i) {
+  return function() {
+    update(uid, data, i)
+  }
+}
+
+/**
+ * Create the eval history navigatio div
+ * @param {String} uid - id of the user
+ * @param {Object} data - data retrieved from firebase
+ * @param {number} start - start index of the entries
+ */
+function makeEvalNav(uid, data, start) {
+  var length = Object.keys(data).length
+  $("#history-nav").append("<ul/>")
+  $("#history-nav ul").append(
+    $('<li/>', {"class": start === 0 ? "eval-nav-item-disabled" : "eval-nav-item", click: function() {
+      if (start > 0) {
+        update(uid, data, start - entryPerPage)
+      }
+    }}).append(
+      $("<a/>", {text: "prev"})
+    )
+  )
+  for (i = 0; i < Math.ceil(length / entryPerPage); i++) {
+    var className = "eval-nav-item"
+    if (i === Math.floor(start / entryPerPage)) {
+      className += " Active"
+    }
+    $("#history-nav ul").append(
+      $('<li/>', {"class": className, click: createCallbackNav(uid, data, i * entryPerPage)}).append(
+        $("<a/>", {text: i + 1})
+      )
+    )
+  }
+  $("#history-nav ul").append(
+    $('<li/>', {"class": start + entryPerPage >= length ? "eval-nav-item-disabled" : "eval-nav-item", click: function() {
+      if (start + entryPerPage < length) {
+        update(uid, data, start + entryPerPage)
+      }
+    }}).append(
+      $("<a/>", {text: "next"})
+    )
+  )
+}
+
+/**
+ * Create a nav button in the eval history navigation
+ * @param {String} text - text of the button
+ */
+function makeNavButton(text) {
+  return($('<li/>').append(
+    $("<a/>", {text: text})
+  ))
+}
+
 /**
  * Create an evaluation entry in the eval history page
+ * @param {String} uid - id of the user
  * @param {String} key - id of the entry
  * @param {Object} data - data corresponding to the entry
  */
@@ -101,25 +232,94 @@ function makeEvalEntry(uid, key, data) {
     $('<div/>',
       {'class': 'evalEntry'}
     ).append(
-      $('<a/>', {'class': 'link', 'href': data.url + '&session=' + key, text: "Click Here to Continue"})
-    ).append(
-      $('<p/>', {text: "Last modified: " + data.time})
-    ).append(
-      $('<button/>', {text: "delete"}).click(function() {
-        $.confirm({
-          icon: "fas fa-exclamation-triangle",
-          title: 'Are you sure?',
-          content: 'Do you really want to delete this entry? This process cannot be undone.',
-          buttons: {
-            cancel: function () {
+      $('<div/>',
+        {"class": "evalHeader"}
+      ).append(
+        $('<h3/>', {text: data.name})
+      ).append(
+        $('<i/>', {"class" : "fa fa-edit", click: function() {
+          $.confirm({
+            title: 'Edit Name',
+            content: '' +
+            '<form action="" class="formName">' +
+            '<div class="form-group">' +
+            '<label>Please enter a new name</label>' +
+            '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
+            '<p id="project-name-error" class="error_message Fixed hidden">Project name is required</p>' +
+            '</div>' +
+            '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Submit',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                      var name = this.$content.find('.name').val();
+                      if(!name){
+                        $('#project-name-error').removeClass("hidden")
+                        this.$content.find('.name').addClass("invalid")
+                        return false;
+                      }
+                      editName(uid, key, name)
+                    }
+                },
+                cancel: function () {
+                    //close
+                },
             },
-            confirm: function () {
-              shinyjs.showSpinner()
-              deleteEntry(uid, key)
-            },
-          }
-        })
-      })
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+          });
+        }})
+      )
+    ).append(
+      $('<hr>')
+    ).append(
+      $('<div/>',
+        {'class': 'evalInfo'}
+      ).append(
+        $('<p/>'
+        ).append(
+          $('<strong/>', {text: "Progress: "})
+        ).append(
+          $('<span/>', {text: phases[data.phase - 1]})
+        )
+      ).append(
+        $('<p/>'
+        ).append(
+          $('<strong/>', {text: "Last modified: "})
+        ).append(
+          $('<span/>', {text: data.time})
+        )
+      ).append(
+        $('<div/>',
+          {'class': 'evalActions'}
+        ).append(
+          $('<a/>', {'href': data.url + '&session=' + key, text: "Click Here to Continue"})
+        ).append(
+          $('<button/>', {'class': 'btn', text: "delete"}).click(function() {
+            $.confirm({
+              icon: "fas fa-exclamation-triangle",
+              title: 'Are you sure?',
+              content: 'Do you really want to delete this entry? This process cannot be undone.',
+              buttons: {
+                cancel: function () {
+                },
+                confirm: function () {
+                  shinyjs.showSpinner()
+                  deleteEntry(uid, key)
+                },
+              }
+            })
+          })
+        )
+      )
     )
   )
 }
@@ -136,6 +336,11 @@ shinyjs.hideSpinner = function() {
   $("#spinner_backdrop").addClass("hidden")
 }
 
+/** Refresh the page and start a new session. */
+shinyjs.newSession = function() {
+  window.location.replace(homeURL + "?new=true")
+}
+
 /**
  * Delete an evaluation entry in the eval history page
  * @param {String} uid - id of the user
@@ -149,5 +354,27 @@ function deleteEntry(uid, id) {
     shinyjs.updateAccount(uid)
   }).fail(function(error) {
     shinyjs.hideSpinner()
+  })
+}
+
+/**
+ * Edit the name of the evaluation entry.
+ * @param {String} uid - id of the user
+ * @param {String} id - id of the entry
+ * @param {String} name - new name of the entry
+ */
+function editName(uid, id, name) {
+  shinyjs.showSpinner()
+  var data = {
+    name: name
+  }
+  $.ajax({
+    url: databaseURL + uid + '/' + id + '.json',
+    type: 'PATCH',
+    data: JSON.stringify(data)
+  }).done(function(data){
+    shinyjs.updateAccount(uid)
+  }).fail(function(error) {
+    console.log(error)
   })
 }

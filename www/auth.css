@@ -38,6 +38,10 @@
   margin: 0;
 }
 
+.Fixed {
+  position: fixed;
+}
+
 #login_error {
   padding-bottom: 0px;
 }

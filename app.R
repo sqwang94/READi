@@ -27,10 +27,12 @@ source("Components/RecPage/recPage.R")
 source("Components/EvalHistory/evalHistory.R")
 source("Components/SumPage/sumPage.R")
 source("Components/UI/Loader/loader.R")
+source("Components/UI/SideDrawer/sideDrawer.R")
 
 # Define UI for application that draws a histogram
 ui <- function(request){
   fluidPage(
+    title = "READi",
     theme = shinytheme("lumen"),
     introjsUI(),
     useShinyjs(),
@@ -44,11 +46,13 @@ ui <- function(request){
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
       tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"),
-      shiny::tags$script(src="auth.js")
+      shiny::tags$script(src="auth.js"),
+      shiny::tags$script(src="UI.js")
     ),
     authenticationUI("authentication"),
     loader,
-    navbarPageWithBtn("READi Tool",
+    sideDrawerUI,
+    navbarPageWithBtn(div(tags$div(id = "mobile-toggle", icon("user-circle")), span(id = "nav_title", "READi Tool")),
                       id = "tabs",
                       collapsible = TRUE,
                       header = bookmarkButton(label = "Save Progress", id = "bookmark"),
@@ -80,7 +84,7 @@ ui <- function(request){
                                recPageUI("rec_page")),
                       
                       # Evaluation history page
-                      tabPanel("", value = "account", class = "always-show", evalHistory)
+                      tabPanel("", value = "history", class = "always-show", evalHistory)
     ))
 } # closing function (function necessary for bookmarking)
 
@@ -117,13 +121,14 @@ server <- function(input, output, session) {
     )
     
     intro <- data.frame(
-      element = c("#home", "#loginToggle", "#bookmark", "#learn", "#tabs", "#beginPhase"),
+      element = c("null", "#loginToggle", "#loginToggle", "#learn", "#tabs", "#beginPhase"),
       intro = int_text,
       position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
     
     introjs(session, options = list(steps = intro,
+                                    disableInteraction = TRUE,
                                     "nextLabel" = "Next",
-                                    "prevLabel" = "Go Back",
+                                    "prevLabel" = "Prev",
                                     "doneLabel" = "Cool - let's get started!",
                                     "showProgress" = TRUE,
                                     "showStepNumbers" = FALSE,                                                                                                                             
@@ -146,7 +151,6 @@ server <- function(input, output, session) {
       ))
     }
   })
-  
  
   setBookmarkExclude(c("bookmark", "new_session_save"))
   
@@ -155,11 +159,11 @@ server <- function(input, output, session) {
   })
   
   # ----- Hiding all tabs upon  entry to site
-  hideTab("tabs", "account")
+  hideTab("tabs", "history")
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
   hideTab(inputId = "tabs", target = "tab3")
-  hideTab(inputId = "tabs", target = "tab4")
+  # hideTab(inputId = "tabs", target = "tab4")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
@@ -175,29 +179,49 @@ server <- function(input, output, session) {
         html = FALSE,
       )
     } else {
-      showTab(inputId = "tabs", target = "tab1")
-      updateNavbarPage(session, "tabs", "tab1")
-      session$userData$inSession(TRUE)
-      session$userData$phase(1)
+      startNewSession()
     }
   })
   
   observeEvent(input$new_session_save, {
+    session$userData$newSession(TRUE)
     if (isTRUE(input$new_session_save)) {
       session$doBookmark()
+    } else {
+      js$newSession()
     }
   })
   
-  observeEvent(input$my_account, {
+  # display the my-progress page
+  showProgressPage <- function() {
     shinyjs::hide(id = "bookmark")
-    updateNavbarPage(session, "tabs", "account")
+    updateNavbarPage(session, "tabs", "history")
     toggleDropdownButton(inputId = "account_dropdown")
     js$updateAccount(session$userData$current_user()$uid)
+  }
+  
+  # Update state and UI and start a new session
+  startNewSession <- function() {
+    showTab(inputId = "tabs", target = "tab1")
+    updateNavbarPage(session, "tabs", "tab1")
+    session$userData$inSession(TRUE)
+    session$userData$phase(1)
+  }
+  
+  # eventHandler for displaying my-progress page
+  observeEvent(input$my_progress, {
+    showProgressPage()
+  })
+  
+  # eventHandler for displaying my-progress page from side bar (mobile)
+  observeEvent(input$my_progress_side, {
+    showProgressPage()
   })
   
   callModule(authentication, "authentication")
   
   # initialize user and session data
+  session$userData$newSession <- reactiveVal(FALSE)
   session$userData$current_user <- reactiveVal(NULL)
   session$userData$current_session <- reactiveVal(NULL)
   session$userData$inSession <- reactiveVal(FALSE)
@@ -224,7 +248,7 @@ server <- function(input, output, session) {
         session$userData$inSession(TRUE)
       }
       onBookmarked(function(url) {
-        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
+        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase(), session$userData$newSession())
       })
     } else {
       js$clearAccount()
@@ -239,7 +263,7 @@ server <- function(input, output, session) {
         tags$button(
           id = "login",
           type = "button",
-          class = "btn",
+          class = "Login btn DesktopOnly",
           "Log in"
         )
       )
@@ -248,7 +272,42 @@ server <- function(input, output, session) {
     }
   })
   
-  # hide bookmark button on homepage
+  output$loginToggleSide <- renderUI({
+    current_user <- session$userData$current_user()
+    if (is.null(current_user)) {
+      return (
+        tags$button(
+          id = "login-side",
+          type = "button",
+          class = "Login SideDrawerItem",
+          "Log in"
+        )
+      )
+    } else {
+      return (loginDropdownSide)
+    }
+  })
+  
+  # switch between desktop and mobile navbar
+  observe({
+    req(input$width)
+    if(input$width < 768) {
+      shinyjs::hide("loginToggle")
+      shinyjs::show("sidebar")
+    } else {
+      shinyjs::show("loginToggle")
+      shinyjs::hide("sidebar")
+    }
+  })
+  
+  # hide bookarmk button on homepage
+  observe({
+    if (req(input$tabs) == "home") {
+      shinyjs::hide(id = "bookmark")
+    }
+  })
+
+  # save current phase on bookmark
   onBookmark(function(state) {
     state$values$phase <- session$userData$phase()
   })
@@ -256,6 +315,10 @@ server <- function(input, output, session) {
   # On restored bookmark, update UI to current phase
   onRestore(function(state) {
     session$userData$inSession(TRUE)
+    if (!is.null(getQueryString()$new) && getQueryString()$new == "true") {
+      startNewSession()
+      return()
+    }
     session$userData$phase(state$values$phase)
     for (i in 1:state$values$phase) {
       if (i > 1) {
@@ -264,12 +327,6 @@ server <- function(input, output, session) {
       showTab(inputId = "tabs", target = paste0("tab", i))
     }
     updateNavbarPage(session, "tabs", paste0("tab", i))
-  })
-  
-  observe({
-    if (req(input$tabs) == "home") {
-      shinyjs::hide(id = "bookmark")
-    }
   })
   
   # dynamic title for tab 1

@@ -68,7 +68,7 @@ $(document).on("click", "#reset_password", (e) => {
     '<div class="form-group">' +
     '<label>Please Enter Your Email</label>' +
     '<input type="text" placeholder="example@domain.com" class="reset_email form-control" required />' +
-    '<p class="hidden error_message">Please enter a valid Email address</p>' +
+    '<p class="hidden error_message Fixed">Please enter a valid Email address</p>' +
     '</div>' +
     '</form>',
     buttons: {
@@ -142,9 +142,10 @@ $(document).on("click", "#submit_register", (e) => {
   }
 })
 
-$(document).on("click", "#login", (e) => {
+$(document).on("click", ".Login", (e) => {
   e.stopPropagation();
   e.preventDefault();
+  hideSideBar()
   $("#login_backdrop").removeClass("hidden")
   $("#sign_in_panel").removeClass("hidden")
   $("#auth_panel").addClass("Show")
@@ -199,7 +200,7 @@ function validateFormLogin(email, password) {
 function validateFormRegister(email, password, confirm) {
   removeWarnings()
   let valid = true
-  if (!email.match("^[^@]+@[^@]+\.[^@]+$")) {
+  if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
     $("#register_email").addClass("invalid")
     $("#register_email").next().removeClass("hidden")
     valid = false
