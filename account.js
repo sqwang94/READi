@@ -90,7 +90,7 @@ shinyjs.saveState = function(stateData) {
       '<div class="form-group">' +
       '<label>Please enter a name</label>' +
       '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
-      '<p id="project-name-error" class="error_message hidden">Project name is required</p>' +
+      '<p id="project-name-error" class="error_message Fixed hidden">Project name is required</p>' +
       '</div>' +
       '</form>',
       buttons: {
@@ -245,7 +245,7 @@ function makeEvalEntry(uid, key, data) {
             '<div class="form-group">' +
             '<label>Please enter a new name</label>' +
             '<input type="text" placeholder="Enter your project name" class="name form-control" required />' +
-            '<p id="project-name-error" class="error_message hidden">Project name is required</p>' +
+            '<p id="project-name-error" class="error_message Fixed hidden">Project name is required</p>' +
             '</div>' +
             '</form>',
             buttons: {
