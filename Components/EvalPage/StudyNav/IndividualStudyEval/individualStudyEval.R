@@ -133,6 +133,11 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
                      br(),
                      tagList(a("Amstar", href="https://amstar.ca/", target = "_blank"))),
            wellPanel(standard_bias_question))
+    } else if (input$study_design == "None of the above"){
+      list(wellPanel(strong("We're sorry your study design is not an option below; please do your best to assess the risk bias independently and select a value below!",
+                            br(),
+                            br(),
+                            standard_bias_question)))
     } else {
       return()
     }
