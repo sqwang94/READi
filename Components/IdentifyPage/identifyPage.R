@@ -81,22 +81,18 @@ identifyPageUI <- function(id) {
                
                # ------------------ Well #4
                wellPanel(
-                   radioButtons(
-                       ns("t1_studytype"),
-                       "4. The types of studies that appear should be specific to each topic specified in Question 3. 
-                              Based on your specific topic(s) and questions(s) about evidence, 
-                              publications that use the following study designs may be the most useful to you (as a reference). 
-                              You don't need to check the boxes.",
-                       choices = list("Prospective cohort study"                              = 1,
-                                      "Retrospective cohort study"                            = 2,
-                                      "Cross-sectional study for surveys"                     = 3,
-                                      "Systematic review/Meta-analysis/Network Meta-analysis" = 4,
-                                      "Pragmatic controlled trial/Large simple trial"         = 5,
-                                      "Quasi Expiremental"                                    = 6,
-                                      "Diagnostic accuracy study"                             = 7,
-                                      "Modeling (e.g. CEA, BIA, etc.)"                        = 8,
-                                      "Case-control study"                                    = 9))
+                   pickerInput(
+                       ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
+                       "4. Select the type of studies that you are interested in:",
+                       choices = list("Systematic Review"                        = "&filter=pubt.systematicreviews",
+                                      "Meta-Analysis"                            = "&filter=pubt.meta-analysis",
+                                      "Comparative Study"                        = "&filter=pubt.comparativestudy",
+                                      "Observational Study (pro/retrospective cohort/case-control/cross-sectional)" = "&filter=pubt.observationalstudy",
+                                      "Pragmatic controlled trial/Large simple trial"         = "&filter=pubt.pragmaticclinicaltrial"),
+                       multiple = TRUE,
+                       options =  pickerOptions(actionsBox = TRUE))
                ),
+               textOutput(ns("st")),
                wellPanel(style = "background: #d1b3e6",
                          sliderInput(ns("t1_nyears"),
                                      "5. What's the preferred time frame for your literature search (in the last N years)? 
@@ -130,8 +126,9 @@ identifyPageUI <- function(id) {
 # server function for phase 1 identification of evidence page
 identifyPage <- function(input, output, session, parentSession) {
     ns <- session$ns
-    
     setBookmarkExclude(c("submit_1"))
+    
+    output$st <- renderText({input$t1_studytype})
     
     # The following renders questions for Phase1, Question 2 (O)
     output$multoutcomes <- renderUI({
@@ -212,19 +209,19 @@ identifyPage <- function(input, output, session, parentSession) {
     search_string <- reactive({
         pop <- input$t1_pop_interest
         int <- input$t1_int_interest
+        study_type <- input$t1_studytype
         comparator <- input$t1_comparator
         outcome1 <- input$t1_poutcome
         outcome2 <- input$t1_soutcome
-        time_frame <- input$t1_timeframe
+        time_frame <- paste0("&filter=years.", year(Sys.Date())-input$t1_timeframe,"-",year(Sys.Date()))
         
         if(is.null(outcome2)){
-          search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20",outcome1,"[tiab]%20AND%20(\"last ",time_frame," years\"[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20\"meta-analysis%20as%20topic\"%5BMeSH%20Terms%5D %20OR%20\"pragmatic%20clinical%20trials%20as%20topic\"%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=",pop,"[tiab]+",int,"[tiab]+",outcome1,"[tiab]",study_type,"",time_frame)
         } else {
           search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20(",outcome1,"[tiab]%20OR%20",outcome2,"[tiab])%20AND%20('last ",time_frame," years'[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20'meta-analysis%20as%20topic'%5BMeSH%20Terms%5D %20OR%20'pragmatic%20clinical%20trials%20as%20topic'%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
         }
         
         search
-        
     })
     
     # event listener for phase 1 submit button, including input validation
