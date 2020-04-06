@@ -214,13 +214,15 @@ identifyPage <- function(input, output, session, parentSession) {
         outcome1 <- input$t1_poutcome
         outcome2 <- input$t1_soutcome
         time_frame <- paste0("&filter=years.", year(Sys.Date())-input$t1_timeframe,"-",year(Sys.Date()))
-        
         if(is.null(outcome2)){
-          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=",pop,"[tiab]+",int,"[tiab]+",outcome1,"[tiab]",study_type,"",time_frame)
+          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=",pop,"[tiab]+",int,"[tiab]+",outcome1,"[tiab]")
+          for (type in study_type) {
+              search <- paste0(search, type)
+          }
+          search <- paste0(search, time_frame)
         } else {
           search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20(",outcome1,"[tiab]%20OR%20",outcome2,"[tiab])%20AND%20('last ",time_frame," years'[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20'meta-analysis%20as%20topic'%5BMeSH%20Terms%5D %20OR%20'pragmatic%20clinical%20trials%20as%20topic'%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
         }
-        
         search
     })
     
