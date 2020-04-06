@@ -6,10 +6,12 @@
 #
 # ----------------------------------------------------- #
 library(shiny)
+library(plotly)
 library(shinyjs)
 library(rintrojs)
 library(shinythemes)
 library(shinyWidgets)
+library(scales)
 library(lubridate)
 library(shinyBS)
 library(kableExtra)
@@ -163,7 +165,7 @@ server <- function(input, output, session) {
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
   hideTab(inputId = "tabs", target = "tab3")
-  # hideTab(inputId = "tabs", target = "tab4")
+  hideTab(inputId = "tabs", target = "tab4")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
@@ -176,7 +178,7 @@ server <- function(input, output, session) {
         btn_labels = c("Don't Save", "Save"),
         closeOnClickOutside = TRUE,
         showCloseButton = TRUE,
-        html = FALSE,
+        html = FALSE
       )
     } else {
       startNewSession()
