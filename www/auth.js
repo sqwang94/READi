@@ -4,7 +4,7 @@ const config = {
   projectId: "readi-dcf98"
 }
 
-const HOME_URL = "54.213.15.223:3838/READi/"
+const HOME_URL = "http://54.213.15.223:3838/READi/"
 
 firebase.initializeApp(config)
 const auth = firebase.auth()
