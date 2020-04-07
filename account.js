@@ -114,7 +114,7 @@ shinyjs.saveState = function(stateData) {
                   // Add the new saved state
                   $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
                     if (stateData[4]) {
-                      alert("refresh")
+                      shinyjs.newSession()
                     }
                     Shiny.setInputValue('current_session', data.name);
                     shinyjs.hideSpinner()
