@@ -84,11 +84,11 @@ identifyPageUI <- function(id) {
                    pickerInput(
                        ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
                        "4. Select the type of studies that you are interested in:",
-                       choices = list("Systematic Review"                        = "&filter=pubt.systematicreviews",
-                                      "Meta-Analysis"                            = "&filter=pubt.meta-analysis",
-                                      "Comparative Study"                        = "&filter=pubt.comparativestudy",
-                                      "Observational Study (pro/retrospective cohort/case-control/cross-sectional)" = "&filter=pubt.observationalstudy",
-                                      "Pragmatic controlled trial/Large simple trial"         = "&filter=pubt.pragmaticclinicaltrial"),
+                       choices = list("Systematic Review"                        = "systematicreviews[Filter]",
+                                      "Meta-Analysis"                            = "meta-analysis[Filter]",
+                                      "Comparative Study"                        = "comparativestudy[Filter]",
+                                      "Observational Study (pro/retrospective cohort/case-control/cross-sectional)" = "observationalstudy[Filter]",
+                                      "Pragmatic controlled trial/Large simple trial"         = "pragmaticclinicaltrial[Filter]"),
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
@@ -205,7 +205,6 @@ identifyPage <- function(input, output, session, parentSession) {
     })
     
     # --- Need to create search string:
-    # ----- 
     search_string <- reactive({
         pop <- input$t1_pop_interest
         int <- input$t1_int_interest
@@ -215,14 +214,22 @@ identifyPage <- function(input, output, session, parentSession) {
         outcome2 <- input$t1_soutcome
         time_frame <- paste0("&filter=years.", year(Sys.Date())-input$t1_timeframe,"-",year(Sys.Date()))
         if(is.null(outcome2)){
-          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=",pop,"[tiab]+",int,"[tiab]+",outcome1,"[tiab]")
-          for (type in study_type) {
-              search <- paste0(search, type)
-          }
-          search <- paste0(search, time_frame)
+          # -- begin string 
+          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=(",pop,"[tiab]+",int,"[tiab]+",comparator,"[tiab]+",outcome1,"[tiab](")
         } else {
-          search <- paste("https://www.ncbi.nlm.nih.gov/pubmed/?term=(",pop,"[tiab]%20AND%20",int,"[tiab]%20AND%20(",outcome1,"[tiab]%20OR%20",outcome2,"[tiab])%20AND%20('last ",time_frame," years'[PDat])%20AND%20English[lang])%20NOT%20(Randomized%20Controlled%20Trial%5Bptyp%5D%20NOT%20(Meta-analysis%5Bptyp%5D%20OR%20 Systematic%20Review%5Bptyp%5D%20OR%20'meta-analysis%20as%20topic'%5BMeSH%20Terms%5D %20OR%20'pragmatic%20clinical%20trials%20as%20topic'%5BMeSH%20Terms%5D))&cmd=DetailsSearch")
+          # -- begin string but add second outcome
+          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=(",pop,"[tiab]+",int,"[tiab]+",comparator,"[tiab]+",outcome1,"[tiab]+",outcome2,"[tiab](")
         }
+          # -- add selected study types and then exclude Randomized Controlled Trials
+        for (type in 1:length(study_type)) {
+            # -- loop through all the types; if it isn't the last type, add +OR+, else complete with closed brackets and remove RCTs
+          if(type != length(study_type)){
+            search <- paste0(search, study_type[[type]],"+OR+")
+          } else {
+            search <- paste0(search, study_type[[type]], "))+NOT+(Randomized+Controlled+Trial)")
+          }
+        }
+        search <- paste0(search, time_frame)
         search
     })
     
