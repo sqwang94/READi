@@ -92,7 +92,6 @@ identifyPageUI <- function(id) {
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
-               textOutput(ns("st")),
                wellPanel(style = "background: #d1b3e6",
                          sliderInput(ns("t1_nyears"),
                                      "5. What's the preferred time frame for your literature search (in the last N years)? 
@@ -127,8 +126,7 @@ identifyPageUI <- function(id) {
 identifyPage <- function(input, output, session, parentSession) {
     ns <- session$ns
     setBookmarkExclude(c("submit_1"))
-    
-    output$st <- renderText({input$t1_studytype})
+
     
     # The following renders questions for Phase1, Question 2 (O)
     output$multoutcomes <- renderUI({
