@@ -1,6 +1,6 @@
 var entryPerPage = 3
 var databaseURL = 'https://readi-dcf98.firebaseio.com/'
-var homeURL = 'http://127.0.0.1:4046/'
+var homeURL = '54.213.15.223:3838/READi/'
 var phases = ["Phase 1: Identify Real World Evidence",
               "Phase 2: Reviewing and Grading of Evidence",
               "Phase 3: Summarizing The Literature",
