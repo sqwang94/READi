@@ -1,3 +1,4 @@
+# Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
   # -------------------- Intro Tutorial
@@ -71,7 +72,8 @@ server <- function(input, output, session) {
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
   hideTab(inputId = "tabs", target = "tab3")
-  hideTab(inputId = "tabs", target = "tab4")
+  #hideTab(inputId = "tabs", target = "tab4")
+  #hideTab(inputId = "tabs", target = "tab5")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
@@ -279,6 +281,17 @@ server <- function(input, output, session) {
     return("Phase 4")
   })
   
+  # dynamic title for tab 5
+  output$title_panel_5= renderText({
+    if (req(input$tabs) == "tab5") {
+      shinyjs::show(id = "bookmark")
+      session$userData$phase(5)
+      return("Phase 5: Final Summary")
+    }
+    return("Phase 5")
+  })
+  
+  
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 1: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
@@ -293,5 +306,17 @@ server <- function(input, output, session) {
   # --------------------------- Phase 3: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+  phase3_inputs <- callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 4: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  
+  callModule(recPage, "rec_page")
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 5: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  
+  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
 }

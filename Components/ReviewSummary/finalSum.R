@@ -1,0 +1,67 @@
+source("Components/SumPage/biasPlot/biasPlot.R")
+source("Components/SumPage/tableFunction/tableFunction.R")
+
+
+finalSumUI <- function(id){
+  ns <- NS(id)
+  
+  fluidPage(
+    column(8, offset = 2,
+           wellPanel(strong("Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!"),
+                     p("See below for a summary of the report"))),
+    column(8, offset = 2,
+           wellPanel("We asked you about your clinical question using the 'PICOT' method. You responded with the following:",
+                     htmlOutput(ns("picot")))),
+    column(8, offset = 2,
+           wellPanel("We asked you to grade each of your identified articles. Your summary is below: ",
+                     br(),
+                     br(),
+                     wellPanel(style = "background: #FFFFFF",
+                               plotlyOutput(ns("biasplot_final"))))),
+    column(8, offset = 2,
+           wellPanel("We asked you to assess the full body of information for each outcome. Your summary is below: ",
+                     br(),
+                     br(),
+                     wellPanel(style = "background: #FFFFFF",
+                               gt_output(ns("final_summary_table")))))
+  )
+  
+}
+
+
+
+finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_inputs){
+  ns <- session$ns
+  
+  
+  output$picot <- renderUI({
+    if (phase1_inputs$t1_outcomes == 1){
+      HTML(paste("<center><b><font color='#8A2BE2'>Population: </font></b>", phase1_inputs$t1_pop_interest,
+                "<br/><b><font color='#8A2BE2'>Intervention: </font></b>", phase1_inputs$t1_int_interest,
+                "<br/><b><font color='#8A2BE2'>Comparator: </font></b>", phase1_inputs$t1_comparator,
+                "<br/><b><font color='#8A2BE2'>Outcome: </font></b>", phase1_inputs$t1_poutcome,
+                "<br/><b><font color='#8A2BE2'>Time: </font></b>", phase1_inputs$t1_timeframe,
+                "<br/><b><font color='#8A2BE2'>Setting: </font></b>", phase1_inputs$t1_setting, "</center>"))
+    }  else {
+      HTML(paste("<center><b><font color='#8A2BE2'>Population: </font></b>", phase1_inputs$t1_pop_interest,
+                 "<br/><b><font color='#8A2BE2'>Intervention: </font></b>", phase1_inputs$t1_int_interest,
+                 "<br/><b><font color='#8A2BE2'>Comparator: </font></b>", phase1_inputs$t1_comparator,
+                 "<br/><b><font color='#8A2BE2'>Outcomes:</font></b>", phase1_inputs$t1_poutcome, "and", phase1_inputs$t1_soutcome,
+                 "<br/><b><font color='#8A2BE2'>Time: </font></b>", phase1_inputs$t1_timeframe,
+                 "<br/><b><font color='#8A2BE2'>Setting: </font></b> ", phase1_inputs$t1_setting, "</center>"))
+    }
+  
+  })
+  
+  output$biasplot_final <- renderPlotly({
+    biasPlotFunction(phase1_inputs, bias_values)
+  })
+  
+  output$final_summary_table <- render_gt({
+    table_function(phase1_inputs, phase3_inputs)
+  })
+
+  
+}
+
+

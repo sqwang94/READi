@@ -6,6 +6,7 @@
 #
 # ----------------------------------------------------- #
 library(shiny)
+library(gt)
 library(plotly)
 library(shinyjs)
 library(rintrojs)
@@ -28,6 +29,7 @@ source("Components/Authentication/LoginDropdown/loginDropdown.R")
 source("Components/RecPage/recPage.R")
 source("Components/EvalHistory/evalHistory.R")
 source("Components/SumPage/sumPage.R")
+source("Components/ReviewSummary/finalSum.R")
 source("Components/UI/Loader/loader.R")
 source("Components/UI/SideDrawer/sideDrawer.R")
 
@@ -35,7 +37,7 @@ source("Components/UI/SideDrawer/sideDrawer.R")
 ui <- function(request){
   fluidPage(
     title = "READi",
-    theme = shinytheme("lumen"),
+    theme = shinytheme("cerulean"),
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
@@ -84,6 +86,12 @@ ui <- function(request){
                       # ---------------------------  ----------------------------------#
                       tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
                                recPageUI("rec_page")),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # --------------------------- Phase 5: Summary of Review ----------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_5", class = "inline"), value = "tab5", icon = icon("check-circle"),
+                               finalSumUI("final_sum")),
                       
                       # Evaluation history page
                       tabPanel("", value = "history", class = "always-show", evalHistory)
