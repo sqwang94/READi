@@ -37,7 +37,7 @@ source("Components/UI/SideDrawer/sideDrawer.R")
 ui <- function(request){
   fluidPage(
     title = "READi",
-    theme = shinytheme("sandstone"),
+    theme = shinytheme("cerulean"),
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),

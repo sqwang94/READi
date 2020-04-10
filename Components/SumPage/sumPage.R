@@ -93,65 +93,7 @@ sumPage <- function(input, output, session, phase1_inputs, bias_values) {
     })
     
     output$t3_table <- render_gt({
-        domain_vec <- c("Comparator in each study", 
-                        "Number of studies and number of subjects (overall)",
-                        "Level of overall study limitation",
-                        "Are the results consistent",
-                        "Are the results direct?",
-                        "Are the results precise?",
-                        "Is there publication bias?")
-        
-        if (phase1_inputs$t1_outcomes == 1){
-            outcomes <- c(input$t3_comparator_1, 
-                          input$t3_subjects_1, 
-                          input$t3_studylim_1,
-                          input$t3_consistent_1, 
-                          input$t3_direct_1, 
-                          input$t3_precise_1,
-                          input$t3_bias_1)
-            
-            df <- data.frame(
-                Domains   = domain_vec,
-                Responses = outcomes,
-                type      = rep(phase1_inputs$t1_poutcome, 7)) %>% 
-              group_by(type) %>% 
-              gt(rowname_col = "Domains") %>% 
-              tab_header(title = "Whole Body of Evidence Review",
-                         subtitle = md("*For each outcome of interest*")) %>% 
-              tab_options(
-                row_group.background.color = "#FFEFDB80",
-                heading.background.color = "#E8DCF0"
-              )
-        } else {
-            outcomes <- c(input$t3_studylim_1, 
-                               input$t3_subjects_1, 
-                               input$t3_comparator_1, 
-                               input$t3_consistent_1, 
-                               input$t3_direct_1, 
-                               input$t3_precise_1,
-                               input$t3_bias_1,
-                               input$t3_studylim_2, 
-                               input$t3_subjects_2, 
-                               input$t3_comparator_2, 
-                               input$t3_consistent_2, 
-                               input$t3_direct_2, 
-                               input$t3_precise_2,
-                               input$t3_bias_2)
-           df <- data.frame(
-                Domains   = rep(domain_vec,2),
-                Responses = outcomes,
-                type = c(rep(phase1_inputs$t1_poutcome, 7),rep(phase1_inputs$t1_soutcome,7))) %>% 
-              group_by(type) %>% 
-              gt(rowname_col = "Domains") %>% 
-              tab_header(title = "Whole Body of Evidence Review",
-                         subtitle = md("*For each outcome of interest*")) %>% 
-              tab_options(
-                row_group.background.color = "#FFEFDB80",
-                heading.background.color = "#E8DCF0"
-              )
-        }
-        return(df)
-        
+      table_function(phase1_inputs, input)
     })
-    
+    return(input)
 }
