@@ -84,10 +84,10 @@ identifyPageUI <- function(id) {
                    pickerInput(
                        ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
                        "4. Select the type of studies that you are interested in:",
-                       choices = list("Systematic Review"                        = "systematicreviews[Filter]",
-                                      "Meta-Analysis"                            = "meta-analysis[Filter]",
-                                      "Comparative Study"                        = "comparativestudy[Filter]",
-                                      "Observational Study (pro/retrospective cohort/case-control/cross-sectional)" = "observationalstudy[Filter]",
+                       choices = list("Systematic Review" = "systematicreviews[Filter]",
+                                      "Meta-Analysis" = "meta-analysis[Filter]",
+                                      "Comparative Study" = "comparativestudy[Filter]",
+                                      "Observational Study" = "observationalstudy[Filter]",
                                       "Pragmatic controlled trial/Large simple trial"         = "pragmaticclinicaltrial[Filter]"),
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))

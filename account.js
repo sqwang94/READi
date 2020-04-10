@@ -1,6 +1,6 @@
 var entryPerPage = 3
 var databaseURL = 'https://readi-dcf98.firebaseio.com/'
-var homeURL = 'http://127.0.0.1:4046/'
+var homeURL = 'http://54.213.15.223:3838/READi/'
 var phases = ["Phase 1: Identify Real World Evidence",
               "Phase 2: Reviewing and Grading of Evidence",
               "Phase 3: Summarizing The Literature",
@@ -114,7 +114,7 @@ shinyjs.saveState = function(stateData) {
                   // Add the new saved state
                   $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
                     if (stateData[4]) {
-                      alert("refresh")
+                      shinyjs.newSession()
                     }
                     Shiny.setInputValue('current_session', data.name);
                     shinyjs.hideSpinner()
