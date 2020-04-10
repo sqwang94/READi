@@ -17,7 +17,22 @@ recPageUI <- function(id){
                           selected = "No"),
              uiOutput(ns("lit_available")))
            )),
-    uiOutput(ns("rec"))
+    uiOutput(ns("rec")),
+    br(),
+    br(),
+    column(8, offset = 2,
+    actionBttn(
+      inputId = ns("submit_rec"),
+      label = "Submit Form",
+      color = "royal",
+      style = "minimal",
+      icon = NULL,
+      block = TRUE
+    ),
+    br(),
+    br(),
+    br(),
+    br())
   )
 }
 

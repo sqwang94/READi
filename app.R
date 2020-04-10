@@ -6,6 +6,7 @@
 #
 # ----------------------------------------------------- #
 library(shiny)
+library(gt)
 library(plotly)
 library(shinyjs)
 library(rintrojs)
@@ -28,6 +29,7 @@ source("Components/Authentication/LoginDropdown/loginDropdown.R")
 source("Components/RecPage/recPage.R")
 source("Components/EvalHistory/evalHistory.R")
 source("Components/SumPage/sumPage.R")
+source("Components/ReviewSummary/finalSum.R")
 source("Components/UI/Loader/loader.R")
 source("Components/UI/SideDrawer/sideDrawer.R")
 
@@ -35,7 +37,6 @@ source("Components/UI/SideDrawer/sideDrawer.R")
 ui <- function(request){
   fluidPage(
     title = "READi",
-    theme = shinytheme("lumen"),
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
@@ -84,6 +85,12 @@ ui <- function(request){
                       # ---------------------------  ----------------------------------#
                       tabPanel(uiOutput("title_panel_4", class = "inline"), value = "tab4", icon = icon("check-circle"),
                                recPageUI("rec_page")),
+                      
+                      # ---------------------------  ----------------------------------#
+                      # --------------------------- Phase 5: Summary of Review ----------------------------#
+                      # ---------------------------  ----------------------------------#
+                      tabPanel(uiOutput("title_panel_5", class = "inline"), value = "tab5", icon = icon("check-circle"),
+                               finalSumUI("final_sum")),
                       
                       # Evaluation history page
                       tabPanel("", value = "history", class = "always-show", evalHistory)
@@ -166,6 +173,7 @@ server <- function(input, output, session) {
   hideTab(inputId = "tabs", target = "tab2")
   hideTab(inputId = "tabs", target = "tab3")
   #hideTab(inputId = "tabs", target = "tab4")
+  #hideTab(inputId = "tabs", target = "tab5")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
@@ -373,6 +381,17 @@ server <- function(input, output, session) {
     return("Phase 4")
   })
   
+  # dynamic title for tab 5
+  output$title_panel_5= renderText({
+    if (req(input$tabs) == "tab5") {
+      shinyjs::show(id = "bookmark")
+      session$userData$phase(5)
+      return("Phase 5: Final Summary")
+    }
+    return("Phase 5")
+  })
+  
+  
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 1: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
@@ -387,13 +406,21 @@ server <- function(input, output, session) {
   # --------------------------- Phase 3: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+  phase3_inputs <- callModule(sumPage, "sum_page", phase1_inputs, bias_values)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 4: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
   callModule(recPage, "rec_page")
+  
+  # ---------------------------  ----------------------------------#
+  # --------------------------- Phase 5: RWE ----------------------------------#
+  # ---------------------------  ----------------------------------#
+  
+  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
+  
+  
 }
 
 # Run the application 
