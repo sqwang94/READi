@@ -260,7 +260,7 @@ input.Error {
   border: 1px solid rgb(0, 0, 0, 0);
 }
 
-#account_Dropdown .caret {
+.btn-default .caret {
   border-top-color: #fff;
 }
 
