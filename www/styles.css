@@ -37,6 +37,15 @@ h2 {
   background-color: #e7e7e7;
 }
 
+#login {
+  color: white;
+}
+
+#login:hover, #login:focus, #login:hover:focus {
+  color: white;
+  border-color: white;
+}
+
 #loginToggle {
   float: right;
   margin-top: 6px;
@@ -64,32 +73,6 @@ h2 {
 
 .Filler {
   min-height: 100vh;
-}
-
-::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
-}
-
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0);
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
-}
-
-::-webkit-scrollbar-thumb {
-    border-radius: 7px;
-    background: #b9b9b9;
-    height: 3px;
-}
-
-::-webkit-scrollbar-corner {
-    display: none;
-    height: 0px;
-    width: 0px;
 }
 
 @media (min-width: 768px) {
@@ -208,6 +191,7 @@ input.Error {
 
 #bookmark {
   float: right;
+  margin: 0 30px 10px 0;
 }
 
 .introjs-progress {
