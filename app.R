@@ -172,9 +172,9 @@ server <- function(input, output, session) {
   hideTab("tabs", "history")
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
-  # hideTab(inputId = "tabs", target = "tab3")
-  #hideTab(inputId = "tabs", target = "tab4")
-  #hideTab(inputId = "tabs", target = "tab5")
+  hideTab(inputId = "tabs", target = "tab3")
+  hideTab(inputId = "tabs", target = "tab4")
+  hideTab(inputId = "tabs", target = "tab5")
   
   observeEvent(input$beginPhase,{
     if (session$userData$inSession()) {
