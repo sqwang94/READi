@@ -9,7 +9,7 @@ identifyPageUI <- function(id) {
                     "Screening and surveilence" = 6)
     fluidPage(
         column(2, 
-               dropdownButton(
+               dropdownButton(inputId = "infoDropDown",
                    print("This page will allow you to enter all the details of studies
                                          you are searching for. If you are receiving an error when trying to
                                          submit, make sure that all inputs available have been marked. Don't panic, it
@@ -21,8 +21,7 @@ identifyPageUI <- function(id) {
         useSweetAlert(),
         column(8, #offset = 3,
                # --------- Well #1
-               wellPanel(style = "background: #e8dcf0",
-                         selectInput("t1_int",
+               wellPanel(selectInput("t1_int",
                                      "1. What Type of Intervention Are You Evaluating?",
                                      choices =  list("Pharmaceuticals" = 1,
                                                      "Devices"            = 2,
@@ -64,8 +63,7 @@ identifyPageUI <- function(id) {
                              "(C) What is the setting of interest?",
                              placeholder = "Ex.) SNF, Acute Care, etc.")),
                # ---------- Well #3
-               wellPanel(style = "background: #e8dcf0",
-                         strong("3. For which topic(s) are you seeking to evaluate the literature? 
+               wellPanel(strong("3. For which topic(s) are you seeking to evaluate the literature? 
                                    More specific questions will pop up based on your selected topic(s)."),
                          br(),
                          br(),
@@ -92,8 +90,7 @@ identifyPageUI <- function(id) {
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
-               wellPanel(style = "background: #e8dcf0",
-                         sliderInput(ns("t1_nyears"),
+               wellPanel(sliderInput(ns("t1_nyears"),
                                      "5. What's the preferred time frame for your literature search (in the last N years)? 
                                         Please specify the number of years only.",
                                      min = 0.5, max = 20, step = 0.5, value = 10)),

@@ -162,7 +162,7 @@ server <- function(input, output, session) {
     }
   })
  
-  setBookmarkExclude(c("bookmark", "new_session_save"))
+  setBookmarkExclude(c("bookmark", "new_session"))
   
   observeEvent(input$bookmark, {
     session$doBookmark()
@@ -180,11 +180,11 @@ server <- function(input, output, session) {
     if (session$userData$inSession()) {
       confirmSweetAlert(
         session,
-        inputId = "new_session_save",
+        inputId = "new_session",
         title = "New session",
-        text = "You are leaving your current session. Do you want to save your progress?",
+        text = "Do you want to leave your current session? Any unsaved progress will be lost.",
         type = "question",
-        btn_labels = c("Don't Save", "Save"),
+        btn_labels = c("cancel", "continue"),
         closeOnClickOutside = TRUE,
         showCloseButton = TRUE,
         html = FALSE
@@ -194,11 +194,8 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$new_session_save, {
-    session$userData$newSession(TRUE)
-    if (isTRUE(input$new_session_save)) {
-      session$doBookmark()
-    } else {
+  observeEvent(input$new_session, {
+    if (isTRUE(input$new_session)) {
       js$newSession()
     }
   })
@@ -214,6 +211,7 @@ server <- function(input, output, session) {
   # Update state and UI and start a new session
   startNewSession <- function() {
     showTab(inputId = "tabs", target = "tab1")
+    shinyjs::show(id = "bookmark")
     updateNavbarPage(session, "tabs", "tab1")
     session$userData$inSession(TRUE)
     session$userData$phase(1)
@@ -407,7 +405,7 @@ server <- function(input, output, session) {
   # --------------------------- Phase 3: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  phase3_inputs <- callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+  phase3_inputs <- callModule(sumPage, "sum_page", session, phase1_inputs, bias_values)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 4: RWE ----------------------------------#
