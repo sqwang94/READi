@@ -59,7 +59,7 @@ identifyPageUI <- function(id) {
                    # place holder for yes or no (if yes, need multiple outcomes of interest)
                    sliderInput(ns("t1_timeframe"),
                                "(C) What is the time frame in years?",
-                               min = 0.5, max = 20, step = 0.5, value = 5),
+                               min = 1, max = 20, step = 1, value = 5),
                    textInput(ns("t1_setting"),
                              "(C) What is the setting of interest?",
                              placeholder = "Ex.) SNF, Acute Care, etc.")),
