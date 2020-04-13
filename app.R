@@ -172,7 +172,7 @@ server <- function(input, output, session) {
   hideTab("tabs", "history")
   hideTab(inputId = "tabs", target = "tab1")
   hideTab(inputId = "tabs", target = "tab2")
-  hideTab(inputId = "tabs", target = "tab3")
+  # hideTab(inputId = "tabs", target = "tab3")
   #hideTab(inputId = "tabs", target = "tab4")
   #hideTab(inputId = "tabs", target = "tab5")
   
@@ -405,7 +405,7 @@ server <- function(input, output, session) {
   # --------------------------- Phase 3: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  phase3_inputs <- callModule(sumPage, "sum_page", phase1_inputs, bias_values)
+  phase3_inputs <- callModule(sumPage, "sum_page", session, phase1_inputs, bias_values)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 4: RWE ----------------------------------#

@@ -33,8 +33,7 @@ h2 {
 }
 
 #mobile-toggle:hover {
-  opacity: 0.8;
-  background-color: #e7e7e7;
+  background-color: #37475A;
 }
 
 #login {
@@ -138,6 +137,10 @@ h2 {
   #home {
     padding: 20px;
     width: 90%;
+  }
+
+  #infoDropDown {
+    display: none;
   }
 }
 
@@ -267,6 +270,12 @@ input.Error {
 #account_dropdown:hover, #account_dropdown:focus {
   margin-top: auto;
   border-color: inherit;
+}
+
+#dropdown-menu-infoDropDown li {
+  left: 20px;
+  top: 20px;
+  width: 300px;
 }
 
 .evalEntry {

@@ -9,7 +9,7 @@ identifyPageUI <- function(id) {
                     "Screening and surveilence" = 6)
     fluidPage(
         column(2, 
-               dropdownButton(
+               dropdownButton(inputId = "infoDropDown",
                    print("This page will allow you to enter all the details of studies
                                          you are searching for. If you are receiving an error when trying to
                                          submit, make sure that all inputs available have been marked. Don't panic, it
