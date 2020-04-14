@@ -82,11 +82,11 @@ identifyPageUI <- function(id) {
                    pickerInput(
                        ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
                        "4. Select the type of studies that you are interested in:",
-                       choices = list("Systematic Review" = "systematicreviews[Filter]",
-                                      "Meta-Analysis" = "meta-analysis[Filter]",
-                                      "Comparative Study" = "comparativestudy[Filter]",
-                                      "Observational Study" = "observationalstudy[Filter]",
-                                      "Pragmatic controlled trial/Large simple trial"         = "pragmaticclinicaltrial[Filter]"),
+                       choices = list("Systematic Review" = "pubt.systematicreviews",
+                                      "Meta-Analysis" = "pubt.meta-analysis",
+                                      "Comparative Study" = "pubt.comparativestudy",
+                                      "Observational Study" = "pubt.observationalstudy",
+                                      "Pragmatic controlled trial/Large simple trial" = "pubt.pragmaticclinicaltrial"),
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
@@ -209,20 +209,16 @@ identifyPage <- function(input, output, session, parentSession) {
         outcome2 <- input$t1_soutcome
         time_frame <- paste0("&filter=years.", year(Sys.Date())-input$t1_timeframe,"-",year(Sys.Date()))
         if(is.null(outcome2)){
-          # -- begin string 
-          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=(",pop,"[tiab]+",int,"[tiab]+",comparator,"[tiab]+",outcome1,"[tiab](")
+            # -- begin string 
+            search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=((",pop,"[tiab])+AND+(",int,"[tiab])+AND+(",comparator,"[tiab])+AND+(",outcome1,"[tiab]))")
         } else {
-          # -- begin string but add second outcome
-          search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=(",pop,"[tiab]+",int,"[tiab]+",comparator,"[tiab]+",outcome1,"[tiab]+",outcome2,"[tiab](")
+            # -- begin string but add second outcome
+            search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=((",pop,"[tiab])+AND+(",int,"[tiab])+AND+(",comparator,"[tiab])+AND+(",outcome1,"[tiab])+AND+(",outcome2,"[tiab]))")
         }
-          # -- add selected study types and then exclude Randomized Controlled Trials
+        search <- paste0(search, "+NOT+(randomized+controlled+trial[Publication+Type])")
+        # -- add selected study types and then exclude Randomized Controlled Trials
         for (type in 1:length(study_type)) {
-            # -- loop through all the types; if it isn't the last type, add +OR+, else complete with closed brackets and remove RCTs
-          if(type != length(study_type)){
-            search <- paste0(search, study_type[[type]],"+OR+")
-          } else {
-            search <- paste0(search, study_type[[type]], "))+NOT+(Randomized+Controlled+Trial)")
-          }
+            search <- paste0(search, "&filter=", study_type[[type]])
         }
         search <- paste0(search, time_frame)
         search
