@@ -1,5 +1,7 @@
 source("Components/EvalPage/StudyNav/IndividualStudyEval/Robins/robins.R")
 source("Components/EvalPage/StudyNav/IndividualStudyEval/AMSTAR2/amstar.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/GRACE/grace.R")
+
 
 # UI function for individual study eval
 individualStudyEvalUI <- function(id, studyId) {
@@ -29,6 +31,7 @@ individualStudyEvalUI <- function(id, studyId) {
                                        "Budget Impact Model",
                                        "Discrete Choice Experiment",
                                        "Multi-criteria Decision Analysis",
+                                       "Comparative Study",
                                        "None of the above"),
                            selected = "None of the above")),
             br(),
@@ -127,26 +130,48 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
                                   label = strong("1C. Overall: Based on the rating for each question, please give a general rating of the quality of this study. (Good; Fair; Poor)"),
                                   choices = choice_quasi,
                                   selected = character(0))),
-           wellPanel(standard_bias_question)
-      )
+           wellPanel(standard_bias_question))
+      
+      # BIM
     } else if (input$study_design == "Budget Impact Model"){
-      list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices for BIM II to inform your review"),
+      list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices to inform your review"),
                      br(),
                      tagList(a("ISPOR Good Research Practices for BIM II", href = "https://www.ispor.org/heor-resources/good-practices-for-outcomes-research/article/principles-of-good-practice-for-budget-impact-analysis-ii", 
                                target = "_blank"))),
            wellPanel(standard_bias_question))
+      
+      # DCE
     } else if (input$study_design == "Discrete Choice Experiment"){
       list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices to inform your review"),
                      br(),
                      tagList(a("Constructing Experimental Designs for Discrete-Choice Experiments ", href = "https://www.ispor.org/heor-resources/good-practices-for-outcomes-research/article/constructing-experimental-designs-for-discrete-choice-experiments", 
                                target = "_blank"))),
            wellPanel(standard_bias_question))
+      
+      # MCDA
+    } else if (input$study_design == "Multi-criteria Decision Analysis"){
+      list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices to inform your review"),
+                     br(),
+                     tagList(a("Multiple Criteria Decision Analysis for Health Care Decision Making - Emerging Good Practices: Report 2 ", href = "https://www.ispor.org/heor-resources/good-practices-for-outcomes-research/article/multiple-criteria-decision-analysis-for-health-care-decision-making---emerging-good-practices", 
+                               target = "_blank"))),
+           wellPanel(standard_bias_question))
+      
+      # Observational
     } else if (input$study_design %in% c("Prospective cohort study", "Retrospective cohort study", "Case-control study")) {
       list(robinsUI(ns("robins")),
            wellPanel(standard_bias_question))
+      
+      # Systematic Reviews
     } else if (input$study_design == "Systematic review/Meta-analysis/Network Meta-analysis") {
       list(amstar2UI(ns("amstar")),
            wellPanel(standard_bias_question))
+      
+      # Compartive Study
+    } else if (input$study_design == "Comparative Study"){
+      list(graceUI(ns("grace")),
+           wellPanel(standard_bias_question))
+      
+      
     } else if (input$study_design == "None of the above"){
       list(wellPanel(strong("We're sorry your study design is not an option below; please do your best to assess the risk bias independently and select a value below!",
                             br(),
@@ -159,6 +184,7 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
   
   callModule(amstar2, "amstar")
   callModule(robinsServer, "robins")
+  callModule(grace, "grace")
   return(input)
   
   

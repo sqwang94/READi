@@ -23,7 +23,19 @@ finalSumUI <- function(id){
                      br(),
                      br(),
                      wellPanel(style = "background: #FFFFFF",
-                               gt_output(ns("final_summary_table")))))
+                               gt_output(ns("final_summary_table"))))),
+    br(),
+    br(),
+    br(),
+    column(8, offset =2, 
+           wellPanel(strong("If you'd like to generate a PDF of your report, you may do so here. Note that we recommend creating an account and saving your progress as well."),
+                     br(),
+                     br(),
+                     wellPanel(style = "background: #FFFFFF",
+                       textInput(inputId = ns("filename"), "Name your file here", placeholder = "MyFile.PDF"),
+                       downloadButton(outputId = ns("dwnld"), label = "Click here to Download PDF"))
+           )
+    )
   )
   
 }
@@ -60,6 +72,37 @@ finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_
   output$final_summary_table <- render_gt({
     table_function(phase1_inputs, phase3_inputs)
   })
+  
+  
+  output$dwnld <- downloadHandler(
+
+    filename = function(){
+      name <- input$filename
+      pdf_check <- str_detect(tolower(name), ".pdf")
+      
+      if(is.null(name)){
+        return(print("Please give your pdf file a name (above)"))
+      } else if(!pdf_check){
+        print("Please save your file as '.pdf'. For example, if you'd like to make your title 'BrennanIsCool', please type 'BrennanIsCool.pdf")
+      } else {
+        paste0(name, ".pdf")
+      }
+    },
+    
+    content = function(file){
+      hist(cars$speed)
+    }
+    
+    
+    
+    
+  )
+  
+  
+  
+  
+  
+  
 
   
 }
