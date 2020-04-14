@@ -82,11 +82,16 @@ identifyPageUI <- function(id) {
                    pickerInput(
                        ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
                        "4. Select the type of studies that you are interested in:",
-                       choices = list("Systematic Review" = "pubt.systematicreviews",
-                                      "Meta-Analysis" = "pubt.meta-analysis",
-                                      "Comparative Study" = "pubt.comparativestudy",
-                                      "Observational Study" = "pubt.observationalstudy",
-                                      "Pragmatic controlled trial/Large simple trial" = "pubt.pragmaticclinicaltrial"),
+                       choices = list("Systematic Review" = '("systematic review"[ptyp])',
+                                      "Meta-Analysis" = '("meta-analysis"[ptyp])',
+                                      "Comparative Study" = '("comparative study"[ptyp])',
+                                      "Observational Study" = '("observational study"[ptyp])',
+                                      "Pragmatic controlled trial/Large simple trial" = '("pragmatic clinical trial"[ptyp])',
+                                      "Cost-Benefit Anaylsis" = '("Cost-Benefit Analysis"[Mesh] OR "Quality-Adjusted Life Years"[Mesh] OR ("Computer Simulation/economics"[Mesh] OR "Computer Simulation/statistics and numerical data"[Mesh]) OR "Discrete event"[tiab])',
+                                      "Budget Impact" = '("Budgets"[Mesh] OR "Cost Control"[Mesh])',
+                                      "Discrete Choice Experiment" = '("Patient Preference"[Mesh] or "Choice Behavior"[Mesh])',
+                                      "Multi-Criteria Decision Analysis" = '("Decision Support Techniques/economics"[Mesh])'
+                                      ),
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
@@ -215,10 +220,14 @@ identifyPage <- function(input, output, session, parentSession) {
             # -- begin string but add second outcome
             search <- paste0("https://pubmed.ncbi.nlm.nih.gov/?term=((",pop,"[tiab])+AND+(",int,"[tiab])+AND+(",comparator,"[tiab])+AND+(",outcome1,"[tiab])+AND+(",outcome2,"[tiab]))")
         }
-        search <- paste0(search, "+NOT+(randomized+controlled+trial[Publication+Type])")
+        search <- paste0(search, "+NOT+(randomized+controlled+trial[ptyp])+AND+(")
         # -- add selected study types and then exclude Randomized Controlled Trials
         for (type in 1:length(study_type)) {
-            search <- paste0(search, "&filter=", study_type[[type]])
+            if (type != length(study_type)) {
+                search <- paste0(search, study_type[[type]], "+OR+")
+            } else {
+                search <- paste0(search, study_type[[type]], ")")
+            }
         }
         search <- paste0(search, time_frame)
         search

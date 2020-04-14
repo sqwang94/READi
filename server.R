@@ -129,7 +129,7 @@ server <- function(input, output, session) {
   callModule(authentication, "authentication")
   
   # initialize user and session data
-  session$userData$newSession <- reactiveVal(FALSE)
+  session$userData$current_state <- reactiveVal(NULL)
   session$userData$current_user <- reactiveVal(NULL)
   session$userData$current_session <- reactiveVal(NULL)
   session$userData$inSession <- reactiveVal(FALSE)
@@ -151,12 +151,20 @@ server <- function(input, output, session) {
       js$hideSpinner()
       # get current session and update bookmark save state
       if (!is.null(cur_session)) {
+        session$userData$current_state(getQueryString()[['_state_id_']])
         js$checkSession(current_user$uid, cur_session)
         session$userData$current_session(cur_session)
         session$userData$inSession(TRUE)
       }
       onBookmarked(function(url) {
-        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase(), session$userData$newSession())
+        if (!is.null(session$userData$current_state())) {
+          cmd <- ("ls")
+          alert(getwd())
+          # cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state())
+          try(shell(cmd))
+        }
+        session$userData$current_state(strsplit(url, "=")[[1]][2])
+        js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
       })
     } else {
       js$clearAccount()
@@ -317,4 +325,6 @@ server <- function(input, output, session) {
   # ---------------------------  ----------------------------------#
   
   callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
+  
+  
 }
