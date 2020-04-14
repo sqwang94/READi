@@ -1,4 +1,5 @@
 source("Components/EvalPage/StudyNav/IndividualStudyEval/Robins/robins.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/AMSTAR2/amstar.R")
 
 # UI function for individual study eval
 individualStudyEvalUI <- function(id, studyId) {
@@ -25,6 +26,9 @@ individualStudyEvalUI <- function(id, studyId) {
                                        "Retrospective cohort study",
                                        "Case-control study",
                                        "Systematic review/Meta-analysis/Network Meta-analysis",
+                                       "Budget Impact Model",
+                                       "Discrete Choice Experiment",
+                                       "Multi-criteria Decision Analysis",
                                        "None of the above"),
                            selected = "None of the above")),
             br(),
@@ -125,13 +129,23 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
                                   selected = character(0))),
            wellPanel(standard_bias_question)
       )
+    } else if (input$study_design == "Budget Impact Model"){
+      list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices for BIM II to inform your review"),
+                     br(),
+                     tagList(a("ISPOR Good Research Practices for BIM II", href = "https://www.ispor.org/heor-resources/good-practices-for-outcomes-research/article/principles-of-good-practice-for-budget-impact-analysis-ii", 
+                               target = "_blank"))),
+           wellPanel(standard_bias_question))
+    } else if (input$study_design == "Discrete Choice Experiment"){
+      list(wellPanel(strong("1B. Please use the following ISPOR Good Research Practices to inform your review"),
+                     br(),
+                     tagList(a("Constructing Experimental Designs for Discrete-Choice Experiments ", href = "https://www.ispor.org/heor-resources/good-practices-for-outcomes-research/article/constructing-experimental-designs-for-discrete-choice-experiments", 
+                               target = "_blank"))),
+           wellPanel(standard_bias_question))
     } else if (input$study_design %in% c("Prospective cohort study", "Retrospective cohort study", "Case-control study")) {
       list(robinsUI(ns("robins")),
            wellPanel(standard_bias_question))
     } else if (input$study_design == "Systematic review/Meta-analysis/Network Meta-analysis") {
-      list(wellPanel(strong("1B. Please rate the quality of the study using the AMSTAR 2 Checklist."),
-                     br(),
-                     tagList(a("Amstar", href="https://amstar.ca/", target = "_blank"))),
+      list(amstar2UI(ns("amstar")),
            wellPanel(standard_bias_question))
     } else if (input$study_design == "None of the above"){
       list(wellPanel(strong("We're sorry your study design is not an option below; please do your best to assess the risk bias independently and select a value below!",
@@ -142,8 +156,12 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
       return()
     }
   })
+  
+  callModule(amstar2, "amstar")
   callModule(robinsServer, "robins")
   return(input)
+  
+  
 }
 
 
