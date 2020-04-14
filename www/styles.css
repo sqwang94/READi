@@ -391,3 +391,7 @@ input.Error {
   padding: 8px 12px 7px 13px;
   display: block;
 }
+
+.dropdown-menu li a span.text {
+  margin-right: 15px;
+}
