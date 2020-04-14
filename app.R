@@ -259,8 +259,7 @@ server <- function(input, output, session) {
       }
       onBookmarked(function(url) {
         if (!is.null(session$userData$current_state())) {
-          cmd <- ("ls")
-          # cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state())
+          cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state)
           try(shell(cmd))
         }
         session$userData$current_state(strsplit(url, "=")[[1]][2])
