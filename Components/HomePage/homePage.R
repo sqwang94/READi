@@ -3,11 +3,12 @@ homePageUI <- bootstrapPage(
         img(src = "CHOICE.png", id = "choice-image"),
         h2("Welcome to the READi (Real-World Evidence Assessments and Needs Guidance) Tool"),
         h3(id = "author", "presented by The CHOICE Institute"),
+        tagList(a(icon("github", "fa-2x"), href = "https://github.com/btbeal/READi", 
+                  target = "_blank")),
         hr(),
         p("The READi Tool is a comprehensive online tool to guide literature review and coverage decision-making"),
         p("Once you have decided you need real world evidence to answer your question of interest, the READi tool 
                                         will guide you through a 3-Phase processs of evaluating the literature to inform your adoption decision."),
-        
         a(class = "btn btn-primary btn-lg", `data-toggle` = "collapse", href ="#collapse-detail", role = "button", "Learn more", id = "learn"),
         div(class = "collapse", id = "collapse-detail",
             bsCollapse(id = "accordion",

@@ -1,12 +1,7 @@
 # UI function for phase 1 identifying evidence page
 identifyPageUI <- function(id) {
     ns <- NS(id)
-    choice_vec <- c("Safety and efficacy" = 1,   # chioces to later be passed to question list
-                    "Treatment patterns" = 2,        
-                    "Comparative effectiveness" = 3,
-                    "Economic evaluation" = 4,
-                    "Disease burdens" = 5,
-                    "Screening and surveilence" = 6)
+    
     fluidPage(
         column(2, 
                dropdownButton(inputId = "infoDropDown",
@@ -21,7 +16,7 @@ identifyPageUI <- function(id) {
         useSweetAlert(),
         column(8, #offset = 3,
                # --------- Well #1
-               wellPanel(selectInput("t1_int",
+               wellPanel(selectInput(ns("t1_int"),
                                      "1. What Type of Intervention Are You Evaluating?",
                                      choices =  list("Pharmaceuticals" = 1,
                                                      "Devices"            = 2,
@@ -57,10 +52,10 @@ identifyPageUI <- function(id) {
                    uiOutput(ns("multoutcomes")),
                    # place holder for yes or no (if yes, need multiple outcomes of interest)
                    sliderInput(ns("t1_timeframe"),
-                               "(C) What is the time frame in years?",
+                               "(T) What is the time frame in years?",
                                min = 1, max = 20, step = 1, value = 5),
                    textInput(ns("t1_setting"),
-                             "(C) What is the setting of interest?",
+                             "(S) What is the setting of interest?",
                              placeholder = "Ex.) SNF, Acute Care, etc.")),
                # ---------- Well #3
                wellPanel(strong("3. For which topic(s) are you seeking to evaluate the literature? 
@@ -69,9 +64,13 @@ identifyPageUI <- function(id) {
                          br(),
                          checkboxGroupInput(ns("t1_AOI"),
                                             "What is your area(s) of interest?",
-                                            choices = choice_vec,
+                                            choices = c("Safety and efficacy",
+                                                        "Treatment patterns",        
+                                                        "Effectiveness",
+                                                        "Value",
+                                                        "Disease burdens",
+                                                        "Screening and surveilence"), 
                                             selected = NULL),
-                         uiOutput(ns("ui")),
                          textInput(ns("t1_other"),
                                    "If your area of interest is not specified above,
                                       please specify it here:")
@@ -95,10 +94,6 @@ identifyPageUI <- function(id) {
                        multiple = TRUE,
                        options =  pickerOptions(actionsBox = TRUE))
                ),
-               wellPanel(sliderInput(ns("t1_nyears"),
-                                     "5. What's the preferred time frame for your literature search (in the last N years)? 
-                                        Please specify the number of years only.",
-                                     min = 0.5, max = 20, step = 0.5, value = 10)),
                wellPanel(
                    radioButtons(ns("t1_language"),
                                 "6. What is your preferred language of the literature?",
@@ -120,7 +115,18 @@ identifyPageUI <- function(id) {
                br(),
                br(),
                br(),
-               br()
+               br(),
+               
+               # ----------------------------------- Creating the popover to indicate that some things will not be going into the search string
+               lapply(1:3, function(i){
+                 popover_vec <- c("t1_int", "t1_AOI", "t1_setting") # create vector of ids to place this popover
+                 bsPopover(id = ns(popover_vec[i]),                 # insert ID into standard popover
+                           title = "Notice:",
+                           content =  paste("This entry will not go directly into your search. This question is meant only assist your thought process."), 
+                           placement = "left", 
+                           trigger = "hover")
+               })
+               
         ))
 }
 
@@ -138,51 +144,9 @@ identifyPage <- function(input, output, session, parentSession) {
         
         if (input$t1_outcomes == 2){
             textInput(ns("t1_soutcome"),
-                      "(O) c. What is your secondary outcome of interest?")
+                      "(O) c. What is your secondary outcome of interest?",
+                      placeholder = "Ex.) HBA1c, mortality, etc.")
         }
-    })
-    
-    # The following renders questions for Phase1, Question 3
-    output$ui <- renderUI({        # renders questions based on checkbox
-        if (is.null(input$t1_AOI))
-            return()
-        
-        c_vec <- c()
-        if (1 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("To what degree is the treatment safe? (Safety and efficacy)",
-                                "To what degree is the treatment effective? (Safety and efficacy)"))
-        } 
-        
-        if (2 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("What are the current treatment patterns (switching/cycling/adherence/persistence) for this disease? (Treatment patterns)",
-                                "What is the heterogeneity of the treatment effect among my subpopulation? (Treatment patterns)"))
-        } 
-        
-        if (3 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("What is the comparative effectiveness of intervention on clinical outcomes? (Comparative effectiveness)",
-                                "What is the comparative effectiveness of intervention on patient-centered outcomes? (Comparative effectiveness)"))
-        } 
-        
-        if (4 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("What is the current value of this intervention compared to the next best alternative? (Can include HRQoL) (Economic evaluation)",
-                                "What is the budget impact? (Economic evaluation)"))
-        } 
-        
-        if (5 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("What is the natural history of the disease without treatment? (Disease burdens)",
-                                "What is the clinical burden of the disease? (Disease burdens)",
-                                "What is the economic burden of the disease? (Disease burdens)"))
-        } 
-        
-        if (6 %in% input$t1_AOI){
-            c_vec <- c(c_vec, c("What current screening strategies are in place to detect early disease or risk factors for disease in large numbers of apparently healthy individuals? (Screening and surveilence)",
-                                "What current surveillance strategies are in place to assess the safety/efficacy/prevention of disease recurrence of my intervention? (Screening and surveilence)"))
-        } 
-        
-        
-        checkboxGroupInput(label = "What is your specific question(s) about evidence?", # add all questions above to final choice vector and checkbox
-                           "dynamic",
-                           choices = c_vec)
     })
     
     # Creating list to check if all inputs are valid (not NULL)

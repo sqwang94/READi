@@ -6,24 +6,25 @@ finalSumUI <- function(id){
   ns <- NS(id)
   
   fluidPage(
-    column(8, offset = 2,
-           wellPanel(strong("Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!"),
-                     p("See below for a summary of the report"))),
-    column(8, offset = 2,
-           wellPanel("We asked you about your clinical question using the 'PICOT' method. You responded with the following:",
-                     htmlOutput(ns("picot")))),
-    column(8, offset = 2,
+    fluidRow(
+      column(12,
+             HTML("<center><h4>Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!</h4></center>"))),
+    fluidRow(
+      column(6, 
+           wellPanel(htmlOutput(ns("picot")))),
+      column(6,
            wellPanel("We asked you to grade each of your identified articles. Your summary is below: ",
                      br(),
                      br(),
                      wellPanel(style = "background: #FFFFFF",
-                               plotlyOutput(ns("biasplot_final"))))),
-    column(8, offset = 2,
+                               plotlyOutput(ns("biasplot_final")))))),
+    fluidRow(
+      column(6, offset = 6,
            wellPanel("We asked you to assess the full body of information for each outcome. Your summary is below: ",
                      br(),
                      br(),
                      wellPanel(style = "background: #FFFFFF",
-                               gt_output(ns("final_summary_table"))))),
+                               gt_output(ns("final_summary_table")))))),
     br(),
     br(),
     br(),
@@ -48,12 +49,20 @@ finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_
   
   output$picot <- renderUI({
     if (phase1_inputs$t1_outcomes == 1){
-      HTML(paste("<center><b><font color='#8A2BE2'>Population: </font></b>", phase1_inputs$t1_pop_interest,
-                "<br/><b><font color='#8A2BE2'>Intervention: </font></b>", phase1_inputs$t1_int_interest,
-                "<br/><b><font color='#8A2BE2'>Comparator: </font></b>", phase1_inputs$t1_comparator,
-                "<br/><b><font color='#8A2BE2'>Outcome: </font></b>", phase1_inputs$t1_poutcome,
-                "<br/><b><font color='#8A2BE2'>Time: </font></b>", phase1_inputs$t1_timeframe,
-                "<br/><b><font color='#8A2BE2'>Setting: </font></b>", phase1_inputs$t1_setting, "</center>"))
+      
+      bootstrapPage(
+        HTML(paste("<center><b><i><h1>READi</h1></b>
+             <h6><u>R</u>eal-World <u>E</u>vidence <u>A</u>ssessments and Needs Guidance</h6></i></center>")),
+        hr(),
+        br(),
+      HTML("<b><h3><font color='#8A2BE2'><u>P</u>opulation: </font></b>", phase1_inputs$t1_pop_interest,
+                "<br/><b><font color='#8A2BE2'><u>I</u>ntervention: </font></b>", phase1_inputs$t1_int_interest,
+                "<br/><b><font color='#8A2BE2'><u>C</u>omparator: </font></b>", phase1_inputs$t1_comparator,
+                "<br/><b><font color='#8A2BE2'><u>O</u>utcome: </font></b>", phase1_inputs$t1_poutcome,
+                "<br/><b><font color='#8A2BE2'><u>T</u>ime: </font></b>", phase1_inputs$t1_timeframe,
+                "<br/><b><font color='#8A2BE2'><u>S</u>etting: </font></b>", phase1_inputs$t1_setting, "</h3>")
+      
+      )
     }  else {
       HTML(paste("<center><b><font color='#8A2BE2'>Population: </font></b>", phase1_inputs$t1_pop_interest,
                  "<br/><b><font color='#8A2BE2'>Intervention: </font></b>", phase1_inputs$t1_int_interest,
