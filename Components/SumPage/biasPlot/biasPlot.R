@@ -6,10 +6,14 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
   }
   
   # -- creating dummy df to merge to primary or secondary outcomes (to account for 0 values in count)
+  resp <-  c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting")
+  
   df_dummy <- data.frame(     # using variable convention of table() to bind and then account for 0s (table won't show 0 count values, obviously)
-    responses =  c("High Risk", "Low Risk", "Unclear Risk"),
-    Freq = c(rep(0,3))
+    responses =  factor(resp, levels = resp, ordered = TRUE),
+    Freq = c(rep(0,4))
   )
+  
+  
   
   bias <- reactiveValuesToList(bias_values())
   
@@ -27,6 +31,7 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
     df_responses <- data.frame(x = x, y = y) 
     responses <- df_responses$x[df_responses$y == "Yes"]
     
+    
     x <- data.frame(table(responses))   # counting all responses in x
     
     
@@ -35,17 +40,21 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
       group_by(responses) %>% 
       summarise(pct = sum(Freq)/max(total_count))
     
+  
+    
     
     bias_plot <- plot_ly(df_full,
                          x = ~responses,
                          y = ~pct,
                          type = "bar",
                          marker = list(color = c('rgba(51,0,111,0.8)', 'rgba(232,211,162,0.8)',
-                                                 'rgba(216,217,218,1)')),
+                                                 'rgba(216,217,218,1)', "black")),
                          hovertemplate = paste("Response: %{x} <br> Share of Responses: %{y}")) %>% 
-      layout(title = "Summary of Responses for the Primary Outcome of",
+      layout(title = paste0("Summary of Responses for the Primary Outcome of",  phase1_inputs$t1_poutcome),
              yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
-             xaxis = list(title = '')) %>% 
+             xaxis = list(title = '',
+                          categoryorder = "array",
+                          categoryarray = c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting"))) %>% 
       config(displayModeBar = FALSE, displaylogo = FALSE)
     
     return(bias_plot)
@@ -86,7 +95,7 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
                          marker = list(color = c('rgba(51,0,111,0.8)')),
                          name = "Primary",
                          hovertemplate = paste("Outcome: Primary <br> Response: %{x} <br> Share of Responses: %{y}")) %>% 
-      layout(title = "Summary of Responses for the Primary Outcome of",
+      layout(title = paste0("Summary of Responses for the Outcomes of ", phase1_inputs$t1_poutcome," and ", phase1_inputs$t1_soutcome),
              yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
              xaxis = list(title = '')) %>% 
       add_trace(

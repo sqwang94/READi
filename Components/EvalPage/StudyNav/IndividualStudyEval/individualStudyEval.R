@@ -1,6 +1,7 @@
 source("Components/EvalPage/StudyNav/IndividualStudyEval/Robins/robins.R")
 source("Components/EvalPage/StudyNav/IndividualStudyEval/AMSTAR2/amstar.R")
 source("Components/EvalPage/StudyNav/IndividualStudyEval/GRACE/grace.R")
+source("Components/EvalPage/StudyNav/IndividualStudyEval/QHES/qhes.R")
 
 
 # UI function for individual study eval
@@ -28,6 +29,7 @@ individualStudyEvalUI <- function(id, studyId) {
                                        "Retrospective cohort study",
                                        "Case-control study",
                                        "Systematic review/Meta-analysis/Network Meta-analysis",
+                                       "Cost-Benefit Analysis",
                                        "Budget Impact Model",
                                        "Discrete Choice Experiment",
                                        "Multi-criteria Decision Analysis",
@@ -36,6 +38,7 @@ individualStudyEvalUI <- function(id, studyId) {
                            selected = "None of the above")),
             br(),
             uiOutput(ns("radio_random"))
+            
   )
 }
 
@@ -61,76 +64,19 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
   # create well panels based on the study type
   output$radio_random <- renderUI({
     
-    # ---- Creating a standard bias question to go at the end of all questions, regardless of 
-    standard_bias_question <- radioButtons(inputId = ns("standard_bias"), label = strong("1X. THIS IS WHERE THE STANDARD RATING OF BIAS WILL GO, 
-                                                                                           please give a general rating of the risk of bias for this study. 
-                                                                                           (Low risk: Low risk of bias for all key domains; Unclear risk: Unclear risk of bias for one or more key domains;
-                                                                                           High risk: High risk of bias for one or more key domains)"),
-                                           choices = c("Low Risk", "Unclear Risk", "High Risk"),
+    # ---- Creating a standard bias question to go at the end of all questions, regardless of study type
+    standard_bias_question <- radioButtons(inputId = ns("standard_bias"), label = strong("1C. Please rate the overall risk of bias for the study evaluated above"),
+                                           choices = c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting"),
                                            selected = character(0))
     
+    # Pragmatci Controlled Trial
     if (input$study_design == "Pragmatic controlled trial/Large simple trial"){
-      choice_prag <- c("Low Risk", "Unclear Risk", "High Risk")
-      labels_prag <- c("Random sequence generation (selection bias)",
-                       "Allocation concealment (selection bias)",
-                       "Blinding of participants and personnel (performance bias)",
-                       "Blinding of outcome assessment (detection bias) (patient-reported outcomes)",
-                       "Blinding of outcome assessment (detection bias) (Mortality)",
-                       "Incomplete outcome data addressed (attrition bias) (Short-term outcomes (2-6 weeks))",
-                       "Incomplete outcome data addressed (attrition bias) (Longer-term outcomes (>6 weeks))",
-                       "Selective reporting (reporting bias)")
-      list(wellPanel(strong("1B. Please rate the quality of the study using the Cochrane risk of bias tool below to assess the risk of bias"),
+      list(wellPanel(strong("1B. Please rate the quality of the study using the Revised Cochrane risk of bias tool for randomized trials (RoB 2)"),
                      br(),
-                     tagList(a("Cochrane", href="http://handbook-5-1.cochrane.org/", target = "_blank")),
-                     br(),
-                     br(),
-                     lapply(seq_len(8),
-                            function(i){radioButtons(inputId = ns(paste0("input", i)), 
-                                                     label = labels_prag[i], 
-                                                     choices = choice_prag,
-                                                     inline = TRUE,
-                                                     selected = character(0))}),
-                     br(),
-                     br(),
-                     radioButtons(inputId = ns("input"), label = strong("1C. Overall: Based on the rating for each domain, 
-                                                                          please give a general rating of the risk of bias for this study. 
-                                                                          (Low risk: Low risk of bias for all key domains; Unclear risk: Unclear risk of bias for one or more key domains;
-                                                                          High risk: High risk of bias for one or more key domains)"),
-                                  choices = choice_prag,
-                                  selected = character(0))),
+                     tagList(a("RoB 2", href="https://www.riskofbias.info/welcome/rob-2-0-tool/current-version-of-rob-2", target = "_blank")),
+                     br()),
            wellPanel(standard_bias_question))
-    } else if (input$study_design == "Quasi experimental"){
-      choice_quasi <- c("Yes", "No", "Other")
-      labels_quasi <- c("Was the study question or objective clearly stated?",
-                        "Were eligibility/selection criteria for the study population prespecified and clearly described?",
-                        "Were the participants in the study representative of those who would be eligible for the test/service/intervention in the general or clinical population of interest?",
-                        "Were all eligible participants that met the prespecified entry criteria enrolled?",
-                        "Was the sample size sufficiently large to provide confidence in the findings?",
-                        "Was the test/service/intervention clearly described and delivered consistently across the study population?",
-                        "Were the outcome measures prespecified, clearly defined, valid, reliable, and assessed consistently across all study participants?",
-                        "Were the people assessing the outcomes blinded to the participants' exposures/interventions?",
-                        "Was the loss to follow-up after baseline 20% or less? Were those lost to follow-up accounted for in the analysis?",
-                        "Did the statistical methods examine changes in outcome measures from before to after the intervention? Were statistical tests done that provided p values for the pre-to-post changes?",
-                        "Were outcome measures of interest taken multiple times before the intervention and multiple times after the intervention (i.e., did they use an interrupted time-series design)?",
-                        "If the intervention was conducted at a group level (e.g., a whole hospital, a community, etc.) did the statistical analysis take into account the use of individual-level data to determine effects at the group level?")
-      list(wellPanel(strong("1B. Please rate the quality of this study using the quality assessment tool from NHLBI"),
-                     br(),
-                     tagList(a("NHLBI Tool", href="https://www.nhlbi.nih.gov/health-topics/study-quality-assessment-tools", target = "_blank")),
-                     br(),
-                     br(),
-                     lapply(seq_len(8),
-                            function(i){radioButtons(inputId = ns(paste0("input", i)),
-                                                     label = labels_quasi[i],
-                                                     choices = choice_quasi,
-                                                     inline = TRUE,
-                                                     selected = character(0))}),
-                     br(),
-                     br(),
-                     radioButtons(inputId = ns("input"),
-                                  label = strong("1C. Overall: Based on the rating for each question, please give a general rating of the quality of this study. (Good; Fair; Poor)"),
-                                  choices = choice_quasi,
-                                  selected = character(0))),
-           wellPanel(standard_bias_question))
+
       
       # BIM
     } else if (input$study_design == "Budget Impact Model"){
@@ -157,8 +103,13 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
            wellPanel(standard_bias_question))
       
       # Observational
-    } else if (input$study_design %in% c("Prospective cohort study", "Retrospective cohort study", "Case-control study")) {
+    } else if (input$study_design %in% c("Prospective cohort study", "Retrospective cohort study", "Case-control study", "Quasi experimental")) {
       list(robinsUI(ns("robins")),
+           wellPanel(standard_bias_question))
+      
+      # CBA
+    } else if (input$study_design == c("Cost-Benefit Analysis")) {
+      list(qhesUI(ns("qhes")),
            wellPanel(standard_bias_question))
       
       # Systematic Reviews
@@ -180,7 +131,11 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
     } else {
       return()
     }
+    
+    
   })
+  
+  
   
   callModule(amstar2, "amstar")
   callModule(robinsServer, "robins")
