@@ -158,8 +158,8 @@ server <- function(input, output, session) {
       }
       onBookmarked(function(url) {
         if (!is.null(session$userData$current_state())) {
-          cmd <- paste0("rm -rf ../../../var/lib/shiny-server/bookmarks/shiny/READi-3e07a9e87f32a93b98df28d1699f20ce/", session$userData$current_state())
-          try(system(cmd))
+          cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state)
+          try(shell(cmd))
         }
         session$userData$current_state(strsplit(url, "=")[[1]][2])
         js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
@@ -316,13 +316,13 @@ server <- function(input, output, session) {
   # --------------------------- Phase 4: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(recPage, "rec_page")
+  phase4_inputs <- callModule(recPage, "rec_page", session)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 5: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
+  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs, phase4_inputs)
   
   
 }

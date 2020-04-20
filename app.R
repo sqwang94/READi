@@ -46,6 +46,7 @@ ui <- function(request){
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "UI.css"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "print.css"),
       tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
@@ -417,13 +418,13 @@ server <- function(input, output, session) {
   # --------------------------- Phase 4: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(recPage, "rec_page")
+  phase4_inputs <- callModule(recPage, "rec_page", session)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 5: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
+  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs, phase4_inputs)
   
   
 }

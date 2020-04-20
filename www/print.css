@@ -1,0 +1,164 @@
+@media print {
+  body {
+    font-size: 12px;
+  }
+
+  #bookmark, #print {
+    display: none;
+  }
+
+  #final-container {
+    border: none !important;
+    margin: 5% 10% !important;
+    min-width: 0 !important;
+  }
+
+  .final-row {
+    max-width: 800px;
+  }
+
+  #final-plot {
+    min-width: 380px;
+    padding: 0;
+    border: none;
+  }
+
+  #final-bias {
+    width: 50%;
+    max-width: 420px;
+  }
+
+  .final-well {
+    padding: 10px;
+    background-color: white;
+    box-shadow: none;
+    margin-bottom: 0;
+  }
+
+  #final-table {
+    max-width: 400px;
+  }
+}
+
+#final-picot {
+  min-width: 300px;
+}
+
+#final-bias {
+  min-width: 395px;
+}
+
+#final-container {
+  min-width: 700px;
+  margin: 0 15%;
+  border: 2px solid lightgrey;
+  margin-bottom: 20px;
+}
+
+#final_sum-picot {
+  overflow-wrap: break-word;
+}
+
+#final_sum-picot h3 {
+  font-size: 18px;
+}
+
+#final_sum-picot font {
+  line-height: 1.5;
+}
+
+#final_sum-biasplot_final {
+  height: 280px !important;
+}
+
+.final-row {
+  justify-content: space-between;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: stretch;
+}
+
+#final-plot {
+  box-shadow: none;
+  margin-bottom: 0;
+  border: none;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#final-table {
+  min-width: 370px;
+  margin-right: 20px;
+  padding: 10px;
+  width: 55%;
+  margin-left: 10px;
+}
+
+#final-table-content {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+#final-container .gt_table {
+  font-size: 12px !important;
+}
+
+#final-container .gt_table_body {
+  font-size: 11px;
+  line-height: 0;
+}
+
+#final-rec {
+  width: 45%;
+  margin-right: 15px;
+  min-width: 280px;
+}
+
+#print {
+  margin-top: 20px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#print i {
+  float: right;
+}
+
+@media not print {
+  @media(max-width: 768px) {
+    #final-container {
+      margin: auto !important;
+      min-width: 400px !important;
+      border: none !important;
+    }
+
+    .final-row {
+      justify-content: flex-start !important;
+      flex-wrap: wrap;
+      margin: 20px;
+    }
+
+    .final-col {
+      width: 100% !important;
+    }
+
+    .final-well {
+      width: 100%!important;
+      min-width: 300px !important;
+      max-width: 100% !important;
+    }
+
+    #final-rec, #final-table {
+      margin: 15px !important;
+    }
+
+    #final-plot {
+      padding: 0 !important;
+    }
+
+    #print {
+      display: none;
+    }
+  }
+}

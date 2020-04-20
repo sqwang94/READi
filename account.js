@@ -4,7 +4,8 @@ var homeURL = 'http://54.213.15.223:3838/READi/'
 var phases = ["Phase 1: Identify Real World Evidence",
               "Phase 2: Reviewing and Grading of Evidence",
               "Phase 3: Summarizing The Literature",
-              "Phase 4: Making an Evidence-Based Recommendation"]
+              "Phase 4: Making an Evidence-Based Recommendation",
+              "Phase 5: Final Summary"]
 
 
 

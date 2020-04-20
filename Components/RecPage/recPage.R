@@ -37,7 +37,7 @@ recPageUI <- function(id){
 }
 
 
-recPage <- function(input, output, session){
+recPage <- function(input, output, session, parentSession){
   ns <- session$ns
   
   output$lit_available <- renderUI({
@@ -107,5 +107,33 @@ recPage <- function(input, output, session){
     }
   })
   
+  observeEvent(input$submit_rec, {
+    if (!is.null(input$recommendation) && (input$recommendation != "Other" || input$other != "")) {
+      sendSweetAlert(        # if all inputs are valid, submission successful
+        session = session,
+        title = "Submitted!", 
+        text = "Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!",
+        html = TRUE,
+        type = "success",
+        btn_labels = c("Great")
+      ) 
+      showTab(session = parentSession, inputId = "tabs", target = "tab5")
+      shinyjs::show(selector = "#tabs li:nth-child(5) i")
+      updateNavbarPage(parentSession, "tabs", "tab5")
+      parentSession$userData$phase(5)
+      
+      # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
+    } else {
+      sendSweetAlert(         # add error message if user needs more information
+        session = session,
+        title = "Oops!",
+        text = "It looks like you may not have answered all the questions!",
+        type = "error",
+        btn_labels = c("Go back")
+      )
+      shinyjs::hide(selector = "#tabs li:nth-child(4) i")
+    }
+  })
   
+  return(input)
 }

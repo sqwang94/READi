@@ -33,7 +33,7 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
     setBookmarkExclude(c("submit_3"))
     
     output$summaryoutcomes <- renderPlotly({
-      biasPlotFunction(phase1_inputs, bias_values)
+      biasPlotFunction(phase1_inputs, bias_values, FALSE)
     })
 
     output$t3_pt1 <- renderUI({

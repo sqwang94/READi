@@ -152,22 +152,22 @@ individualStudyInputValidation <- function(input, output, session) {
   reactive({
     inputs <- list()
     inputs[[ns("author")]] <- input$author
-    if (input$study_design %in% c("Pragmatic controlled trial/Large simple trial", "Quasi experimental")) {
-      for (i in seq(8)) {
-        selected <- input[[paste0("input", i)]]
-        if (is.null(input[[paste0("input", i)]])) {
-          selected <- ""
-        }
-        inputs[[ns(paste0("input", i))]] <- selected
-      }
-      eval <- input$input
-      if (is.null(input$input)) {
-        eval <- ""
-      }
-      inputs[[ns("input")]] <- eval
-    }
+    # if (input$study_design %in% c("Pragmatic controlled trial/Large simple trial", "Quasi experimental")) {
+    #   for (i in seq(8)) {
+    #     selected <- input[[paste0("input", i)]]
+    #     if (is.null(input[[paste0("input", i)]])) {
+    #       selected <- ""
+    #     }
+    #     inputs[[ns(paste0("input", i))]] <- selected
+    #   }
+    #   eval <- input$input
+    #   if (is.null(input$input)) {
+    #     eval <- ""
+    #   }
+    #   inputs[[ns("input")]] <- eval
+    # }
     bias <- input$standard_bias
-    if (input$study_design != "None of the above" && is.null(input$standard_bias)) {
+    if (is.null(input$standard_bias)) {
       bias <- ""
     }
     inputs[[ns("standard_bias")]] <- bias
