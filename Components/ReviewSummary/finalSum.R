@@ -11,9 +11,6 @@ finalSumUI <- function(id){
         icon("print")),
     HTML(paste("<center><b><i><h1>READi</h1></b>
              <h6><u>R</u>eal-World <u>E</u>vidence <u>A</u>ssessments and Needs Guidance</h6></i></center>")),
-    # fluidRow(
-    #   column(12,
-    #          HTML("<center><h4>Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!</h4></center>"))),
     fluidRow(
       class = "final-row",
       column(6,
@@ -47,7 +44,6 @@ finalSumUI <- function(id){
 
 finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_inputs, phase4_inputs){
   ns <- session$ns
-  
   
   output$picot <- renderUI({
     if (phase1_inputs$t1_outcomes == 1){

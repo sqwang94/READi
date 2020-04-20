@@ -39,6 +39,7 @@ recPageUI <- function(id){
 
 recPage <- function(input, output, session, parentSession){
   ns <- session$ns
+  setBookmarkExclude(c("submit_rec"))
   
   output$lit_available <- renderUI({
     if(input$t4_ev_available == "Yes"){
