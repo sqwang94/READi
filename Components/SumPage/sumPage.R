@@ -146,6 +146,7 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
           type = "error",
           btn_labels = c("Go back")
         )
+        shinyjs::hide(selector = "#tabs li:nth-child(4) i")
       }
     })
     

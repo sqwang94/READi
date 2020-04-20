@@ -33,8 +33,6 @@ evalPageUI <- function(id) {
 evalPage <- function(input, output, session, parentSession, phase1_inputs) {
     ns <- session$ns
     
-    setBookmarkExclude(c("submit_2"))
-    
     output$study_identified <- renderUI({ # Rendering UI based on whether or not studies are available
         if(input$t2_ev_available == "No"){
             return()

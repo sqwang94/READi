@@ -260,7 +260,7 @@ server <- function(input, output, session) {
       }
       onBookmarked(function(url) {
         if (!is.null(session$userData$current_state())) {
-          cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state)
+          cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state())
           try(shell(cmd))
         }
         session$userData$current_state(strsplit(url, "=")[[1]][2])
@@ -341,8 +341,8 @@ server <- function(input, output, session) {
         shinyjs::show(selector = paste0("#tabs li:nth-child(", i, ") i"))
       }
       showTab(inputId = "tabs", target = paste0("tab", i))
+      updateNavbarPage(session, "tabs", paste0("tab", i))
     }
-    updateNavbarPage(session, "tabs", paste0("tab", i))
   })
   
   # dynamic title for tab 1

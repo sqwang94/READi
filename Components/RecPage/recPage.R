@@ -132,7 +132,7 @@ recPage <- function(input, output, session, parentSession){
         type = "error",
         btn_labels = c("Go back")
       )
-      shinyjs::hide(selector = "#tabs li:nth-child(4) i")
+      shinyjs::hide(selector = "#tabs li:nth-child(5) i")
     }
   })
   
