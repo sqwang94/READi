@@ -45,7 +45,7 @@ table_function <- function(phase1_inputs, phase3_inputs){
                     phase3_inputs$t3_precise_2,
                     phase3_inputs$t3_bias_2)
       df <- data.frame(
-        Domains   = rep(domain_vec,2),
+        Domains   = rep(domain_vec, 2),
         Responses = outcomes,
         type = c(rep(phase1_inputs$t1_poutcome, 7),rep(phase1_inputs$t1_soutcome,7))) %>% 
         group_by(type) %>% 

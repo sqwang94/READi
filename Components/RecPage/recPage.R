@@ -53,8 +53,10 @@ recPage <- function(input, output, session, parentSession){
     }
   })
   
+  outputOptions(output, "lit_available", suspendWhenHidden=FALSE)
+  
   output$lit_applicable <- renderUI({
-    if(input$applicable == "Yes"){
+    if(input$t4_ev_available == "Yes" && !is.null(input$applicable) && input$applicable == "Yes"){
       list(radioButtons(ns("sufficient"),
                    "3. Was current evidence sufficient to answer your research question(s)? Please consider your rating from Phase 3 (especially the body of evidence).",
                    choices = c("Yes","No"),
@@ -65,10 +67,10 @@ recPage <- function(input, output, session, parentSession){
     }
   })
   
+  outputOptions(output, "lit_applicable", suspendWhenHidden=FALSE)
+  
   output$rec <- renderUI({
-    if(is.null(input$sufficient)){
-      return()
-    } else if(input$sufficient == "Yes"){
+    if(input$t4_ev_available == "Yes" && !is.null(input$applicable) && input$applicable == "Yes" && !is.null(input$sufficient) && input$sufficient == "Yes"){
       list(
         column(8, offset = 2,
                wellPanel(strong("Making an Evidence-Based Recommendation"),
@@ -89,11 +91,13 @@ recPage <- function(input, output, session, parentSession){
     }
   })
   
+  outputOptions(output, "rec", suspendWhenHidden=FALSE)
+  
   output$rec_output <- renderUI({
-    if(input$recommendation == "Other"){
+    if(!is.null(input$recommendation) && input$recommendation == "Other"){
       textInput(ns("other"), 
                 label = "5. What other recommendation are you considering?")
-    } else if (input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)"){
+    } else if (!is.null(input$recommendation) && input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)"){
       pickerInput(
         ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
         "5. Select the type of studies that you are interested in:",
@@ -108,8 +112,27 @@ recPage <- function(input, output, session, parentSession){
     }
   })
   
+  outputOptions(output, "rec_output", suspendWhenHidden=FALSE)
+  
+  t4_inputs <- reactive({ 
+    inputs <- list()
+    if (!is.null(input$recommendation) && input$recommendation == "Other") {
+      inputs[[ns("other")]] <- input$other
+    }
+    if (!is.null(input$recommendation) && input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)") {
+      studyType <- ""
+      if (!is.null(input$t1_studytype)) {
+        studyType <- input$t1_studytype
+      }
+      inputs[[ns("t1_studytype")]] <- studyType
+    }
+    return(inputs)
+  })
+  
   observeEvent(input$submit_rec, {
-    if (!is.null(input$recommendation) && (input$recommendation != "Other" || input$other != "")) {
+    inputs <- t4_inputs()
+    toggleErrorInputHandler(inputs)
+    if (input_validation(inputs)) {
       sendSweetAlert(        # if all inputs are valid, submission successful
         session = session,
         title = "Submitted!", 
@@ -122,6 +145,7 @@ recPage <- function(input, output, session, parentSession){
       shinyjs::show(selector = "#tabs li:nth-child(5) i")
       updateNavbarPage(parentSession, "tabs", "tab5")
       parentSession$userData$phase(5)
+      js$toWindowTop()
       
       # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
     } else {

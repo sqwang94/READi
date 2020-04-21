@@ -41,3 +41,7 @@ toTop <- "shinyjs.toTop = function() {
         'linear'
     )
 }"
+
+toWindowTop <- "shinyjs.toWindowTop = function() {
+    $('html, body').scrollTop(0)
+}"

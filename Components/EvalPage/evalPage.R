@@ -33,6 +33,8 @@ evalPageUI <- function(id) {
 evalPage <- function(input, output, session, parentSession, phase1_inputs) {
     ns <- session$ns
     
+    setBookmarkExclude(c("submit_2"))
+    
     output$study_identified <- renderUI({ # Rendering UI based on whether or not studies are available
         if(input$t2_ev_available == "No"){
             return()
@@ -42,6 +44,8 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
                         min = 0, max = 50, step = 1, value = 0)
         }
     })
+    
+    outputOptions(output, "study_identified", suspendWhenHidden=FALSE)
     
     bias_values <- reactiveVal(reactiveValues())
     # ------ Creating reactionary wellPanel based on how many studies selected ------- # 
@@ -61,8 +65,11 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
             our_ui
         }
     })
+    
+    outputOptions(output, "study_react", suspendWhenHidden=FALSE)
+    
     callModule(studyNavGlobal, "study_nav", phase1_inputs, bias_values)
-
+    
     # input validation for all studies in studies navigation
     observeEvent(input$submit_2, {
         inputs <- callModule(studyNavValidation, "study_nav")
@@ -80,6 +87,7 @@ evalPage <- function(input, output, session, parentSession, phase1_inputs) {
             shinyjs::show(selector = "#tabs li:nth-child(3) i")
             showTab(session = parentSession, inputId = "tabs", target = "tab3")
             updateNavbarPage(parentSession, "tabs", "tab3")
+            js$toWindowTop()
         } else {
             sendSweetAlert(     # add error message if user needs more information
                 session = session,

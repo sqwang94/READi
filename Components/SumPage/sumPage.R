@@ -10,6 +10,7 @@ sumPageUI <- function(id) {
                          wellPanel(style = "background: #FFFFFF",
                            plotlyOutput(ns("summaryoutcomes"))))),
         uiOutput(ns("t3_pt1")),
+        uiOutput(ns("t3_pt2")),
         column(8, offset = 2,
                wellPanel(style = "background: #FFFFFF",
                    gt_output(ns("t3_table"))),
@@ -37,72 +38,102 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
     })
 
     output$t3_pt1 <- renderUI({
-      study_count <- 0
-      if (!is.null(bias_values())) {
-        study_count <- reactiveValuesToList(bias_values())$count
-      }
-      
-        # ------ Defining inputID for all inputs
-        studylim <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_studylim_", i)})
-        subjects <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_subjects_", i)})
-        comparator <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_comparator_", i)})
-        consistent <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_consistent_", i)})
-        direct     <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_direct_", i)})
-        precise    <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_precise_", i)})
-        bias       <- lapply(seq_len(phase1_inputs$t1_outcomes), function(i){paste0("t3_bias_", i)})
-        
-        lapply(seq_len(phase1_inputs$t1_outcomes), function(i){
-            if(i == 1){
-                out <- "primary"
-                type <- phase1_inputs$t1_poutcome
-                study <- study_count
-            } else {
-                out <- "secondary"
-                type <- phase1_inputs$t1_soutcome
-            }
-            column(8, offset = 2,
-                   wellPanel(strong(paste0("For your ", out, " outcome of ", type, " answer the following questions:")),
-                             br(),
-                             br(),
-                             wellPanel(
-                                 selectInput(inputId = ns(studylim[[i]]),
-                                             label = "Based on the rating for each study, what's the overall level of study limitation?",
-                                             choices = c("High", "Moderate", "Low"),
-                                             selected = character(0)),
-                                 textInput(inputId = ns(subjects[[i]]),
-                                           label = "What is the overall number of subjects (N)?",
-                                           placeholder = 50),
-                                 textInput(inputId = ns(comparator[[i]]),
-                                           label = "What is the comparator listed in each study for this outcome?",
-                                           placeholder = "Standard of Care"),
-                                 selectInput(inputId = ns(consistent[[i]]),
-                                             label = "Are the results among the studies consistent with one another? ",
-                                             choices = c("Consistent", "Unknown", "Inconsistent")),
-                                 selectInput(inputId = ns(direct[[i]]),
-                                             label = "Are the results direct?",  # need hover tool tip for "direct"
-                                             choices = c("Direct", "Indirect")),
-                                 selectInput(inputId = ns(precise[[i]]),
-                                             label = "Are the results precise?",
-                                             choices = c("Precise", "Imprecise")),
-                                 selectInput(inputId = ns(bias[[i]]),
-                                             label = "Is there publication bias?",
-                                             choices = c("Yes", "No"))),
-                             bsPopover(id = ns(direct[[i]]),
-                                       title = "Evidence can be indirect when:",
-                                       content =  paste("i. Patients, intervention, or outcomes differ from that of interest",
-                                                        "ii. Clinicians must choose between interventions that hvae not been compared in a head-to-head manner",
-                                                        sep = "<br><br>"), 
-                                       placement = "left", 
-                                       trigger = "hover"),
-                             bsPopover(id = ns(precise[[i]]),
-                                       title = "Precision", content =  paste("Studies can be considered imprecise if there are few patients or and few events, thereby rendering a fairly large confidence interval"),
-                                       placement = "left",
-                                       trigger = "hover"),
-                             bsPopover(id = ns(bias[[i]]),
-                                       title = "Publication Bias:", content =  paste("A systematic over or underestimate of treatment effect due to the selective publication of studies"),
-                                       placement = "left",
-                                       trigger = "hover")))
-        })
+      column(8, offset = 2,
+             wellPanel(strong(paste0("For your primary outcome of ", phase1_inputs$t1_poutcome, " answer the following questions:")),
+                       br(),
+                       br(),
+                       wellPanel(
+                         selectInput(inputId = ns("t3_studylim_1"),
+                                     label = "Based on the rating for each study, what's the overall level of study limitation?",
+                                     choices = c("High", "Moderate", "Low"),
+                                     selected = character(0)),
+                         textInput(inputId = ns("t3_subjects_1"),
+                                   label = "What is the overall number of subjects (N)?",
+                                   placeholder = 50),
+                         textInput(inputId = ns("t3_comparator_1"),
+                                   label = "What is the comparator listed in each study for this outcome?",
+                                   placeholder = "Standard of Care"),
+                         selectInput(inputId = ns("t3_consistent_1"),
+                                     label = "Are the results among the studies consistent with one another? ",
+                                     choices = c("Consistent", "Unknown", "Inconsistent")),
+                         selectInput(inputId = ns("t3_direct_1"),
+                                     label = "Are the results direct?",  # need hover tool tip for "direct"
+                                     choices = c("Direct", "Indirect")),
+                         selectInput(inputId = ns("t3_precise_1"),
+                                     label = "Are the results precise?",
+                                     choices = c("Precise", "Imprecise")),
+                         selectInput(inputId = ns("t3_bias_1"),
+                                     label = "Is there publication bias?",
+                                     choices = c("Yes", "No"))),
+                       bsPopover(id = ns("t3_direct_1"),
+                                 title = "Evidence can be indirect when:",
+                                 content =  paste("i. Patients, intervention, or outcomes differ from that of interest",
+                                                  "ii. Clinicians must choose between interventions that hvae not been compared in a head-to-head manner",
+                                                  sep = "<br><br>"), 
+                                 placement = "left", 
+                                 trigger = "hover"),
+                       bsPopover(id = ns("t3_precise_1"),
+                                 title = "Precision", content =  paste("Studies can be considered imprecise if there are few patients or and few events, thereby rendering a fairly large confidence interval"),
+                                 placement = "left",
+                                 trigger = "hover"),
+                       bsPopover(id = ns("t3_bias_1"),
+                                 title = "Publication Bias:", content =  paste("A systematic over or underestimate of treatment effect due to the selective publication of studies"),
+                                 placement = "left",
+                                 trigger = "hover")))
+    })
+    
+    outputOptions(output, "t3_pt1", suspendWhenHidden=FALSE)
+    
+    shinyjs::delay(500, {
+      output$t3_pt2 <- renderUI({
+        if (phase1_inputs$t1_outcomes == 2) {
+          column(8, offset = 2,
+                 wellPanel(strong(paste0("For your secondary outcome ", phase1_inputs$t1_soutcome, " answer the following questions:")),
+                           br(),
+                           br(),
+                           wellPanel(
+                             selectInput(inputId = ns("t3_studylim_2"),
+                                         label = "Based on the rating for each study, what's the overall level of study limitation?",
+                                         choices = c("High", "Moderate", "Low"),
+                                         selected = character(0)),
+                             textInput(inputId = ns("t3_subjects_2"),
+                                       label = "What is the overall number of subjects (N)?",
+                                       placeholder = 50),
+                             textInput(inputId = ns("t3_comparator_2"),
+                                       label = "What is the comparator listed in each study for this outcome?",
+                                       placeholder = "Standard of Care"),
+                             selectInput(inputId = ns("t3_consistent_2"),
+                                         label = "Are the results among the studies consistent with one another? ",
+                                         choices = c("Consistent", "Unknown", "Inconsistent")),
+                             selectInput(inputId = ns("t3_direct_2"),
+                                         label = "Are the results direct?",  # need hover tool tip for "direct"
+                                         choices = c("Direct", "Indirect")),
+                             selectInput(inputId = ns("t3_precise_2"),
+                                         label = "Are the results precise?",
+                                         choices = c("Precise", "Imprecise")),
+                             selectInput(inputId = ns("t3_bias_2"),
+                                         label = "Is there publication bias?",
+                                         choices = c("Yes", "No"))),
+                           bsPopover(id = ns("t3_direct_2"),
+                                     title = "Evidence can be indirect when:",
+                                     content =  paste("i. Patients, intervention, or outcomes differ from that of interest",
+                                                      "ii. Clinicians must choose between interventions that hvae not been compared in a head-to-head manner",
+                                                      sep = "<br><br>"), 
+                                     placement = "left", 
+                                     trigger = "hover"),
+                           bsPopover(id = ns("t3_precise_2"),
+                                     title = "Precision", content =  paste("Studies can be considered imprecise if there are few patients or and few events, thereby rendering a fairly large confidence interval"),
+                                     placement = "left",
+                                     trigger = "hover"),
+                           bsPopover(id = ns("t3_bias_2"),
+                                     title = "Publication Bias:", content =  paste("A systematic over or underestimate of treatment effect due to the selective publication of studies"),
+                                     placement = "left",
+                                     trigger = "hover")))
+        } else {
+          return()
+        }
+      })
+      outputOptions(output, "t3_pt2", suspendWhenHidden=FALSE)
     })
     
     output$t3_table <- render_gt({
@@ -136,8 +167,7 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
         shinyjs::show(selector = "#tabs li:nth-child(4) i")
         updateNavbarPage(parentSession, "tabs", "tab4")
         parentSession$userData$phase(4)
-        
-        # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
+        js$toWindowTop()
       } else {
         sendSweetAlert(         # add error message if user needs more information
           session = session,

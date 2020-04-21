@@ -41,6 +41,7 @@ ui <- function(request){
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
+    extendShinyjs(text = toWindowTop),
     extendShinyjs(script = "account.js"),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
@@ -341,8 +342,8 @@ server <- function(input, output, session) {
         shinyjs::show(selector = paste0("#tabs li:nth-child(", i, ") i"))
       }
       showTab(inputId = "tabs", target = paste0("tab", i))
-      updateNavbarPage(session, "tabs", paste0("tab", i))
     }
+    updateNavbarPage(session, "tabs", paste0("tab", i))
   })
   
   # dynamic title for tab 1
