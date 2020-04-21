@@ -55,7 +55,7 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
   output$soutcome <- renderUI({
     if (!is.null(phase1_inputs$t1_outcomes) && phase1_inputs$t1_outcomes == 2) {
       return(radioButtons(ns("outcome2"),
-                          paste0("Did this study address your secondary outcome of interest (", phase1_inputs$t1_secondary_outcome, ") ?"),
+                          paste0("Did this study address your secondary outcome of interest (", phase1_inputs$t1_soutcome, ") ?"),
                           choices = c("Yes", "No")))
     }
     return()

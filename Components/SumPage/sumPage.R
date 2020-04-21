@@ -61,20 +61,15 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
                 type <- phase1_inputs$t1_soutcome
             }
             column(8, offset = 2,
-                   wellPanel(strong(paste0("For your ", out, " outcome of ", type, " answer the following questions:")),
+                   wellPanel(strong(paste0("For your ", out, " outcome of ", type, " answer the following questions based on the GRADEPro system:")),
                              br(),
+                             tagList(a("GRADEPro", href="https://gradepro.org/", target = "_blank")),
                              br(),
                              wellPanel(
                                  selectInput(inputId = ns(studylim[[i]]),
-                                             label = "Based on the rating for each study, what's the overall level of study limitation?",
+                                             label = "Based on the rating for each study, what's the overall risk of bias?",
                                              choices = c("High", "Moderate", "Low"),
                                              selected = character(0)),
-                                 textInput(inputId = ns(subjects[[i]]),
-                                           label = "What is the overall number of subjects (N)?",
-                                           placeholder = 50),
-                                 textInput(inputId = ns(comparator[[i]]),
-                                           label = "What is the comparator listed in each study for this outcome?",
-                                           placeholder = "Standard of Care"),
                                  selectInput(inputId = ns(consistent[[i]]),
                                              label = "Are the results among the studies consistent with one another? ",
                                              choices = c("Consistent", "Unknown", "Inconsistent")),
