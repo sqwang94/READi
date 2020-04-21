@@ -13,10 +13,11 @@ finalSumUI <- function(id){
              <h6><u>R</u>eal-World <u>E</u>vidence <u>A</u>ssessments and Needs Guidance</h6></i></center>")),
     fluidRow(
       class = "final-row",
-      column(6,
-             class = "final-col",
-             id = "final-picot",
-             wellPanel(class = "final-well", htmlOutput(ns("picot")))),
+        column(6,
+               class = "final-col",
+               id = "final-picot",
+               wellPanel(class = "final-well", htmlOutput(ns("picot"))))),
+    fluidRow(
       column(6,
              class = "final-col",
              id = "final-bias",
@@ -24,20 +25,22 @@ finalSumUI <- function(id){
                        br(),
                        br(),
                        wellPanel(id = "final-plot", style = "background: #FFFFFF",
-                                 plotlyOutput(ns("biasplot_final")))))),
-      fluidRow(
-        class = "final-row",
-        wellPanel(id = "final-table", class = "final-well", "We asked you to assess the full body of information for each outcome. Your summary is below: ",
-                 br(),
-                 br(),
-                 wellPanel(style = "background: #FFFFFF",
-                           id = "final-table-content",
-                           gt_output(ns("final_summary_table")))),
-        wellPanel(id = "final-rec", class = "final-well", h3("Making an Evidence-Based Recommendation"),
-                  hr(),
-                  uiOutput(ns("final_rec"))))
+                                 plotlyOutput(ns("biasplot_final"))))),
+      class = "final-row",
+      wellPanel(id = "final-table", class = "final-well", "We asked you to assess the full body of information for each outcome. Your summary is below: ",
+               br(),
+               br(),
+               wellPanel(style = "background: #FFFFFF",
+                         id = "final-table-content",
+                         gt_output(ns("final_summary_table"))))),
+      fluidRow( class = "final-row",
+                wellPanel(id = "final-rec", class = "final-well", h3("Making an Evidence-Based Recommendation"),
+                          hr(),
+                          div(id = "final-rec-content", 
+                              uiOutput(ns("final_rec")))
+                          )
+                )
   )
-  
 }
 
 
@@ -78,9 +81,30 @@ finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_
     })
   })
   
-  
   output$final_rec <- renderUI({
-    div(id = "final-rec-content", phase4_inputs$recommendation)
+    if (!is.null(phase4_inputs$recommendation)) {
+      if (phase4_inputs$recommendation == "Other") {
+        div(id = "final-rec-content", h4(phase4_inputs$other))
+      } else {
+        div(id = "final-rec-content", h4(phase4_inputs$recommendation), uiOutput(ns("final_rec_aux")))
+      }
+    }
+  })
+  
+  shinyjs::delay(500, {
+    output$final_rec_aux <- renderUI({
+      if (phase4_inputs$recommendation == "Performance-based risk-sharing arrangements (PBRSA)") {
+        lapply(0:length(phase4_inputs$t1_studytype), function(i) {
+          if (i == 0) {
+            h5("Study types interested in:")
+          } else {
+            tags$li(phase4_inputs$t1_studytype[i])
+          }
+        })
+      } else {
+        return()
+      }
+    })
   })
 }
 

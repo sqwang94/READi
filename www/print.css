@@ -20,36 +20,39 @@
   #final-plot {
     min-width: 380px;
     padding: 0;
+    padding-bottom: 20px !important;
     border: none;
   }
 
   #final-bias {
     width: 50%;
-    max-width: 420px;
+    max-width: 365px;
+    min-width: 350px !important;
   }
 
   .final-well {
     padding: 10px;
     background-color: white;
     box-shadow: none;
-    margin-bottom: 0;
   }
 
   #final-table {
-    max-width: 400px;
+    min-width: 300px !important;
   }
 }
 
 #final-picot {
+  width: 100%;
   min-width: 300px;
 }
 
 #final-bias {
+  width: 50%;
   min-width: 395px;
 }
 
 #final-container {
-  min-width: 700px;
+  min-width: 800px;
   margin: 0 15%;
   border: 2px solid lightgrey;
   margin-bottom: 20px;
@@ -73,7 +76,6 @@
 
 .final-row {
   justify-content: space-between;
-  margin-bottom: 20px;
   display: flex;
   align-items: stretch;
 }
@@ -88,10 +90,10 @@
 
 #final-table {
   min-width: 370px;
-  margin-right: 20px;
+  margin-right: 15px;
   padding: 10px;
-  width: 55%;
-  margin-left: 10px;
+  padding-bottom: 0;
+  width: 50%;
 }
 
 #final-table-content {
@@ -110,9 +112,18 @@
 }
 
 #final-rec {
-  width: 45%;
-  margin-right: 15px;
+  width: 100%;
   min-width: 280px;
+  margin: 0 15px;
+  margin-bottom: 30px;
+}
+
+#final-rec h3 {
+  text-align: center;
+}
+
+#final-rec-content {
+  margin: 0 20px;
 }
 
 #print {
