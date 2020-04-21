@@ -157,6 +157,10 @@
       padding: 0 !important;
     }
 
+    #final-bias {
+      min-width: 100% !important;
+    }
+
     #print {
       display: none;
     }

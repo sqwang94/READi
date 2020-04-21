@@ -39,20 +39,15 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
 
     output$t3_pt1 <- renderUI({
       column(8, offset = 2,
-             wellPanel(strong(paste0("For your primary outcome of ", phase1_inputs$t1_poutcome, " answer the following questions:")),
+             wellPanel(strong(paste0("For your primary outcome of ", phase1_inputs$t1_poutcome, " answer the following questions based on the GRADEPro system:")),
                        br(),
+                       tagList(a("GRADEPro", href="https://gradepro.org/", target = "_blank")),
                        br(),
                        wellPanel(
                          selectInput(inputId = ns("t3_studylim_1"),
-                                     label = "Based on the rating for each study, what's the overall level of study limitation?",
+                                     label = "Based on the rating for each study, what's the overall risk of bias?",
                                      choices = c("High", "Moderate", "Low"),
                                      selected = character(0)),
-                         textInput(inputId = ns("t3_subjects_1"),
-                                   label = "What is the overall number of subjects (N)?",
-                                   placeholder = 50),
-                         textInput(inputId = ns("t3_comparator_1"),
-                                   label = "What is the comparator listed in each study for this outcome?",
-                                   placeholder = "Standard of Care"),
                          selectInput(inputId = ns("t3_consistent_1"),
                                      label = "Are the results among the studies consistent with one another? ",
                                      choices = c("Consistent", "Unknown", "Inconsistent")),
@@ -88,20 +83,15 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
       output$t3_pt2 <- renderUI({
         if (phase1_inputs$t1_outcomes == 2) {
           column(8, offset = 2,
-                 wellPanel(strong(paste0("For your secondary outcome ", phase1_inputs$t1_soutcome, " answer the following questions:")),
+                 wellPanel(strong(paste0("For your secondary outcome ", phase1_inputs$t1_soutcome, " answer the following questions based on the GRADEPro system:")),
                            br(),
+                           tagList(a("GRADEPro", href="https://gradepro.org/", target = "_blank")),
                            br(),
                            wellPanel(
                              selectInput(inputId = ns("t3_studylim_2"),
-                                         label = "Based on the rating for each study, what's the overall level of study limitation?",
+                                         label = "Based on the rating for each study, what's the overall risk of bias?",
                                          choices = c("High", "Moderate", "Low"),
                                          selected = character(0)),
-                             textInput(inputId = ns("t3_subjects_2"),
-                                       label = "What is the overall number of subjects (N)?",
-                                       placeholder = 50),
-                             textInput(inputId = ns("t3_comparator_2"),
-                                       label = "What is the comparator listed in each study for this outcome?",
-                                       placeholder = "Standard of Care"),
                              selectInput(inputId = ns("t3_consistent_2"),
                                          label = "Are the results among the studies consistent with one another? ",
                                          choices = c("Consistent", "Unknown", "Inconsistent")),
@@ -140,44 +130,20 @@ sumPage <- function(input, output, session, parentSession, phase1_inputs, bias_v
       table_function(phase1_inputs, input)
     })
     
-    t3_inputs <- reactive({ 
-      inputs <- list()
-      inputs[[ns("t3_comparator_1")]] = input$t3_comparator_1
-      inputs[[ns("t3_subjects_1")]] = input$t3_subjects_1
-      if (!is.null(phase1_inputs$t1_outcomes) && phase1_inputs$t1_outcomes == 2) {
-        inputs[[ns("t3_comparator_2")]] = input$t3_comparator_2
-        inputs[[ns("t3_subjects_2")]] = input$t3_subjects_2
-      }
-      return(inputs)
-    })
-    
     observeEvent(input$submit_3, {
-      inputs <- t3_inputs()
-      toggleErrorInputHandler(inputs)
-      if (input_validation(t3_inputs())) {
-        sendSweetAlert(        # if all inputs are valid, submission successful
-          session = session,
-          title = "Submitted!", 
-          text = "Please move on to next phase!",
-          html = TRUE,
-          type = "success",
-          btn_labels = c("Great")
-        ) 
-        showTab(session = parentSession, inputId = "tabs", target = "tab4")
-        shinyjs::show(selector = "#tabs li:nth-child(4) i")
-        updateNavbarPage(parentSession, "tabs", "tab4")
-        parentSession$userData$phase(4)
-        js$toWindowTop()
-      } else {
-        sendSweetAlert(         # add error message if user needs more information
-          session = session,
-          title = "Oops!",
-          text = "It looks like you may not have answered all the questions!",
-          type = "error",
-          btn_labels = c("Go back")
-        )
-        shinyjs::hide(selector = "#tabs li:nth-child(4) i")
-      }
+      sendSweetAlert(        # if all inputs are valid, submission successful
+        session = session,
+        title = "Submitted!", 
+        text = "Please move on to next phase!",
+        html = TRUE,
+        type = "success",
+        btn_labels = c("Great")
+      ) 
+      showTab(session = parentSession, inputId = "tabs", target = "tab4")
+      shinyjs::show(selector = "#tabs li:nth-child(4) i")
+      updateNavbarPage(parentSession, "tabs", "tab4")
+      parentSession$userData$phase(4)
+      js$toWindowTop()
     })
     
     return(input)

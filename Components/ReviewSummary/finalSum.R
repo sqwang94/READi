@@ -33,7 +33,7 @@ finalSumUI <- function(id){
                  wellPanel(style = "background: #FFFFFF",
                            id = "final-table-content",
                            gt_output(ns("final_summary_table")))),
-        wellPanel(id = "final-rec", class = "final-well", "Making an Evidence-Based Recommendation",
+        wellPanel(id = "final-rec", class = "final-well", h3("Making an Evidence-Based Recommendation"),
                   hr(),
                   uiOutput(ns("final_rec"))))
   )
@@ -72,9 +72,12 @@ finalSum <- function(input, output, session, phase1_inputs, bias_values, phase3_
     biasPlotFunction(phase1_inputs, bias_values, TRUE)
   })
   
-  output$final_summary_table <- render_gt({
-    table_function(phase1_inputs, phase3_inputs)
+  shinyjs::delay(500, {
+    output$final_summary_table <- render_gt({
+      table_function(phase1_inputs, phase3_inputs)
+    })
   })
+  
   
   output$final_rec <- renderUI({
     div(id = "final-rec-content", phase4_inputs$recommendation)
