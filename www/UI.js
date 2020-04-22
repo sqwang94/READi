@@ -22,6 +22,10 @@ $(document).on("click", ".Progress", function() {
   hideSideBar()
 })
 
+$(document).on("click", "#print", function() {
+  window.print()
+})
+
 function hideSideBar() {
   $("#sidebar").addClass("Close")
   $("#sidebar").removeClass("Show")

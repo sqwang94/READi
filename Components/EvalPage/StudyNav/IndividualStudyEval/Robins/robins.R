@@ -154,6 +154,8 @@ robinsServer <- function(input, output, session) {
             
     })
     
+    outputOptions(output, "rob_output1_1", suspendWhenHidden=FALSE)
+    
     # ---- for quesstion response to 1.2
     output$rob_output1_2 <- renderUI({
         if (input$bias_input1_2 == "No Information"){
@@ -175,6 +177,8 @@ robinsServer <- function(input, output, session) {
         }
     })
     
+    outputOptions(output, "rob_output1_2", suspendWhenHidden=FALSE)
+    
     # ---- for question response to 1.3
     output$rob_output1_3 <- renderUI({
         if (input$bias_input1_3 == "No Information"){
@@ -195,6 +199,8 @@ robinsServer <- function(input, output, session) {
                  uiOutput(ns("rob_output1_7")))
         }
     })
+    
+    outputOptions(output, "rob_output1_3", suspendWhenHidden=FALSE)
     
     # ---- for question response to 1.4
     output$rob_output1_4 <- renderUI({
@@ -220,6 +226,7 @@ robinsServer <- function(input, output, session) {
         }
     })
     
+    outputOptions(output, "rob_output1_4", suspendWhenHidden=FALSE)
     
     output$rob_output1_7 <- renderUI({
       if (input$bias_input1_7 %in% c("No", "Probably No", "No Information")){
@@ -233,6 +240,7 @@ robinsServer <- function(input, output, session) {
       }
     })
     
+    outputOptions(output, "rob_output1_7", suspendWhenHidden=FALSE)
     
     # ------------------------------------------------------------------------------------------------------------------- #
     # -------------------------------------  For all of Part 2; Bias due to Confounding --------------------------------- #
@@ -250,6 +258,9 @@ robinsServer <- function(input, output, session) {
                uiOutput(ns("rob_output2_2")))
         }
     })
+    
+    outputOptions(output, "rob_output2_1", suspendWhenHidden=FALSE)
+    
     # ------- Question 2.2 not functional for some reason? 
     output$rob_output2_2 <- renderUI({
         if (input$bias_input2_2 %in% c("Yes", "Probably Yes")){
@@ -262,6 +273,8 @@ robinsServer <- function(input, output, session) {
             return()
         }
     })
+    
+    outputOptions(output, "rob_output2_2", suspendWhenHidden=FALSE)
     
     output$rob_output2_5 <- renderUI({
         if ((input$bias_input2_1 %in% c("Yes", "Probably Yes") && (!is.null(input$bias_input2_2) && input$bias_input2_2 %in% c("Yes", "Probably Yes")) 
@@ -276,6 +289,8 @@ robinsServer <- function(input, output, session) {
             return()
         }
     })
+    
+    outputOptions(output, "rob_output2_5", suspendWhenHidden=FALSE)
     
     
     # ------------------------------------------------------------------------------------------------------------------- #
@@ -294,6 +309,8 @@ robinsServer <- function(input, output, session) {
         }
     })
     
+    outputOptions(output, "rob_output4_1", suspendWhenHidden=FALSE)
+    
     output$rob_output4_6 <- renderUI({
         input_vec <- c(input$bias_input4_3, input$bias_input4_4, input$bias_input4_5)
         if (isTruthy(c("No", "Probably No") %in% input_vec)){
@@ -304,4 +321,6 @@ robinsServer <- function(input, output, session) {
                        selected = "No Information")
         }
     })
+    
+    outputOptions(output, "rob_output4_6", suspendWhenHidden=FALSE)
 }

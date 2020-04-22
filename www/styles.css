@@ -395,3 +395,22 @@ input.Error {
 .dropdown-menu li a span.text {
   margin-right: 15px;
 }
+
+#Grace .row {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+#Grace .row .col-sm-4 .shiny-input-container {
+  height: 100%;
+}
+
+#Grace .row .col-sm-4 {
+  flex: 1;
+}
+
+#Grace textarea {
+  height: 95% !important;
+  resize: none;
+}

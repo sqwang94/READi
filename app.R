@@ -41,11 +41,13 @@ ui <- function(request){
     introjsUI(),
     useShinyjs(),
     extendShinyjs(text = toTop),
+    extendShinyjs(text = toWindowTop),
     extendShinyjs(script = "account.js"),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "UI.css"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "print.css"),
       tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-app.js"),
       tags$script(src="https://www.gstatic.com/firebasejs/7.9.2/firebase-auth.js"),
@@ -259,9 +261,8 @@ server <- function(input, output, session) {
       }
       onBookmarked(function(url) {
         if (!is.null(session$userData$current_state())) {
-          cmd <- ("ls")
-          # cmd <- paste0("rmdir /Q /S shiny_bookmarks\\", session$userData$current_state())
-          try(shell(cmd))
+          cmd <- paste0("rm -rf ../../../var/lib/shiny-server/bookmarks/shiny/READi-3e07a9e87f32a93b98df28d1699f20ce/", session$userData$current_state())
+          try(system(cmd))
         }
         session$userData$current_state(strsplit(url, "=")[[1]][2])
         js$saveState(url, current_user$uid, session$userData$current_session(), session$userData$phase())
@@ -418,13 +419,13 @@ server <- function(input, output, session) {
   # --------------------------- Phase 4: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(recPage, "rec_page")
+  phase4_inputs <- callModule(recPage, "rec_page", session)
   
   # ---------------------------  ----------------------------------#
   # --------------------------- Phase 5: RWE ----------------------------------#
   # ---------------------------  ----------------------------------#
   
-  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs)
+  callModule(finalSum, "final_sum", phase1_inputs, bias_values, phase3_inputs, phase4_inputs)
   
   
 }

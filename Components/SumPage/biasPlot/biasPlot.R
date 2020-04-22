@@ -1,6 +1,6 @@
 
 
-biasPlotFunction <- function(phase1_inputs, bias_values){
+biasPlotFunction <- function(phase1_inputs, bias_values, final_plot){
   if (is.null(bias_values())){
     return()
   }
@@ -13,10 +13,7 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
     Freq = c(rep(0,4))
   )
   
-  
-  
   bias <- reactiveValuesToList(bias_values())
-  
   
   # -- Answers to the Standard Question at the end of all individual study evals
   x <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$standard_bias})) # unlisting answers from individualStudyEval (found in bias <- reactiveValuesToList(bias_values()))
@@ -40,23 +37,41 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
       group_by(responses) %>% 
       summarise(pct = sum(Freq)/max(total_count))
     
-  
-    
-    
-    bias_plot <- plot_ly(df_full,
-                         x = ~responses,
-                         y = ~pct,
-                         type = "bar",
-                         marker = list(color = c('rgba(51,0,111,0.8)', 'rgba(232,211,162,0.8)',
-                                                 'rgba(216,217,218,1)', "black")),
-                         hovertemplate = paste("Response: %{x} <br> Share of Responses: %{y}")) %>% 
-      layout(title = paste0("Summary of Responses for the Primary Outcome of",  phase1_inputs$t1_poutcome),
-             yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
-             xaxis = list(title = '',
-                          categoryorder = "array",
-                          categoryarray = c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting"))) %>% 
-      config(displayModeBar = FALSE, displaylogo = FALSE)
-    
+    if (final_plot) {
+      t <- list(family = "sans serif",
+                size = 10)
+      w <- 300
+      h <- 280
+      bias_plot <- plot_ly(df_full,
+                           x = ~responses,
+                           y = ~pct,
+                           type = "bar",
+                           marker = list(color = c('rgba(51,0,111,0.8)', 'rgba(232,211,162,0.8)',
+                                                   'rgba(216,217,218,1)', "black")),
+                           hovertemplate = paste("Response: %{x} <br> Share of Responses: %{y}")) %>% 
+        layout(width = w, height = h,
+               title = paste0("Summary of Responses for the Primary Outcome"),
+               font = t,
+               yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
+               xaxis = list(title = '',
+                            categoryorder = "array",
+                            categoryarray = c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting"))) %>% 
+        config(displayModeBar = FALSE, displaylogo = FALSE)
+    } else {
+      bias_plot <- plot_ly(df_full,
+                           x = ~responses,
+                           y = ~pct,
+                           type = "bar",
+                           marker = list(color = c('rgba(51,0,111,0.8)', 'rgba(232,211,162,0.8)',
+                                                   'rgba(216,217,218,1)', "black")),
+                           hovertemplate = paste("Response: %{x} <br> Share of Responses: %{y}")) %>% 
+        layout(title = paste0("Summary of Responses for the Primary Outcome: ",  phase1_inputs$t1_poutcome),
+               yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
+               xaxis = list(title = '',
+                            categoryorder = "array",
+                            categoryarray = c("Low Risk of Bias", "Moderate Risk of Bias", "High Risk of Bias", "Unclear Reporting"))) %>% 
+        config(displayModeBar = FALSE, displaylogo = FALSE)
+    }
     return(bias_plot)
     
   } else {
@@ -80,33 +95,59 @@ biasPlotFunction <- function(phase1_inputs, bias_values){
     df_secondary <- data.frame(table(responses_secondary)) %>% 
       select(responses = responses_secondary, Freq)
     
-    df_second<- rbind(df_secondary, df_dummy) %>% 
+    df_second <- rbind(df_secondary, df_dummy) %>% 
       mutate(total_count = sum(Freq)) %>% 
       group_by(responses) %>% 
       summarise(pct2 = sum(Freq)/max(total_count))
     
     final <- merge(df_first, df_second)
     
-    
-    bias_plot <- plot_ly(final,
-                         x = ~responses,
-                         y = ~pct1,
-                         type = "bar",
-                         marker = list(color = c('rgba(51,0,111,0.8)')),
-                         name = "Primary",
-                         hovertemplate = paste("Outcome: Primary <br> Response: %{x} <br> Share of Responses: %{y}")) %>% 
-      layout(title = paste0("Summary of Responses for the Outcomes of ", phase1_inputs$t1_poutcome," and ", phase1_inputs$t1_soutcome),
-             yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
-             xaxis = list(title = '')) %>% 
-      add_trace(
-        x = ~responses,
-        y = ~pct2,
-        type = "bar",
-        hovertemplate = paste("Outcome: Secondary <br> Response: %{x} <br> Share of Responses: %{y}"),
-        marker = list(color = c('rgba(232,211,162,0.8)')),
-        name = "Secondary"
-      ) %>% 
-      config(displayModeBar = FALSE, displaylogo = FALSE)
+    if (final_plot) {
+      t <- list(family = "sans serif",
+                size = 10)
+      w <- 300
+      h <- 280
+      bias_plot <- plot_ly(final,
+                           x = ~responses,
+                           y = ~pct1,
+                           type = "bar",
+                           marker = list(color = c('rgba(51,0,111,0.8)')),
+                           name = "Primary",
+                           hovertemplate = paste("Outcome: Primary <br> Response: %{x} <br> Share of Responses: %{y}")) %>% 
+        layout(width = w, height = h, font = t,
+               title = paste0("Summary of Responses for the Outcomes"),
+               yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
+               xaxis = list(title = '')) %>% 
+        add_trace(
+          x = ~responses,
+          y = ~pct2,
+          type = "bar",
+          hovertemplate = paste("Outcome: Secondary <br> Response: %{x} <br> Share of Responses: %{y}"),
+          marker = list(color = c('rgba(232,211,162,0.8)')),
+          name = "Secondary"
+        ) %>% 
+        config(displayModeBar = FALSE, displaylogo = FALSE)
+    } else {
+      bias_plot <- plot_ly(final,
+                           x = ~responses,
+                           y = ~pct1,
+                           type = "bar",
+                           marker = list(color = c('rgba(51,0,111,0.8)')),
+                           name = "Primary",
+                           hovertemplate = paste("Outcome: Primary <br> Response: %{x} <br> Share of Responses: %{y}")) %>% 
+        layout(title = paste0("Summary of Responses for the Outcomes of ", phase1_inputs$t1_poutcome," and ", phase1_inputs$t1_soutcome),
+               yaxis = list(title = 'Percent', tickformat = '.0%',range = c(0,1)),
+               xaxis = list(title = '')) %>% 
+        add_trace(
+          x = ~responses,
+          y = ~pct2,
+          type = "bar",
+          hovertemplate = paste("Outcome: Secondary <br> Response: %{x} <br> Share of Responses: %{y}"),
+          marker = list(color = c('rgba(232,211,162,0.8)')),
+          name = "Secondary"
+        ) %>% 
+        config(displayModeBar = FALSE, displaylogo = FALSE)
+    }
     
   }
     

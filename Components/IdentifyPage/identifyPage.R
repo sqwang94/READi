@@ -149,6 +149,8 @@ identifyPage <- function(input, output, session, parentSession) {
         }
     })
     
+    outputOptions(output, "multoutcomes", suspendWhenHidden=FALSE)
+    
     # Creating list to check if all inputs are valid (not NULL)
     t1_inputs <- reactive({ 
         inputs <- list()
@@ -216,8 +218,7 @@ identifyPage <- function(input, output, session, parentSession) {
             shinyjs::show(selector = "#tabs li:nth-child(2) i")
             updateNavbarPage(parentSession, "tabs", "tab2")
             parentSession$userData$phase(2)
-            
-            # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
+            js$toWindowTop()
         } else {
             sendSweetAlert(         # add error message if user needs more information
                 session = session,

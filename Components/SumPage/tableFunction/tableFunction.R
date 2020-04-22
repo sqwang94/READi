@@ -5,7 +5,6 @@ table_function <- function(phase1_inputs, phase3_inputs){
                   "Are the results direct?",
                   "Are the results precise?",
                   "Is there publication bias?")
-
     if (phase1_inputs$t1_outcomes == 1){
       outcomes <- c(phase3_inputs$t3_studylim_1, # note this is now related to "Overall Risk of Bias"
                     phase3_inputs$t3_consistent_1, 
@@ -52,5 +51,4 @@ table_function <- function(phase1_inputs, phase3_inputs){
         )
     }
     return(df)
-
 }

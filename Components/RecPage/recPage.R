@@ -37,8 +37,9 @@ recPageUI <- function(id){
 }
 
 
-recPage <- function(input, output, session){
+recPage <- function(input, output, session, parentSession){
   ns <- session$ns
+  setBookmarkExclude(c("submit_rec"))
   
   output$lit_available <- renderUI({
     if(input$t4_ev_available == "Yes"){
@@ -52,8 +53,10 @@ recPage <- function(input, output, session){
     }
   })
   
+  outputOptions(output, "lit_available", suspendWhenHidden=FALSE)
+  
   output$lit_applicable <- renderUI({
-    if(input$applicable == "Yes"){
+    if(input$t4_ev_available == "Yes" && !is.null(input$applicable) && input$applicable == "Yes"){
       list(radioButtons(ns("sufficient"),
                    "3. Was current evidence sufficient to answer your research question(s)? Please consider your rating from Phase 3 (especially the body of evidence).",
                    choices = c("Yes","No"),
@@ -64,10 +67,10 @@ recPage <- function(input, output, session){
     }
   })
   
+  outputOptions(output, "lit_applicable", suspendWhenHidden=FALSE)
+  
   output$rec <- renderUI({
-    if(is.null(input$sufficient)){
-      return()
-    } else if(input$sufficient == "Yes"){
+    if(input$t4_ev_available == "Yes" && !is.null(input$applicable) && input$applicable == "Yes" && !is.null(input$sufficient) && input$sufficient == "Yes"){
       list(
         column(8, offset = 2,
                wellPanel(strong("Making an Evidence-Based Recommendation"),
@@ -88,11 +91,13 @@ recPage <- function(input, output, session){
     }
   })
   
+  outputOptions(output, "rec", suspendWhenHidden=FALSE)
+  
   output$rec_output <- renderUI({
-    if(input$recommendation == "Other"){
+    if(!is.null(input$recommendation) && input$recommendation == "Other"){
       textInput(ns("other"), 
                 label = "5. What other recommendation are you considering?")
-    } else if (input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)"){
+    } else if (!is.null(input$recommendation) && input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)"){
       pickerInput(
         ns("t1_studytype"), # the "=" will give the appropriate string filter for each study selected
         "5. Select the type of studies that you are interested in:",
@@ -107,5 +112,53 @@ recPage <- function(input, output, session){
     }
   })
   
+  outputOptions(output, "rec_output", suspendWhenHidden=FALSE)
   
+  t4_inputs <- reactive({ 
+    inputs <- list()
+    if (!is.null(input$recommendation) && input$recommendation == "Other") {
+      inputs[[ns("other")]] <- input$other
+    }
+    if (!is.null(input$recommendation) && input$recommendation == "Performance-based risk-sharing arrangements (PBRSA)") {
+      studyType <- ""
+      if (!is.null(input$t1_studytype)) {
+        studyType <- input$t1_studytype
+      }
+      inputs[[ns("t1_studytype")]] <- studyType
+    }
+    return(inputs)
+  })
+  
+  observeEvent(input$submit_rec, {
+    inputs <- t4_inputs()
+    toggleErrorInputHandler(inputs)
+    if (input_validation(inputs)) {
+      sendSweetAlert(        # if all inputs are valid, submission successful
+        session = session,
+        title = "Submitted!", 
+        text = "Congratulations, you have completed the  READi (Real-World Evidence Assessments and Needs Guidance) Tool!",
+        html = TRUE,
+        type = "success",
+        btn_labels = c("Great")
+      ) 
+      showTab(session = parentSession, inputId = "tabs", target = "tab5")
+      shinyjs::show(selector = "#tabs li:nth-child(5) i")
+      updateNavbarPage(parentSession, "tabs", "tab5")
+      parentSession$userData$phase(5)
+      js$toWindowTop()
+      
+      # ----- Need to add code here to also add all inputs to a data frame/however they should be stored
+    } else {
+      sendSweetAlert(         # add error message if user needs more information
+        session = session,
+        title = "Oops!",
+        text = "It looks like you may not have answered all the questions!",
+        type = "error",
+        btn_labels = c("Go back")
+      )
+      shinyjs::hide(selector = "#tabs li:nth-child(5) i")
+    }
+  })
+  
+  return(input)
 }
