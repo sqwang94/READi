@@ -13,10 +13,7 @@ biasPlotFunction <- function(phase1_inputs, bias_values, final_plot){
     Freq = c(rep(0,4))
   )
   
-  
-  
   bias <- reactiveValuesToList(bias_values())
-  
   
   # -- Answers to the Standard Question at the end of all individual study evals
   x <- unlist(lapply(seq_len(length(bias)), function(i){bias[[as.character(i)]]$standard_bias})) # unlisting answers from individualStudyEval (found in bias <- reactiveValuesToList(bias_values()))
@@ -98,7 +95,7 @@ biasPlotFunction <- function(phase1_inputs, bias_values, final_plot){
     df_secondary <- data.frame(table(responses_secondary)) %>% 
       select(responses = responses_secondary, Freq)
     
-    df_second<- rbind(df_secondary, df_dummy) %>% 
+    df_second <- rbind(df_secondary, df_dummy) %>% 
       mutate(total_count = sum(Freq)) %>% 
       group_by(responses) %>% 
       summarise(pct2 = sum(Freq)/max(total_count))

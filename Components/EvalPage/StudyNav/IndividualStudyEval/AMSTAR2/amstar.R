@@ -328,8 +328,6 @@ amstar2 <- function(input, output, session){
   partialVec <- c("Yes", "Partial Yes", "No")
   noMAvec    <- c("Yes", "No", "No meta-analyis conducted")
   
-  
-  
   output$rctnrsi_1 <- renderUI({
     
     if(is.null(input$RCTvNRSI_1)){
@@ -375,7 +373,7 @@ amstar2 <- function(input, output, session){
                                     animation = "pulse",
                                     status = "info",
                                     icon = icon("check")))))
-    } else if(input$RCTvNRSI_1 == "NRSI") {
+    } else if (input$RCTvNRSI_1 == "NRSI") {
       list(
         fluidRow(
         column(4, "NRSI",
@@ -419,6 +417,7 @@ amstar2 <- function(input, output, session){
     }
   })
   
+  outputOptions(output, "rctnrsi_1", suspendWhenHidden=FALSE)
   
   output$rctnrsi_2 <- renderUI({
     if(is.null(input$RCTvNRSI_2)){
@@ -495,6 +494,8 @@ amstar2 <- function(input, output, session){
     }
     
   })
+  
+  outputOptions(output, "rctnrsi_2", suspendWhenHidden=FALSE)
   
   
   

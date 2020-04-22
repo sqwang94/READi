@@ -124,7 +124,7 @@ individualStudyEval <- function(input, output, session, phase1_inputs) {
     }
   })
   
-  # outputOptions(output, "radio_random", suspendWhenHidden=FALSE)
+  outputOptions(output, "radio_random", suspendWhenHidden=FALSE)
   
   callModule(amstar2, "amstar")
   callModule(robinsServer, "robins")
