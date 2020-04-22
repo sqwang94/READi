@@ -252,6 +252,7 @@ input.Error {
   margin-top: 0;
   background-color: inherit;
   text-decoration: underline;
+  box-shadow: none;
 }
 
 #account_dropdown {
@@ -296,6 +297,11 @@ input.Error {
 .evalActions {
   display: flex;
   justify-content: space-between;
+}
+
+.evalActions button:hover, .evalActions button:focus:active {
+  text-decoration: underline;
+  box-shadow: none;
 }
 
 .evalEntry hr {
