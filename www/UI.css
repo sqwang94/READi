@@ -130,10 +130,11 @@
   border: none;
 }
 
-.SideDrawerItem:hover, .SideDrawerItem:focus {
+.SideDrawerItem:hover, .SideDrawerItem:focus, .SideDrawerItem:focus:active {
   margin-top: 0;
   background-color: white;
   color: #7386D5;
+  box-shadow: none;
 }
 
 .Open {
