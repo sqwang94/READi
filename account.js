@@ -1,6 +1,6 @@
 var entryPerPage = 3
-var databaseURL = 'https://readi-dcf98.firebaseio.com/'
-var homeURL = 'http://54.213.15.223:3838/READi/'
+var databaseURL = 'https://uw-readi.firebaseio.com/'
+var homeURL = 'http://34.210.151.228:3838/READi/'
 var phases = ["Phase 1: Identify Real World Evidence",
               "Phase 2: Reviewing and Grading of Evidence",
               "Phase 3: Summarizing The Literature",
@@ -15,11 +15,15 @@ var phases = ["Phase 1: Identify Real World Evidence",
  */
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
-  $.get(databaseURL + uid + '.json').done(function(data) {
-    update(uid, data, 0)
-    shinyjs.hideSpinner()
-  }).fail(function(error) {
-    shinyjs.hideSpinner()
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
+      update(uid, data, 0)
+      shinyjs.hideSpinner()
+    }).fail(function(error) {
+      shinyjs.hideSpinner()
+      console.log(error)
+    })
+  }).catch(error => {
     console.log(error)
   })
 }
@@ -35,23 +39,27 @@ shinyjs.clearAccount = function() {
  * @param {Array} state - data of the state, including user id and session id
  */
 shinyjs.checkSession = function(state) {
-  $.get(databaseURL + state[0] + "/" + state[1] + '.json').done(function(data) {
-    if (!data) {
-      $.alert({
-        title: 'Session expired',
-        content: 'You will be redirected to homepage',
-        autoClose: 'OK|5000',
-        draggable: false,
-        buttons: {
-          OK: {
-            action: function () {
-              window.location.replace(homeURL)
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.get(databaseURL + state[0] + "/" + state[1] + '.json?auth=' + idToken).done(function(data) {
+      if (!data) {
+        $.alert({
+          title: 'Session expired',
+          content: 'You will be redirected to homepage',
+          autoClose: 'OK|5000',
+          draggable: false,
+          buttons: {
+            OK: {
+              action: function () {
+                window.location.replace(homeURL)
+              }
             }
           }
-        }
-      });
-    }
-  }).fail(function(error) {
+        });
+      }
+    }).fail(function(error) {
+      console.log(error)
+    })
+  }).catch(error => {
     console.log(error)
   })
 }
@@ -71,13 +79,17 @@ shinyjs.saveState = function(stateData) {
       time: time,
       phase: stateData[3]
     }
-    $.ajax({
-      url: databaseURL + stateData[1] + '/' + session + '.json',
-      type: 'PATCH',
-      data: JSON.stringify(data)
-    }).done(function(data){
-      shinyjs.hideSpinner()
-    }).fail(function(error) {
+    auth.currentUser.getIdToken(true).then(function(idToken) {
+      $.ajax({
+        url: databaseURL + stateData[1] + '/' + session + '.json?auth=' + idToken,
+        type: 'PATCH',
+        data: JSON.stringify(data)
+      }).done(function(data){
+        shinyjs.hideSpinner()
+      }).fail(function(error) {
+        console.log(error)
+      })
+    }).catch(error => {
       console.log(error)
     })
   } else {
@@ -110,10 +122,14 @@ shinyjs.saveState = function(stateData) {
                     phase: stateData[3]
                   }
                   // Add the new saved state
-                  $.post(databaseURL + stateData[1] + '.json', JSON.stringify(data)).done(function(data) {
-                    Shiny.setInputValue('current_session', data.name);
-                    shinyjs.hideSpinner()
-                  }).fail(function(error) {
+                  auth.currentUser.getIdToken(true).then(function(idToken) {
+                    $.post(databaseURL + stateData[1] + '.json?auth=' + idToken, JSON.stringify(data)).done(function(data) {
+                      Shiny.setInputValue('current_session', data.name);
+                      shinyjs.hideSpinner()
+                    }).fail(function(error) {
+                      console.log(error)
+                    })
+                  }).catch(error => {
                     console.log(error)
                   })
               }
@@ -342,13 +358,15 @@ shinyjs.newSession = function() {
  * @param {String} id - id of the entry
  */
 function deleteEntry(uid, id) {
-  $.ajax({
-    url: databaseURL + uid + '/' + id + '.json',
-    type: 'DELETE'
-  }).done(function(data) {
-    shinyjs.updateAccount(uid)
-  }).fail(function(error) {
-    shinyjs.hideSpinner()
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.ajax({
+      url: databaseURL + uid + '/' + id + '.json?auth=' + idToken,
+      type: 'DELETE'
+    }).done(function(data) {
+      shinyjs.updateAccount(uid)
+    }).fail(function(error) {
+      shinyjs.hideSpinner()
+    })
   })
 }
 
@@ -363,13 +381,17 @@ function editName(uid, id, name) {
   var data = {
     name: name
   }
-  $.ajax({
-    url: databaseURL + uid + '/' + id + '.json',
-    type: 'PATCH',
-    data: JSON.stringify(data)
-  }).done(function(data){
-    shinyjs.updateAccount(uid)
-  }).fail(function(error) {
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.ajax({
+      url: databaseURL + uid + '/' + id + '.json?auth=' + idToken,
+      type: 'PATCH',
+      data: JSON.stringify(data)
+    }).done(function(data){
+      shinyjs.updateAccount(uid)
+    }).fail(function(error) {
+      console.log(error)
+    })
+  }).catch(error => {
     console.log(error)
   })
 }

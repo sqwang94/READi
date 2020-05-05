@@ -261,7 +261,7 @@ server <- function(input, output, session) {
       }
       onBookmarked(function(url) {
         if (!is.null(session$userData$current_state())) {
-          cmd <- paste0("rm -rf ../../../var/lib/shiny-server/bookmarks/shiny/READi-3e07a9e87f32a93b98df28d1699f20ce/", session$userData$current_state())
+          cmd <- paste0("rm -rf ../../../var/lib/shiny-server/bookmarks/ubuntu/READi-3e07a9e87f32a93b98df28d1699f20ce/", session$userData$current_state())
           try(system(cmd))
         }
         session$userData$current_state(strsplit(url, "=")[[1]][2])

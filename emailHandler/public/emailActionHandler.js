@@ -1,4 +1,4 @@
-const homeURL = "http://54.213.15.223:3838/READi/"
+const homeURL = "http://34.210.151.228:3838/READi/"
 
 document.addEventListener('DOMContentLoaded', function() {
   let mode = getParameterByName('mode');
@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var lang = getParameterByName('lang') || 'en';
 
   const config = {
-    apiKey: "AIzaSyAhPODofJbMMXB3EmBg53l9T9klQPjpje4",
-    authDomain: "readi-dcf98.firebaseapp.com",
-    projectId: "readi-dcf98"
+    apiKey: "AIzaSyCBRA2NrDytgEH3rT2_4xudCRu_fTabGC4",
+    authDomain: "uw-readi.firebaseapp.com",
+    projectId: "uw-readi"
   };
 
   const app = firebase.initializeApp(config);
