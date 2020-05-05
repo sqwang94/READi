@@ -9,25 +9,25 @@ var phases = ["Phase 1: Identify Real World Evidence",
 
 
 
-// /**
-//  * Retrieve eval history data from firebase and update the eval history page
-//  * @param {Array/String} uid - data of the user and entry indexes
-//  */
-// shinyjs.updateAccount = function(uid) {
-//   shinyjs.showSpinner()
-//   auth.currentUser.getIdToken(true).then(function(idToken) {
-//     $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
-//       update(uid, data, 0)
-//       shinyjs.hideSpinner()
-//     }).fail(function(error) {
-//       shinyjs.hideSpinner()
-//       console.log(error)
-//     })
-//   }).catch(error => {
-//     console.log(error)
-//   })
-// }
-//
+/**
+ * Retrieve eval history data from firebase and update the eval history page
+ * @param {Array/String} uid - data of the user and entry indexes
+ */
+shinyjs.updateAccount = function(uid) {
+  shinyjs.showSpinner()
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
+      update(uid, data, 0)
+      shinyjs.hideSpinner()
+    }).fail(function(error) {
+      shinyjs.hideSpinner()
+      console.log(error)
+    })
+  }).catch(error => {
+    console.log(error)
+  })
+}
+
 // /** Clear the evalutaion history page. */
 // shinyjs.clearAccount = function() {
 //   $("#history").empty()
