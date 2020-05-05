@@ -42,7 +42,6 @@ ui <- function(request){
     useShinyjs(),
     extendShinyjs(text = toTop),
     extendShinyjs(text = toWindowTop),
-    extendShinyjs(script = "account.js"),
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "auth.css"),
