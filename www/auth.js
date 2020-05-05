@@ -52,8 +52,7 @@ $(document).on("click", "#submit_sign_in", () => {
  * a Shiny input `input$auth_user`
  */
 auth.onAuthStateChanged((user) => {
-  console.log(user)
-  if (!user || user.emailVerified) {
+  if (user && user.emailVerified) {
     shinyjs.showSpinner()
     Shiny.setInputValue('auth_user', user);
   }
