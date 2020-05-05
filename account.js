@@ -15,16 +15,16 @@ var phases = ["Phase 1: Identify Real World Evidence",
  */
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
-  $.get(databaseURL + uid + '.json').done(function(data) {
-    update(uid, data, 0)
-    shinyjs.hideSpinner()
-  }).fail(function(error) {
-    shinyjs.hideSpinner()
-    console.log(error)
-  })
-}).catch(error => {
-  console.log(error)
-})
+  //   $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
+  //     update(uid, data, 0)
+  //     shinyjs.hideSpinner()
+  //   }).fail(function(error) {
+  //     shinyjs.hideSpinner()
+  //     console.log(error)
+  //   })
+  // }).catch(error => {
+  //   console.log(error)
+  // })
 }
 
 // /** Clear the evalutaion history page. */
