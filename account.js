@@ -15,24 +15,23 @@ var phases = ["Phase 1: Identify Real World Evidence",
  */
 shinyjs.updateAccount = function(uid) {
   shinyjs.showSpinner()
-  //   $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
-  //     update(uid, data, 0)
-  //     shinyjs.hideSpinner()
-  //   }).fail(function(error) {
-  //     shinyjs.hideSpinner()
-  //     console.log(error)
-  //   })
-  // }).catch(error => {
-  //   console.log(error)
-  // })
+  auth.currentUser.getIdToken(true).then(function(idToken) {
+    $.get(databaseURL + uid + '.json?auth=' + idToken).done(function(data) {
+      update(uid, data, 0)
+      shinyjs.hideSpinner()
+    }).fail(function(error) {
+      shinyjs.hideSpinner()
+      console.log(error)
+    })
+  })
 }
 
-// /** Clear the evalutaion history page. */
-// shinyjs.clearAccount = function() {
-//   $("#history").empty()
-//   $("#history-nav").empty()
-// }
-//
+/** Clear the evalutaion history page. */
+shinyjs.clearAccount = function() {
+  $("#history").empty()
+  $("#history-nav").empty()
+}
+
 // /**
 //  * Check if the current session is expired. Redirect to homepage if true.
 //  * @param {Array} state - data of the state, including user id and session id
