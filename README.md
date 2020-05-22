@@ -1,4 +1,4 @@
 # READi
 READi Tool for RWE review
 
-https://brennanbeal.shinyapps.io/READi/
+http://54.213.15.223:3838/READi/
