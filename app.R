@@ -22,6 +22,7 @@ library(V8)
 
 source("Components/EvalPage/evalPage.R")
 source("Components/HomePage/homePage.R")
+source("Components/HomePage/welcomeText.R")
 source("Components/IdentifyPage/identifyPage.R")
 source("Auxiliary/auxiliary.R")
 source("Components/Authentication/authentication.R")
@@ -36,7 +37,7 @@ source("Components/UI/SideDrawer/sideDrawer.R")
 # Define UI for application that draws a histogram
 ui <- function(request){
   fluidPage(
-    title = "READi",
+    title = "REAdi",
     theme = shinytheme("cerulean"),
     introjsUI(),
     useShinyjs(),
@@ -58,7 +59,7 @@ ui <- function(request){
     authenticationUI("authentication"),
     loader,
     sideDrawerUI,
-    navbarPageWithBtn(div(tags$div(id = "mobile-toggle", icon("user-circle")), span(id = "nav_title", "READi Tool")),
+    navbarPageWithBtn(div(tags$div(id = "mobile-toggle", icon("user-circle")), span(id = "nav_title", "REAdi Tool")),
                       id = "tabs",
                       collapsible = TRUE,
                       header = bookmarkButton(label = "Save Progress", id = "bookmark"),
@@ -109,9 +110,6 @@ server <- function(input, output, session) {
     removeModal()
     int_text <- c(
       
-      # -- Welcome
-      "Welcome to the READi tool - for a quick tour, click next, otherwise click 'skip' to begin! (needs to be html with actual button to continue to tour - this is placeholder)",
-      
       # -- Login
       "The first thing you should do is login. Here, you can either register as a new user or continue your progress on any of your projects with your login.
         If you don't want to register, you can continue as a guest but you won't have access to your other projects!",
@@ -121,11 +119,11 @@ server <- function(input, output, session) {
         Click this button for a link to copy and save progress.",
       
       #  -- If you want to know more
-      "This process is completed in phases (which I will show you in a few seconds). If you want to learn more about the
+      "This process is completed in phases. If you want to learn more about the
         phases themselves before beginning, check them out here.",
       
       # -- Navigate
-      "You can navigate between those phases here.",
+      "You can navigate between those phases here. Once you begin, phases will be revealed upon successful completion of the previous phase.",
       
       # -- To begin
       "Finally, click here when you are ready to begin!"
@@ -133,9 +131,9 @@ server <- function(input, output, session) {
     )
     
     intro <- data.frame(
-      element = c("null", "#loginToggle", "#loginToggle", "#learn", "#tabs", "#beginPhase"),
+      element = c("#loginToggle", "#loginToggle", "#learn", "#tabs", "#beginPhase"),
       intro = int_text,
-      position =  c("bottom", "bottom", "bottom", "bottom", "bottom", "bottom"))
+      position =  c("bottom", "bottom", "bottom", "bottom", "bottom"))
     
     introjs(session, options = list(steps = intro,
                                     disableInteraction = TRUE,
@@ -153,8 +151,7 @@ server <- function(input, output, session) {
     if (length(getQueryString(session)) == 0) {
       showModal(modalDialog(
         # --- Need html file here but for now:
-        title = "Important Message",
-        "Some welcome message:",
+        introText,
         easyClose = TRUE,
         footer = tagList(
           # --- Creating intro option on main intro
